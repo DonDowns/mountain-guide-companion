@@ -8,7 +8,7 @@ function deepFreeze(value) {
 }
 export const companionData = deepFreeze({
   "identity": {
-    "companionVersion": "0.6.0-candidate.3",
+    "companionVersion": "0.6.0-candidate.4",
     "releaseStatus": "candidate",
     "dataVersion": "1.0.0",
     "sourceRelease": "v15.3.10",
@@ -17,7 +17,7 @@ export const companionData = deepFreeze({
     "verifiedAt": "2026-08-07T07:45:17Z",
     "manifestSha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
     "manifestShort": "3cda95d4e6b1",
-    "bundleId": "ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1",
+    "bundleId": "ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1",
     "offlineBundleVersion": 1,
     "publicBaseUrl": "https://companion.vondadowns.com/"
   },
@@ -336,7 +336,7 @@ export const companionData = deepFreeze({
   "artifacts": {
     "fieldGuide": {
       "url": "./generated/field-guide.pdf",
-      "sha256": "c5cfaca1996f7dc12bedb2ec325f0ab6f5049cc8db914992df865f1ab5af64c1"
+      "sha256": "3ac4b8b512637d99d44263ae5ab97d75650a06bf75b0b65797cd585329517523"
     },
     "pocketCard": {
       "url": "./generated/pocket-card.pdf",
@@ -345,7 +345,7 @@ export const companionData = deepFreeze({
   }
 });
 export const releaseMetadata = deepFreeze({
-  "companion_version": "0.6.0-candidate.3",
+  "companion_version": "0.6.0-candidate.4",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
@@ -353,7 +353,7 @@ export const releaseMetadata = deepFreeze({
   "generated_at": "2026-08-07T19:26:53Z",
   "verified_at": "2026-08-07T07:45:17Z",
   "release_status": "candidate",
-  "bundle_id": "ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",

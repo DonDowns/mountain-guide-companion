@@ -78,15 +78,9 @@ async function readMarker(cache) {
   }
 }
 
-async function verifyCache(cacheName, { hashAssets = true } = {}) {
+async function verifyCacheContents(cacheName, bundle, { hashAssets = true } = {}) {
   const cache = await caches.open(cacheName);
-  const marker = await readMarker(cache);
-  if (!marker || marker.complete !== true || marker.bundle_id !== OFFLINE_RELEASE.bundleId ||
-      marker.bundle_manifest_sha256 !== OFFLINE_RELEASE.bundleManifestSha256 ||
-      marker.bundle_content_sha256 !== OFFLINE_RELEASE.bundleContentSha256) {
-    throw new Error('Complete release marker is missing or has the wrong identity');
-  }
-  verifyBundleShape(marker.offline_bundle);
+  verifyBundleShape(bundle);
   const keys = await cache.keys();
   const expectedUrls = new Set(OFFLINE_RELEASE.resources.map(entry => resourceUrl(entry.path)));
   const assetKeys = keys.map(request => request.url).filter(url => url !== COMPLETE_MARKER_URL);
@@ -144,8 +138,20 @@ async function verifyCache(cacheName, { hashAssets = true } = {}) {
       sourceCommit: OFFLINE_RELEASE.sourceCommit,
       manifestSha256: OFFLINE_RELEASE.tripManifestSha256
     },
-    installedAt: marker.installed_at
+    installedAt: ''
   };
+}
+
+async function verifyCache(cacheName, options = {}) {
+  const cache = await caches.open(cacheName);
+  const marker = await readMarker(cache);
+  if (!marker || marker.complete !== true || marker.bundle_id !== OFFLINE_RELEASE.bundleId ||
+      marker.bundle_manifest_sha256 !== OFFLINE_RELEASE.bundleManifestSha256 ||
+      marker.bundle_content_sha256 !== OFFLINE_RELEASE.bundleContentSha256) {
+    throw new Error('Complete release marker is missing or has the wrong identity');
+  }
+  const result = await verifyCacheContents(cacheName, marker.offline_bundle, options);
+  return { ...result, installedAt: marker.installed_at };
 }
 
 async function completedCaches() {
@@ -173,7 +179,8 @@ async function buildCandidate(reason) {
     for (const entry of OFFLINE_RELEASE.resources) {
       await cache.put(resourceUrl(entry.path), await fetchVerifiedResource(entry));
     }
-    const temporaryMarker = {
+    await verifyCacheContents(cacheName, bundle);
+    const completeMarker = {
       complete: true,
       bundle_id: OFFLINE_RELEASE.bundleId,
       bundle_manifest_sha256: OFFLINE_RELEASE.bundleManifestSha256,
@@ -182,10 +189,9 @@ async function buildCandidate(reason) {
       reason,
       offline_bundle: bundle
     };
-    await cache.put(COMPLETE_MARKER_URL, new Response(JSON.stringify(temporaryMarker), {
+    await cache.put(COMPLETE_MARKER_URL, new Response(JSON.stringify(completeMarker), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     }));
-    await verifyCache(cacheName);
     return cacheName;
   } catch (error) {
     await caches.delete(cacheName);
@@ -198,9 +204,22 @@ async function cleanupCaches() {
   const companionNames = allNames.filter(name => name.startsWith(CACHE_PREFIX));
   const complete = await completedCaches();
   const current = complete.find(record => record.marker.bundle_id === OFFLINE_RELEASE.bundleId);
-  const previous = complete.find(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId);
-  const keep = new Set([current?.name, previous?.name].filter(Boolean).slice(0, OFFLINE_RELEASE.retentionCount));
+  const previous = complete
+    .filter(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId)
+    .slice(0, Math.max(0, OFFLINE_RELEASE.retentionCount - (current ? 1 : 0)));
+  const keep = new Set([current?.name, ...previous.map(record => record.name)].filter(Boolean));
   await Promise.all(companionNames.filter(name => !keep.has(name)).map(name => caches.delete(name)));
+}
+
+async function cleanupFailedActivation() {
+  const companionNames = (await caches.keys()).filter(name => name.startsWith(CACHE_PREFIX));
+  for (const name of companionNames) {
+    const marker = await readMarker(await caches.open(name));
+    if (marker?.bundle_id === OFFLINE_RELEASE.bundleId || marker?.complete !== true) {
+      await caches.delete(name);
+    }
+  }
+  await cleanupCaches();
 }
 
 async function verifyActiveCache() {
@@ -234,9 +253,20 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    await verifyActiveCache();
+    const replacingPreviousRelease = (await completedCaches())
+      .some(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId);
+    try {
+      await verifyActiveCache();
+    } catch (error) {
+      await cleanupFailedActivation();
+      throw error;
+    }
     await cleanupCaches();
     await self.clients.claim();
+    if (replacingPreviousRelease) {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      await Promise.all(windows.map(client => client.navigate(client.url)));
+    }
   })());
 });
 
@@ -245,7 +275,8 @@ self.addEventListener('fetch', event => {
   const scopeUrl = new URL(self.registration.scope);
   if (requestUrl.origin !== scopeUrl.origin || !requestUrl.pathname.startsWith(scopeUrl.pathname)) return;
   const relativePath = decodeURIComponent(requestUrl.pathname.slice(scopeUrl.pathname.length)) || 'index.html';
-  const requestedPath = event.request.mode === 'navigate' ? 'index.html' : relativePath;
+  const isExplicitResource = OFFLINE_RELEASE.resources.some(entry => entry.path === relativePath);
+  const requestedPath = event.request.mode === 'navigate' && !isExplicitResource ? 'index.html' : relativePath;
   if (!OFFLINE_RELEASE.resources.some(entry => entry.path === requestedPath)) return;
 
   event.respondWith((async () => {

@@ -172,6 +172,8 @@ SHA-256 covers the exact `data/trip-manifest.json` bytes, including whitespace a
 
 `3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758`
 
+The manifest validator locks the latitude, longitude, and elevation triples shared by the Lake Como, Blanca, Ellingwood, and Mount Lindsey waypoint and weather-reference records. Each pair must remain exactly equal. Their verification statuses intentionally differ because waypoint records represent the pinned route dataset while weather-reference records carry separate external evidence for their weather-reference purpose. Numeric equality does not collapse those distinct record purposes or evidence states.
+
 Final checks:
 
 - `npm run check:data`: pass, including validation, provenance, privacy, safety, and repeated hash.

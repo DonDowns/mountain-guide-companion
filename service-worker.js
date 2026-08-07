@@ -1,5 +1,5 @@
 /* Generated constants are inserted by scripts/build-offline.mjs. */
-const OFFLINE_RELEASE = JSON.parse("{\"cacheNamespace\":\"ddmg-companion\",\"bundleId\":\"ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1\",\"companionVersion\":\"0.6.0-candidate.3\",\"dataVersion\":\"1.0.0\",\"sourceRelease\":\"v15.3.10\",\"sourceCommit\":\"fb711292b2642c2296eb76c0cfe2531606029609\",\"tripManifestSha256\":\"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758\",\"bundleContentSha256\":\"f4cd27a5576151a1cabbcb3d59e5758dfe82f86a2100ff562cc14d932fb8a1bb\",\"bundleManifestSha256\":\"38dc02cd7fa7588d2d0a6beac20fa81fd5a047bd43df1884ed4692dff275fe80\",\"bundleManifestPath\":\"offline-bundle.json\",\"generatedAt\":\"2026-08-07T19:26:53Z\",\"retentionCount\":2,\"resources\":[{\"path\":\"index.html\",\"sha256\":\"843ffb67d1affc5c2f22740a82c6eb45b0ffa5b02fa2121073cfa195674eac59\",\"bytes\":6257,\"role\":\"application-shell\",\"required\":true},{\"path\":\"css/companion.css\",\"sha256\":\"9116b3371821e89089d9a796dd0617f7b50df481daa44bf25559a2e08f6421f2\",\"bytes\":19723,\"role\":\"application-style\",\"required\":true},{\"path\":\"js/red-bootstrap.js\",\"sha256\":\"47ac65138b68c6a6e7f701f6358b7d1fd0ffcae735a3cbfc3bf269354f3fd1d5\",\"bytes\":653,\"role\":\"display-bootstrap\",\"required\":true},{\"path\":\"js/companion-data.js\",\"sha256\":\"9698fe0184e1b642773a31736f1be9e5bc8fcf5dc50b93209d412847d4c0c845\",\"bytes\":14652,\"role\":\"canonical-runtime-data\",\"required\":true},{\"path\":\"js/companion-state.js\",\"sha256\":\"8e122a44ce7eeeb8266d7cd94cb6f57bd36fcfad2e002ad8b47c0857ce603195\",\"bytes\":5547,\"role\":\"device-local-state\",\"required\":true},{\"path\":\"js/companion-install.js\",\"sha256\":\"c7901d7f3af1fdce1fe6e104c56ccd1a39823ff377b5ff6258eb21b6c580aa9f\",\"bytes\":5682,\"role\":\"install-and-offline-control\",\"required\":true},{\"path\":\"js/companion-ui.js\",\"sha256\":\"4b7307b9af0e1432b44a12ef937ad95a7444cfb0d1e3af321035f7fe8c375c26\",\"bytes\":21168,\"role\":\"application-ui\",\"required\":true},{\"path\":\"js/companion.js\",\"sha256\":\"c4162bd3bf400dd3f0ad5417ca9b95558160acf8e6af596706c587d5e0cc4d5b\",\"bytes\":9092,\"role\":\"application-controller\",\"required\":true},{\"path\":\"manifest.webmanifest\",\"sha256\":\"09478c96d3a113d18ca7a597d211735793a67e40ab7936761e487768d102897f\",\"bytes\":672,\"role\":\"web-app-manifest\",\"required\":true},{\"path\":\"icons/companion-icon.svg\",\"sha256\":\"bb419adde3ab2112434ddae94a11ee5bcb40cba7399771dd51a315fef4547871\",\"bytes\":494,\"role\":\"application-icon\",\"required\":true},{\"path\":\"icons/companion-maskable.svg\",\"sha256\":\"67ccb079c74c2a4f9fceb278e13d4720fc7e043a861a39989e3531623a21525f\",\"bytes\":475,\"role\":\"maskable-application-icon\",\"required\":true},{\"path\":\"data/trip-manifest.json\",\"sha256\":\"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758\",\"bytes\":58645,\"role\":\"canonical-manifest\",\"required\":true},{\"path\":\"generated/field-guide.pdf\",\"sha256\":\"c5cfaca1996f7dc12bedb2ec325f0ab6f5049cc8db914992df865f1ab5af64c1\",\"bytes\":12518,\"role\":\"field-guide-pdf\",\"required\":true},{\"path\":\"generated/pocket-card.pdf\",\"sha256\":\"99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958\",\"bytes\":5844,\"role\":\"pocket-card-pdf\",\"required\":true},{\"path\":\"release.json\",\"sha256\":\"b692a42ee45df9933c36d8cce3f513bb8cac9b86b311b4409b63db85a5a50ef2\",\"bytes\":912,\"role\":\"release-metadata\",\"required\":true}]}");
+const OFFLINE_RELEASE = JSON.parse("{\"cacheNamespace\":\"ddmg-companion\",\"bundleId\":\"ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1\",\"companionVersion\":\"0.6.0-candidate.4\",\"dataVersion\":\"1.0.0\",\"sourceRelease\":\"v15.3.10\",\"sourceCommit\":\"fb711292b2642c2296eb76c0cfe2531606029609\",\"tripManifestSha256\":\"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758\",\"bundleContentSha256\":\"66f89d2f605f5a64ac8c925b82f3696c1ee9c502a19fbdeb07c2160f75fefbab\",\"bundleManifestSha256\":\"3293dbb943a87b416be65c4e68d2318486360112c474b3fbd82a9411bacb9416\",\"bundleManifestPath\":\"offline-bundle.json\",\"generatedAt\":\"2026-08-07T19:26:53Z\",\"retentionCount\":2,\"resources\":[{\"path\":\"index.html\",\"sha256\":\"843ffb67d1affc5c2f22740a82c6eb45b0ffa5b02fa2121073cfa195674eac59\",\"bytes\":6257,\"role\":\"application-shell\",\"required\":true},{\"path\":\"css/companion.css\",\"sha256\":\"88430adda109da545804f23a33b5ae3da481e2c07b0b04032f00f6eb7f1e0eee\",\"bytes\":19923,\"role\":\"application-style\",\"required\":true},{\"path\":\"js/red-bootstrap.js\",\"sha256\":\"47ac65138b68c6a6e7f701f6358b7d1fd0ffcae735a3cbfc3bf269354f3fd1d5\",\"bytes\":653,\"role\":\"display-bootstrap\",\"required\":true},{\"path\":\"js/companion-data.js\",\"sha256\":\"07be0d1eb2adf52b7c9ed6a76a706c675bf820a318f1ed0567b61a835d2e003d\",\"bytes\":14652,\"role\":\"canonical-runtime-data\",\"required\":true},{\"path\":\"js/companion-state.js\",\"sha256\":\"8e122a44ce7eeeb8266d7cd94cb6f57bd36fcfad2e002ad8b47c0857ce603195\",\"bytes\":5547,\"role\":\"device-local-state\",\"required\":true},{\"path\":\"js/companion-install.js\",\"sha256\":\"67b614b410a027a19a96b0ee00f04f51c4120f1de169337c84a75f7c788faf17\",\"bytes\":6457,\"role\":\"install-and-offline-control\",\"required\":true},{\"path\":\"js/companion-ui.js\",\"sha256\":\"de69acac96e4a808c789cc45c325a8d42ca83a20a0a54a78118347768124ab03\",\"bytes\":21191,\"role\":\"application-ui\",\"required\":true},{\"path\":\"js/companion.js\",\"sha256\":\"855f58d8bee33add181673a236f29e3113d0391f2772f9d504be9fe1f2b3c2ec\",\"bytes\":9069,\"role\":\"application-controller\",\"required\":true},{\"path\":\"manifest.webmanifest\",\"sha256\":\"09478c96d3a113d18ca7a597d211735793a67e40ab7936761e487768d102897f\",\"bytes\":672,\"role\":\"web-app-manifest\",\"required\":true},{\"path\":\"icons/companion-icon.svg\",\"sha256\":\"bb419adde3ab2112434ddae94a11ee5bcb40cba7399771dd51a315fef4547871\",\"bytes\":494,\"role\":\"application-icon\",\"required\":true},{\"path\":\"icons/companion-maskable.svg\",\"sha256\":\"67ccb079c74c2a4f9fceb278e13d4720fc7e043a861a39989e3531623a21525f\",\"bytes\":475,\"role\":\"maskable-application-icon\",\"required\":true},{\"path\":\"data/trip-manifest.json\",\"sha256\":\"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758\",\"bytes\":58645,\"role\":\"canonical-manifest\",\"required\":true},{\"path\":\"generated/field-guide.pdf\",\"sha256\":\"3ac4b8b512637d99d44263ae5ab97d75650a06bf75b0b65797cd585329517523\",\"bytes\":12662,\"role\":\"field-guide-pdf\",\"required\":true},{\"path\":\"generated/pocket-card.pdf\",\"sha256\":\"99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958\",\"bytes\":5844,\"role\":\"pocket-card-pdf\",\"required\":true},{\"path\":\"release.json\",\"sha256\":\"bf791e376028f221e5ed260aad609f45a654044fb56fbd735432abf52e95a436\",\"bytes\":912,\"role\":\"release-metadata\",\"required\":true}]}");
 
 const CACHE_PREFIX = `${OFFLINE_RELEASE.cacheNamespace}-release-`;
 const COMPLETE_MARKER_PATH = '__ddmg_complete__.json';
@@ -78,15 +78,9 @@ async function readMarker(cache) {
   }
 }
 
-async function verifyCache(cacheName, { hashAssets = true } = {}) {
+async function verifyCacheContents(cacheName, bundle, { hashAssets = true } = {}) {
   const cache = await caches.open(cacheName);
-  const marker = await readMarker(cache);
-  if (!marker || marker.complete !== true || marker.bundle_id !== OFFLINE_RELEASE.bundleId ||
-      marker.bundle_manifest_sha256 !== OFFLINE_RELEASE.bundleManifestSha256 ||
-      marker.bundle_content_sha256 !== OFFLINE_RELEASE.bundleContentSha256) {
-    throw new Error('Complete release marker is missing or has the wrong identity');
-  }
-  verifyBundleShape(marker.offline_bundle);
+  verifyBundleShape(bundle);
   const keys = await cache.keys();
   const expectedUrls = new Set(OFFLINE_RELEASE.resources.map(entry => resourceUrl(entry.path)));
   const assetKeys = keys.map(request => request.url).filter(url => url !== COMPLETE_MARKER_URL);
@@ -144,8 +138,20 @@ async function verifyCache(cacheName, { hashAssets = true } = {}) {
       sourceCommit: OFFLINE_RELEASE.sourceCommit,
       manifestSha256: OFFLINE_RELEASE.tripManifestSha256
     },
-    installedAt: marker.installed_at
+    installedAt: ''
   };
+}
+
+async function verifyCache(cacheName, options = {}) {
+  const cache = await caches.open(cacheName);
+  const marker = await readMarker(cache);
+  if (!marker || marker.complete !== true || marker.bundle_id !== OFFLINE_RELEASE.bundleId ||
+      marker.bundle_manifest_sha256 !== OFFLINE_RELEASE.bundleManifestSha256 ||
+      marker.bundle_content_sha256 !== OFFLINE_RELEASE.bundleContentSha256) {
+    throw new Error('Complete release marker is missing or has the wrong identity');
+  }
+  const result = await verifyCacheContents(cacheName, marker.offline_bundle, options);
+  return { ...result, installedAt: marker.installed_at };
 }
 
 async function completedCaches() {
@@ -173,7 +179,8 @@ async function buildCandidate(reason) {
     for (const entry of OFFLINE_RELEASE.resources) {
       await cache.put(resourceUrl(entry.path), await fetchVerifiedResource(entry));
     }
-    const temporaryMarker = {
+    await verifyCacheContents(cacheName, bundle);
+    const completeMarker = {
       complete: true,
       bundle_id: OFFLINE_RELEASE.bundleId,
       bundle_manifest_sha256: OFFLINE_RELEASE.bundleManifestSha256,
@@ -182,10 +189,9 @@ async function buildCandidate(reason) {
       reason,
       offline_bundle: bundle
     };
-    await cache.put(COMPLETE_MARKER_URL, new Response(JSON.stringify(temporaryMarker), {
+    await cache.put(COMPLETE_MARKER_URL, new Response(JSON.stringify(completeMarker), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     }));
-    await verifyCache(cacheName);
     return cacheName;
   } catch (error) {
     await caches.delete(cacheName);
@@ -198,9 +204,22 @@ async function cleanupCaches() {
   const companionNames = allNames.filter(name => name.startsWith(CACHE_PREFIX));
   const complete = await completedCaches();
   const current = complete.find(record => record.marker.bundle_id === OFFLINE_RELEASE.bundleId);
-  const previous = complete.find(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId);
-  const keep = new Set([current?.name, previous?.name].filter(Boolean).slice(0, OFFLINE_RELEASE.retentionCount));
+  const previous = complete
+    .filter(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId)
+    .slice(0, Math.max(0, OFFLINE_RELEASE.retentionCount - (current ? 1 : 0)));
+  const keep = new Set([current?.name, ...previous.map(record => record.name)].filter(Boolean));
   await Promise.all(companionNames.filter(name => !keep.has(name)).map(name => caches.delete(name)));
+}
+
+async function cleanupFailedActivation() {
+  const companionNames = (await caches.keys()).filter(name => name.startsWith(CACHE_PREFIX));
+  for (const name of companionNames) {
+    const marker = await readMarker(await caches.open(name));
+    if (marker?.bundle_id === OFFLINE_RELEASE.bundleId || marker?.complete !== true) {
+      await caches.delete(name);
+    }
+  }
+  await cleanupCaches();
 }
 
 async function verifyActiveCache() {
@@ -234,9 +253,20 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    await verifyActiveCache();
+    const replacingPreviousRelease = (await completedCaches())
+      .some(record => record.marker.bundle_id !== OFFLINE_RELEASE.bundleId);
+    try {
+      await verifyActiveCache();
+    } catch (error) {
+      await cleanupFailedActivation();
+      throw error;
+    }
     await cleanupCaches();
     await self.clients.claim();
+    if (replacingPreviousRelease) {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      await Promise.all(windows.map(client => client.navigate(client.url)));
+    }
   })());
 });
 
@@ -245,7 +275,8 @@ self.addEventListener('fetch', event => {
   const scopeUrl = new URL(self.registration.scope);
   if (requestUrl.origin !== scopeUrl.origin || !requestUrl.pathname.startsWith(scopeUrl.pathname)) return;
   const relativePath = decodeURIComponent(requestUrl.pathname.slice(scopeUrl.pathname.length)) || 'index.html';
-  const requestedPath = event.request.mode === 'navigate' ? 'index.html' : relativePath;
+  const isExplicitResource = OFFLINE_RELEASE.resources.some(entry => entry.path === relativePath);
+  const requestedPath = event.request.mode === 'navigate' && !isExplicitResource ? 'index.html' : relativePath;
   if (!OFFLINE_RELEASE.resources.some(entry => entry.path === requestedPath)) return;
 
   event.respondWith((async () => {

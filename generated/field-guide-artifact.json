@@ -2,7 +2,7 @@
   "artifact_id": "printable-field-guide-v1",
   "artifact_status": "draft_not_field_release",
   "artifact_path": "generated/field-guide.pdf",
-  "field_guide_pdf_sha256": "c5cfaca1996f7dc12bedb2ec325f0ab6f5049cc8db914992df865f1ab5af64c1",
+  "field_guide_pdf_sha256": "3ac4b8b512637d99d44263ae5ab97d75650a06bf75b0b65797cd585329517523",
   "trip_manifest_path": "data/trip-manifest.json",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "data_version": "1.0.0",

@@ -252,6 +252,25 @@ function assertCrossRecordRules(manifest, errors) {
   for (const waypoint of manifest.waypoints) {
     if ((waypoint.latitude === null) !== (waypoint.longitude === null)) fail(errors, waypoint.id + ' must provide both coordinates or neither');
   }
+  const coordinatePairs = [
+    ['waypoint-lake-como-area', 'weather-lake-como-area'],
+    ['waypoint-blanca-peak', 'weather-blanca-peak'],
+    ['waypoint-ellingwood-point', 'weather-ellingwood-point'],
+    ['waypoint-mount-lindsey', 'weather-mount-lindsey']
+  ];
+  const waypointById = new Map(manifest.waypoints.map(record => [record.id, record]));
+  const weatherById = new Map(manifest.weather_reference_locations.map(record => [record.id, record]));
+  for (const [waypointId, weatherId] of coordinatePairs) {
+    const waypoint = waypointById.get(waypointId);
+    const weather = weatherById.get(weatherId);
+    if (!waypoint || !weather) {
+      fail(errors, `coordinate drift pair is missing ${waypointId} or ${weatherId}`);
+      continue;
+    }
+    for (const field of ['latitude', 'longitude', 'elevation_ft']) {
+      if (waypoint[field] !== weather[field]) fail(errors, `${waypointId}.${field} must exactly match ${weatherId}.${field}`);
+    }
+  }
   for (const contact of manifest.public_emergency_contacts) {
     if (contact.verification_status === 'externally_verified' && !contact.last_externally_verified) {
       fail(errors, contact.id + ' claims external verification without a date');

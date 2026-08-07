@@ -68,7 +68,7 @@ async function main() {
     model.trip.name,
     model.trip.dateRange,
     ...model.timeline.flatMap(item => item.times.map(time => time.value)),
-    ...model.routes.flatMap(route => [route.name, route.distance, route.gain, route.difficulty, route.exposure]),
+    ...model.routes.flatMap(route => [route.name, route.distance, route.gain, route.difficulty, route.exposure, route.fieldNote].filter(Boolean)),
     model.emergency.headline,
     ...model.contacts.flatMap(contact => contact.phones.map(phone => phone.value)),
     model.weatherRule,

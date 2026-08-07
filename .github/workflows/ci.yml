@@ -133,8 +133,11 @@ jobs:
       - name: Run offline bundle byte-integrity contract
         run: npm run check:offline
 
-      - name: Run production service-worker atomicity and scope contract
+      - name: Run service-worker static contract checks
         run: npm run check:service-worker
+
+      - name: Run real service-worker runtime lifecycle tests
+        run: npm run test:service-worker:runtime
 
       - name: Build flattened GitHub Pages candidate artifact
         run: |
@@ -146,7 +149,7 @@ jobs:
           test -f .pages-site/generated/field-guide.pdf
           test -f .pages-site/generated/pocket-card.pdf
 
-      - name: Test marker-last transaction and quota-failure logic
+      - name: Run transaction model tests
         run: npm run test:offline:logic
 
       - name: Run three-artifact parity contract

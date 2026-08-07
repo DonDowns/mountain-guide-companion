@@ -92,6 +92,13 @@ def main():
             for character in page.chars:
                 if character.get('top', 0) < 730:
                     body_font_sizes.append(round(float(character.get('size', 0)), 2))
+        route_card_regions = [
+            (30, 90, 306, 245),
+            (306, 90, 582, 245),
+            (30, 242, 306, 400),
+            (306, 242, 582, 400)
+        ]
+        region_texts.extend(normalized(pdf.pages[1].crop(box).extract_text() or '') for box in route_card_regions)
         region_texts.append(normalized(pdf.pages[1].crop((340, 380, 590, 630)).extract_text() or ''))
 
     full_text = normalized(' '.join(page_texts + region_texts))
@@ -99,7 +106,7 @@ def main():
         model['trip']['name'],
         model['trip']['dateRange'],
         *[entry['value'] for item in model['timeline'] for entry in item['times']],
-        *[value for route in model['routes'] for value in [route['name'], route['distance'], route['gain'], route['difficulty'], route['exposure']]],
+        *[value for route in model['routes'] for value in [route['name'], route['distance'], route['gain'], route['difficulty'], route['exposure'], route['fieldNote']] if value],
         model['emergency']['headline'],
         *[phone['value'] for contact in model['contacts'] for phone in contact['phones']],
         model['weatherRule'],

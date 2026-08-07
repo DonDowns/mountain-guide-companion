@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.3` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, and Phase 6A.1 simplifies field-facing copy without changing canonical data, safety meaning, privacy behavior, or offline architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.4` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, and the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior without changing canonical data, safety meaning, or privacy behavior. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -35,7 +35,7 @@ The setup checklist can truthfully complete packaged-resource checks in Phase 5:
 - every required resource passes byte-size and SHA-256 verification;
 - installed/standalone detection when observed.
 
-Offline Check verifies the controlling worker's complete active bundle locally: exact cache/bundle identity, completion marker, resource count, every listed asset, canonical/release identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, rendered core sections, and both PDFs. Its result is `OFFLINE RESOURCES VERIFIED` or `OFFLINE RESOURCES INCOMPLETE`, followed by an explicit statement that software-resource verification does not verify mountain conditions, access, weather, or route safety.
+Offline Check requires the current page to have a controlling production worker, then verifies that worker's complete active bundle locally: exact cache/bundle identity, completion marker, resource count, every listed asset, canonical/release identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, rendered core sections, and both PDFs. An active registration without a controlling worker fails the check. Its result is `OFFLINE RESOURCES VERIFIED` or `OFFLINE RESOURCES INCOMPLETE`, followed by an explicit statement that software-resource verification does not verify mountain conditions, access, weather, or route safety.
 
 `scripts/build-offline.mjs` generates the explicit `offline-bundle.json` and production `service-worker.js` from actual bytes. Installation is marker-last and hash-verified; a failed candidate is deleted without replacing the last complete release. Field-critical fetches resolve only from one verified active cache, preventing network/cache or old/new mixing. See `docs/offline-architecture.md` for lifecycle, retention, repair, storage, and test details.
 
@@ -71,19 +71,19 @@ Milestone checks use the concise status Marked locally. Tests continue to reject
 
 ## Sharing and URL privacy
 
-Share uses `navigator.share` when available and otherwise copies the single configured public URL. The payload contains only title, public explanatory text, and that URL. It never includes query parameters, local state, actual start, milestones, status notes, contact fields, or storage content.
+Share uses `navigator.share` when available and otherwise copies the single configured public URL. If neither native sharing nor clipboard/legacy copy is available, a manual-copy prompt exposes that same public URL and nothing else. The payload contains only title, public explanatory text, and that URL. It never includes query parameters, local state, actual start, milestones, status notes, contact fields, or storage content.
 
 No external QR API is used. The stable public URL is directly QR-encodable without state; QR presentation belongs to the separate Mountain Guide Crew tab.
 
 ## Display and accessibility
 
-Red is a persistent presentation control with `aria-pressed`; it changes no content or safety state. A synchronous local bootstrap applies Red before the main module renders to reduce daylight flashing on reload. Daylight and Red both use explicit text, borders, and icons rather than color-only meaning.
+Red is a persistent presentation control with `aria-pressed`; it changes no content or safety state. Its active styling uses dedicated display-mode tokens rather than Emergency semantic tokens. A synchronous local bootstrap applies Red before the main module renders to reduce daylight flashing on reload. Daylight and Red both use explicit text, borders, and icons rather than color-only meaning.
 
 The shell uses semantic header/main/nav/footer landmarks, native controls, visible focus, labeled fields, native details disclosure, heading hierarchy, reduced-motion handling, safe-area insets, and responsive portrait/landscape layouts. Playwright runs Chromium and WebKit at desktop and 390×844 mobile. Axe checks the first-open, Timeline, Route, Emergency, and Red states against WCAG 2.1 AA rules. Physical VoiceOver, increased-text, sunlight, headlamp, glove, wet-finger, and actual iPhone testing remain release gates.
 
 ## Physical artifacts
 
-The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. PDF links are local package-relative URLs. Both PDFs are members of the atomic, hash-verified offline bundle and are exercised through offline browser fetches. Public candidate access does not make either PDF a field release.
+The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. PDF links are local package-relative URLs. Both PDFs are members of the atomic, hash-verified offline bundle and are exercised through real online and service-worker-controlled offline browser navigation; the worker runtime harness separately verifies each cached response begins with `%PDF`. Public candidate access does not make either PDF a field release.
 
 ## Remaining release gates
 

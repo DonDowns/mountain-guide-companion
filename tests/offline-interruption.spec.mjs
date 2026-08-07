@@ -19,8 +19,14 @@ for (const [label, failure] of failures) {
     await waitForServiceWorker(page);
     await expect(page.getByRole('heading', { name: 'OLD COMPLETE RELEASE' })).toBeVisible();
     await setServerState(request, { release: 'current', ...failure });
-    await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())?.update());
-    await page.waitForTimeout(900);
+    await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      try { await registration?.update(); } catch {}
+    });
+    await page.waitForFunction(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      return !registration?.installing && !registration?.waiting;
+    });
     await page.reload();
     await expect(page.getByRole('heading', { name: 'OLD COMPLETE RELEASE' })).toBeVisible();
     const state = await page.evaluate(async () => {

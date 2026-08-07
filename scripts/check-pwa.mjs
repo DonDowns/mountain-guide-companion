@@ -17,9 +17,11 @@ function requireText(content, value, label, errors) {
 }
 
 async function main() {
-  const [{ manifest }, release, webManifest, html, css, generated] = await Promise.all([
+  const [{ manifest }, release, buildConfig, packageJson, webManifest, html, css, generated] = await Promise.all([
     runValidation({ silent: true }),
     readFile(resolve(repoRoot, 'release.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(repoRoot, 'config/companion.build.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(repoRoot, 'package.json'), 'utf8').then(JSON.parse),
     readFile(resolve(repoRoot, 'manifest.webmanifest'), 'utf8').then(JSON.parse),
     readFile(resolve(repoRoot, 'index.html'), 'utf8'),
     readFile(resolve(repoRoot, 'css/companion.css'), 'utf8'),
@@ -28,6 +30,10 @@ async function main() {
   const { companionData, releaseMetadata } = generated;
   const manifestHash = await sha256(resolve(repoRoot, 'data/trip-manifest.json'));
   const errors = [];
+
+  if (packageJson.version !== buildConfig.companion_version || release.companion_version !== buildConfig.companion_version) {
+    errors.push('package, build, and release candidate versions must match exactly');
+  }
 
   for (const [key, expected] of [
     ['data_version', manifest.data_version],
