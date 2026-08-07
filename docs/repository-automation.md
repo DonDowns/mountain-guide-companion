@@ -63,3 +63,7 @@ Candidate domains remain `companion.vondadowns.com` and `fieldguide.vondadowns.c
 ## Bootstrap sequence
 
 The repository began with Phase 0 on `main` and Phase 1 on a feature branch. A narrow CI prerequisite was added to the Phase 1 branch so the canonical dataset could pass hosted validation before merge. Phase 1 then merged first. This automation branch was created from that updated `main`, preserving Phase 0 → Phase 1 → automation history and preventing the bootstrap from omitting canonical data.
+
+## Workflow smoke-test record
+
+On 2026-08-07, the Phase 1B closeout used a documentation-only `automation/workflow-smoke-test` branch to exercise local validation, commit, push, helper-generated pull request, both required hosted checks, native auto-merge, fast-forward-only `main` synchronization, and final clean-tree validation. This durable record replaces a disposable marker file and adds no application fact or runtime behavior.
