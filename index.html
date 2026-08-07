@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#163d46">
+  <meta name="description" content="Mountain Guide Companion — a lightweight field reference for the current trip.">
+  <title>Mountain Guide Companion</title>
+  <script src="./js/red-bootstrap.js"></script>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/companion-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/companion.css">
+</head>
+<body>
+  <a class="skip-link" href="#app-main">Skip to Companion</a>
+
+  <header class="app-header">
+    <a class="brand" href="#welcome" aria-label="Mountain Guide Companion home">
+      <img src="./icons/companion-icon.svg" alt="" width="38" height="38">
+      <span><strong>Companion</strong><small>DRAFT</small></span>
+    </a>
+    <div class="header-actions">
+      <button class="quiet-button" type="button" data-action="share">Share</button>
+      <button class="quiet-button header-setup" type="button" data-action="show-setup">Set up this phone</button>
+    </div>
+  </header>
+
+  <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+    <div class="welcome-copy">
+      <p class="eyebrow">CURRENT TRIP</p>
+      <h1 id="welcome-title">Mountain Guide Companion</h1>
+      <p class="trip-name" id="trip-name">Loading current trip…</p>
+      <p class="welcome-summary">A small crew-facing field reference for the plan, route, reassessment prompts, and emergency information.</p>
+      <div class="welcome-actions">
+        <button class="primary-button" type="button" data-action="open-companion">Open Companion</button>
+        <button class="secondary-button" type="button" data-action="show-setup">Install for Offline Use</button>
+      </div>
+    </div>
+
+    <aside class="purpose-card" aria-labelledby="purpose-title">
+      <p class="eyebrow">WHAT THIS IS</p>
+      <h2 id="purpose-title">The field instrument, not the full Mountain Guide</h2>
+      <p>Use it to orient the crew, compare the plan with actual conditions, and reach emergency information quickly.</p>
+    </aside>
+
+    <div id="install-panel" class="setup-host" aria-live="polite"></div>
+
+    <section class="artifact-overview" aria-labelledby="artifact-title">
+      <div class="section-heading compact-heading">
+        <p class="eyebrow">THREE COMPANION ARTIFACTS</p>
+        <h2 id="artifact-title">Digital reference plus physical backups</h2>
+      </div>
+      <div id="artifact-cards" class="artifact-grid"></div>
+    </section>
+  </section>
+
+  <main id="app-main" tabindex="-1">
+    <section class="app-view" id="timeline-view" data-view="timeline" aria-labelledby="timeline-title">
+      <div class="section-heading">
+        <p class="eyebrow">WHERE ARE WE IN THE PLAN?</p>
+        <h2 id="timeline-title">Timeline</h2>
+        <p class="safety-invariant" id="weather-invariant"></p>
+      </div>
+      <div id="objective-selector" class="objective-selector" aria-label="Select current objective"></div>
+      <div id="selected-objective" class="selected-objective"></div>
+      <section class="decision-section" aria-labelledby="decision-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">WHAT SHOULD CAUSE US TO REASSESS?</p>
+          <h3 id="decision-title">Decision Gates</h3>
+        </div>
+        <p class="boundary-note">Opening or acknowledging a prompt does not mean conditions permit continuation.</p>
+        <div id="decision-gates" class="decision-gates"></div>
+      </section>
+      <section class="milestone-section" aria-labelledby="milestone-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">LOCAL CHECKS</p>
+          <h3 id="milestone-title">Communication milestones</h3>
+        </div>
+        <p class="boundary-note" id="delivery-disclaimer"></p>
+        <div id="milestone-list" class="milestone-list"></div>
+        <div id="local-operations" class="local-panel"></div>
+      </section>
+    </section>
+
+    <section class="app-view" id="route-view" data-view="route" aria-labelledby="route-title" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">WHAT MATTERS RIGHT NOW?</p>
+        <h2 id="route-title">Route</h2>
+        <p>Canonical route comparisons only. No live map or fabricated elevation profile.</p>
+      </div>
+      <div id="route-cards" class="route-grid"></div>
+      <aside id="lily-status" class="hold-note"></aside>
+    </section>
+
+    <section class="app-view emergency-view" id="emergency-view" data-view="emergency" aria-labelledby="emergency-title" hidden>
+      <div class="emergency-hero">
+        <p class="eyebrow">IF SOMETHING GOES WRONG</p>
+        <h2 id="emergency-title">CALL 911 FIRST</h2>
+        <a class="call-911" href="tel:911">Call 911</a>
+        <p>Opening a phone intent does not prove that a call occurred.</p>
+      </div>
+      <section class="give-card" aria-labelledby="give-title">
+        <h3 id="give-title">Give</h3>
+        <ul>
+          <li>Exact location</li>
+          <li>Mountain / route</li>
+          <li>Elevation</li>
+          <li>Coordinates if available</li>
+          <li>Injuries</li>
+          <li>Party size</li>
+          <li>Weather / conditions</li>
+        </ul>
+      </section>
+      <p class="jurisdiction" id="jurisdiction-copy"></p>
+      <div id="emergency-contacts" class="contact-grid"></div>
+    </section>
+  </main>
+
+  <footer class="provenance" id="provenance" aria-label="Companion provenance"></footer>
+
+  <nav class="primary-nav" aria-label="Companion sections">
+    <button type="button" data-nav="timeline" aria-current="page"><span aria-hidden="true">◷</span>Timeline</button>
+    <button type="button" data-nav="route"><span aria-hidden="true">△</span>Route</button>
+    <button class="emergency-nav" type="button" data-nav="emergency"><span aria-hidden="true">+</span>Emergency</button>
+    <button type="button" data-action="toggle-red" aria-pressed="false"><span aria-hidden="true">◐</span>Red</button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+  <noscript><p class="noscript">JavaScript is required to render the packaged trip data. Use the printed Field Guide or Pocket Card if unavailable.</p></noscript>
+  <script type="module" src="./js/companion.js"></script>
+</body>
+</html>

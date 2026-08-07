@@ -17,7 +17,7 @@ jobs:
   validate:
     name: Validate repository
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Check out Companion
         uses: actions/checkout@v7
@@ -36,8 +36,12 @@ jobs:
         run: |
           node --version
           npm --version
-          test ! -f package-lock.json
           test -z "$(git status --porcelain)"
+
+      - name: Install pinned browser-test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium webkit
 
       - name: Set up Python for deterministic print tooling
         uses: actions/setup-python@v6
@@ -108,8 +112,26 @@ jobs:
       - name: Run Pocket Card page, content, and render contracts
         run: npm run check:pocket-card-pdf
 
+      - name: Build deterministic Companion PWA data and release metadata
+        run: npm run build:pwa
+
+      - name: Run Companion PWA structural contract
+        run: npm run check:pwa
+
+      - name: Run Companion PWA privacy contract
+        run: npm run check:pwa:privacy
+
+      - name: Run Companion PWA safety contract
+        run: npm run check:pwa:safety
+
+      - name: Run three-artifact parity contract
+        run: npm run check:artifact-parity
+
+      - name: Run Chromium and WebKit browser, install-flow, and accessibility tests
+        run: npm run test:browser
+
       - name: Verify all generated artifacts reproduce committed bytes
-        run: git diff --exit-code -- generated
+        run: git diff --exit-code -- generated js/companion-data.js release.json
 
       - name: Determine canonical manifest SHA-256
         run: sha256sum data/trip-manifest.json

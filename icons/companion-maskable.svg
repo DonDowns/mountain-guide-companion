@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Mountain Guide Companion</title>
+  <rect width="512" height="512" fill="#163d46"/>
+  <circle cx="256" cy="256" r="188" fill="#204e58"/>
+  <path d="M92 376 220 132l54 101 42-71 104 214H92Z" fill="#f4f0df"/>
+  <path d="m170 376 86-160 86 160H170Z" fill="#b93d2e"/>
+  <circle cx="256" cy="289" r="25" fill="#163d46" stroke="#f4f0df" stroke-width="11"/>
+</svg>

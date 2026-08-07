@@ -99,10 +99,12 @@ async function main() {
   exec('git', ['fetch', '--prune', 'origin'], { inherit: true });
   exec('git', ['switch', 'main'], { inherit: true });
   exec('git', ['pull', '--ff-only', 'origin', 'main'], { inherit: true });
+  exec('npm', ['ci'], { inherit: true });
   for (const script of [
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
     'build:field-guide', 'check:field-guide', 'check:pdf',
-    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf'
+    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf',
+    'build:pwa', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity', 'test:browser'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }

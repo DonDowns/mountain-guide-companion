@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This model defines what the Companion may store, display, generate, and claim. It is a design invariant for the future public repository, all generated artifacts, local PWA state, test data, logs, screenshots, print workflows, and release archives.
+This model defines what the Companion may store, display, generate, and claim. It is a design invariant for the public repository, all generated artifacts, local PWA state, test data, logs, screenshots, print workflows, and release archives.
 
 The Companion is a field reference and decision-support system. It is not route authorization, rescue guidance, a safety guarantee, a dispatch system, or proof that a communication was delivered.
 
@@ -73,7 +73,7 @@ Never committed, synchronized by default, or embedded in public artifacts:
 - private location history;
 - local acknowledgments or dismissed notices.
 
-The initial release does not automate personal contacts, medical information, or other sophisticated private overlays. If such a PWA feature is approved after the trip, it must use a separately named, device-local store rather than fields inside the public manifest. Missing or unreadable local data displays Not available on this device. Sample or placeholder private data is never substituted.
+Phase 4 permits a bounded optional local contact name, phone, alternate, and brief private note. These fields start empty, use the versioned device-local operational store, never enter canonical data or sharing, and can be cleared with confirmation. Medical information, cloud synchronization, export, and sophisticated private overlays remain deferred. Missing or unreadable local data displays Not available on this device. Sample or placeholder private data is never substituted.
 
 ### C. Handwritten / print-time private data
 
@@ -110,9 +110,9 @@ Only allowlisted fields can cross this path. Each output carries the same canoni
 
 ### Device-local path
 
-Local actual-start/current-phase input → separate device-local operational store → local rendering.
+Local objective/actual-start/elapsed-basis/milestone/Red/status/setup input plus optional bounded contact fields → versioned device-local operational store → local rendering.
 
-Any future personal-contact, medical, or sophisticated private overlay is deferred until after the trip and requires a separate design approval.
+Medical data, synchronization, export, and any more sophisticated private overlay remain deferred until after the trip and require separate design approval.
 
 The local path:
 
@@ -122,6 +122,8 @@ The local path:
 - defines migration behavior between canonical data versions;
 - fails closed when corrupt or incompatible;
 - requires separate review before any export/backup feature.
+
+Phase 4 local-state schema version 1 fails closed to empty defaults on corrupt or incompatible input and includes migration hooks for future schemas. Share sends only the configured public Companion URL. Checked communication milestones mean only Marked locally, and locally composed status text remains explicitly unsent.
 
 ### Private print path
 

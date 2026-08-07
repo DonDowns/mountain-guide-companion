@@ -283,6 +283,8 @@ For each canonical fact:
 
 An artifact matrix and generated traceability report are release evidence.
 
+Phase 4 implements `npm run check:artifact-parity` across the generated PWA release/runtime identity, Field Guide artifact record, and Pocket Card artifact record. It compares data version, source release, source commit, and the exact canonical manifest SHA-256.
+
 ## Privacy tests
 
 - tracked-file and full-history secret scan before public release;
@@ -298,6 +300,8 @@ An artifact matrix and generated traceability report are release evidence.
 - attempted private-field injection into generators must fail;
 - confirm the initial private-print procedure is handwriting/outside-repository only and excluded from release artifacts;
 - reject automated/encrypted private-print handling and sophisticated personal-data overlays until separately approved after the trip.
+
+Phase 4 additionally scans the HTML, CSS, browser modules, web manifest, generated release metadata, configuration, development service worker, and structural browser fixtures for non-allowlisted contact values. Browser tests prove private fields remain device-local, clear only after confirmation, and never enter the shared URL.
 
 ## Safety-language tests
 
@@ -316,6 +320,8 @@ Manual adversarial review asks:
 - Does Red display look like emergency state?
 
 Any yes/ambiguous answer blocks release.
+
+Phase 4 statically scans the PWA-facing source and generated metadata and exercises rendered browser content. Required principles and emergency hierarchy must appear; affirmative authorization, safety, rescue, delivery, and field-ready offline claims fail validation.
 
 ## Print validation
 

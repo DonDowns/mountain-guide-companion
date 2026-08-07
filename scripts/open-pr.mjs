@@ -60,7 +60,8 @@ async function main() {
   for (const script of [
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
     'build:field-guide', 'check:field-guide', 'check:pdf',
-    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf'
+    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf',
+    'build:pwa', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity', 'test:browser'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }
@@ -77,6 +78,7 @@ async function main() {
   const manifest = JSON.parse(await readFile(resolve(repoRoot, 'data/trip-manifest.json'), 'utf8'));
   const fieldGuideArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/field-guide-artifact.json'), 'utf8'));
   const pocketCardArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/pocket-card-artifact.json'), 'utf8'));
+  const companionRelease = JSON.parse(await readFile(resolve(repoRoot, 'release.json'), 'utf8'));
   const pending = [];
   const visit = value => {
     if (Array.isArray(value)) value.forEach(visit);
@@ -104,6 +106,12 @@ async function main() {
     '- `npm run build:pocket-card`',
     '- `npm run check:pocket-card`',
     '- `npm run check:pocket-card-pdf`',
+    '- `npm run build:pwa`',
+    '- `npm run check:pwa`',
+    '- `npm run check:pwa:privacy`',
+    '- `npm run check:pwa:safety`',
+    '- `npm run check:artifact-parity`',
+    '- `npm run test:browser` (Chromium/WebKit, desktop/390×844, install/setup/share/accessibility)',
     '- `npm run check:policy`', '',
     'Manifest SHA-256: `' + hash + '` (' + (dataChanged ? 'data changed' : 'data unchanged') + ')', '',
     '## Printable Field Guide', '',
@@ -119,10 +127,17 @@ async function main() {
     'Canonical data version: `' + pocketCardArtifact.data_version + '`.', '',
     'Lily Lake treatment: no coordinate or elevation is printed; the scoped canonical hold remains unchanged.', '',
     'Artifact status: draft, not a field release.', '',
-    'Privacy result: pass; no non-allowlisted private value detected.', '',
-    'Safety result: pass; no prohibited authorization or false confirmation detected.', '',
+    '## Interactive Companion PWA', '',
+    'DRAFT Companion version: `' + companionRelease.companion_version + '`.', '',
+    'Designed for future Mountain Guide Crew distribution at the one configured public URL: `' + companionRelease.pwa_url + '`.', '',
+    'Browser result: Chromium and WebKit desktop/mobile interaction, friend install, standalone setup, share privacy, responsive, and accessibility checks pass.', '',
+    'Privacy result: pass; optional local fields remain device-local and sharing contains only the public Companion URL.', '',
+    'Safety result: pass; Emergency stays one action away and no authorization, rescue, delivery, or field-ready offline claim is made.', '',
+    'Offline status: structural resources check only. Phase 5 remains required for production caching, cold launch, mixed-version prevention, update recovery, and physical Airplane Mode proof.', '',
+    'Deployment status: no deployment and no release tag.', '',
     '## Release holds', '',
     pending.length ? 'Approved scoped holds: ' + pending.map(id => '`' + id + '`').join(', ') + '.' : 'No pending canonical record.', '',
+    'Lily Lake hold: canonical coordinate/elevation remain null and pending; no secondary value appears in the PWA or print artifacts.', '',
     'No new unresolved release blocker or conflicted canonical record was introduced.', '',
     '## Runtime and physical testing', '',
     'Runtime files changed: ' + (runtimeChanged ? 'yes' : 'no') + '.', '',
