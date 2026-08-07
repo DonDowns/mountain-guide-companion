@@ -1,5 +1,6 @@
 let deferredInstallPrompt = null;
 let serviceWorkerRegistration = null;
+let controllerReloadStarted = false;
 
 export function isStandalone() {
   if (globalThis.__COMPANION_TEST_STANDALONE__ === true) return true;
@@ -59,7 +60,9 @@ export async function sharePublicCompanion(publicUrl, title) {
   input.select();
   const copied = document.execCommand('copy');
   input.remove();
-  return { method: 'copy', completed: copied };
+  if (copied) return { method: 'copy', completed: true };
+  globalThis.prompt?.('Copy this public Companion link:', publicUrl);
+  return { method: 'manual', completed: false };
 }
 
 function waitForController(timeoutMs = 8000) {
@@ -92,6 +95,7 @@ export async function registerProductionServiceWorker(onChange) {
     return null;
   }
   try {
+    let observedController = navigator.serviceWorker.controller;
     serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js', {
       scope: './',
       updateViaCache: 'none'
@@ -106,7 +110,16 @@ export async function registerProductionServiceWorker(onChange) {
       const installing = serviceWorkerRegistration.installing;
       installing?.addEventListener('statechange', publish);
     });
-    navigator.serviceWorker.addEventListener('controllerchange', publish);
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      const nextController = navigator.serviceWorker.controller;
+      const replacedController = Boolean(observedController && nextController && nextController !== observedController);
+      observedController = nextController || observedController;
+      publish();
+      if (replacedController && !controllerReloadStarted) {
+        controllerReloadStarted = true;
+        globalThis.location.reload();
+      }
+    });
     await navigator.serviceWorker.ready;
     await waitForController();
     publish();
@@ -119,8 +132,11 @@ export async function registerProductionServiceWorker(onChange) {
 
 export async function verifyOfflineResources() {
   if (!serviceWorkerRegistration) await navigator.serviceWorker?.ready;
-  const worker = navigator.serviceWorker?.controller || serviceWorkerRegistration?.active || null;
-  return sendWorkerMessage(worker, 'VERIFY_OFFLINE_BUNDLE');
+  const controller = navigator.serviceWorker?.controller || null;
+  if (!controller) {
+    return { complete: false, error: 'Offline setup is not controlling this page. Reopen Companion and retry Offline Check.' };
+  }
+  return sendWorkerMessage(controller, 'VERIFY_OFFLINE_BUNDLE');
 }
 
 export async function repairOfflineCopy() {

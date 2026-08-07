@@ -56,6 +56,7 @@ jobs:
           npm run check:artifact-parity
           npm run check:offline
           npm run check:service-worker
+          npm run test:service-worker:runtime
           git diff --exit-code -- js/companion-data.js release.json offline-bundle.json service-worker.js
 
       - name: Build flattened Pages artifact

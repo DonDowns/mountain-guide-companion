@@ -47,14 +47,6 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await offlinePage.getByRole('button', { name: /Emergency/ }).last().click();
   await expect(offlinePage.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
   await expect(offlinePage.locator('a.phone-link')).toHaveCount(6);
-  const pdfs = await offlinePage.evaluate(async () => Promise.all([
-    'generated/field-guide.pdf', 'generated/pocket-card.pdf'
-  ].map(async path => {
-    const response = await fetch(path);
-    return { path, ok: response.ok, bytes: (await response.arrayBuffer()).byteLength };
-  })));
-  expect(pdfs.every(pdf => pdf.ok && pdf.bytes > 0)).toBe(true);
-
   await offlinePage.getByRole('button', { name: 'Set up this phone' }).click();
   await offlinePage.getByRole('button', { name: 'Offline Check' }).click();
   await expect(offlinePage.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
@@ -64,6 +56,30 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   const fieldCriticalRequests = observedRequests.filter(({ path }) => path !== 'service-worker.js');
   expect(fieldCriticalRequests).toEqual([]);
   expect(observedRequests.every(({ method, path }) => method === 'GET' && path === 'service-worker.js')).toBe(true);
+  await context.setOffline(false);
+});
+
+test('opens both bundled PDFs through real browser navigation while offline', async ({ page, context, request }, testInfo) => {
+  test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Offline PDF navigation runs once in Chromium desktop');
+  await installCurrent(page, request);
+  await context.setOffline(true);
+  for (const [name, path] of [
+    ['Open Field Guide', '/generated/field-guide.pdf'],
+    ['Open Pocket Card', '/generated/pocket-card.pdf']
+  ]) {
+    const artifactPage = await context.newPage();
+    await artifactPage.goto('/');
+    const responsePromise = artifactPage.waitForResponse(response =>
+      new URL(response.url()).pathname === path && response.request().isNavigationRequest()
+    );
+    await artifactPage.getByRole('link', { name }).click();
+    const response = await responsePromise;
+    expect(response.headers()['content-type']).toContain('application/pdf');
+    expect(response.headers()['content-type']).not.toContain('text/html');
+    expect(response.fromServiceWorker()).toBe(true);
+    expect(new URL(response.url()).pathname).toBe(path);
+    await artifactPage.close();
+  }
   await context.setOffline(false);
 });
 
@@ -92,8 +108,14 @@ test('keeps the previous complete release active when a new required JavaScript 
   })));
 
   await setServerState(request, { release: 'current', failPath: 'js/companion-ui.js' });
-  await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())?.update());
-  await page.waitForTimeout(1200);
+  await page.evaluate(async () => {
+    const registration = await navigator.serviceWorker.getRegistration();
+    try { await registration?.update(); } catch {}
+  });
+  await page.waitForFunction(async () => {
+    const registration = await navigator.serviceWorker.getRegistration();
+    return !registration?.installing && !registration?.waiting;
+  });
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'OLD COMPLETE RELEASE' })).toBeVisible();
@@ -136,4 +158,61 @@ test('keeps the previous complete release active when a new required JavaScript 
   expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).statusNote).toBe('z');
   const cachesAfter = await page.evaluate(() => caches.keys());
   expect(cachesAfter.filter(name => name.startsWith('ddmg-companion-release-')).length).toBeLessThanOrEqual(2);
+});
+
+test('reloads two previous-release tabs coherently when the verified update activates', async ({ page, context, request }, testInfo) => {
+  test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Multi-tab update transaction runs once in Chromium desktop');
+  await context.addInitScript(() => {
+    sessionStorage.setItem('__companion_load_count__', String(Number(sessionStorage.getItem('__companion_load_count__') || 0) + 1));
+  });
+  await setServerState(request, { release: 'previous' });
+  await page.goto('/');
+  await waitForServiceWorker(page);
+  const second = await context.newPage();
+  await second.goto('/');
+  await waitForServiceWorker(second);
+  await expect(page.getByRole('heading', { name: 'OLD COMPLETE RELEASE' })).toBeVisible();
+  await expect(second.getByRole('heading', { name: 'OLD COMPLETE RELEASE' })).toBeVisible();
+
+  await setServerState(request, { release: 'current' });
+  await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())?.update());
+  await page.waitForFunction(async () => Boolean((await navigator.serviceWorker.getRegistration())?.waiting));
+  await expect(page.getByRole('button', { name: 'Restart to use update' })).toBeVisible();
+  await page.getByRole('button', { name: 'Restart to use update' }).click();
+
+  for (const candidatePage of [page, second]) {
+    await expect(candidatePage.getByRole('heading', { name: 'Mountain Guide Companion', level: 1 })).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.4/)).toBeVisible();
+    expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
+  }
+  const complete = await page.evaluate(async () => {
+    const records = [];
+    for (const name of await caches.keys()) {
+      if (!name.startsWith('ddmg-companion-release-')) continue;
+      const response = await (await caches.open(name)).match(new URL('__ddmg_complete__.json', location.href));
+      if (!response) continue;
+      const marker = await response.json();
+      if (marker.complete === true) records.push(marker.bundle_id);
+    }
+    return records.sort();
+  });
+  expect(complete).toEqual([
+    'ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1',
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1$/)
+  ]);
+});
+
+test('Offline Check rejects an active registration when this page has no controlling worker', async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Controller requirement runs once in Chromium desktop');
+  await page.goto('/');
+  await waitForServiceWorker(page);
+  const state = await page.evaluate(async () => {
+    const registration = await navigator.serviceWorker.getRegistration();
+    Object.defineProperty(navigator.serviceWorker, 'controller', { configurable: true, get: () => null });
+    return { active: Boolean(registration?.active), controlled: Boolean(navigator.serviceWorker.controller) };
+  });
+  expect(state).toEqual({ active: true, controlled: false });
+  await page.getByRole('button', { name: 'Offline Check' }).click();
+  await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
+  await expect(page.getByText(/not controlling this page/i)).toBeVisible();
 });

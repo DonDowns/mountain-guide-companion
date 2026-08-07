@@ -31,7 +31,7 @@ function timeCards(model) {
 }
 
 function routeCards(model) {
-  return model.routes.map(route => `<article class="route-card"><p class="kicker">${escapeHtml(route.objective)}</p><h3>${escapeHtml(route.name)}</h3><div class="route-metrics"><span><strong>${escapeHtml(route.distance)}</strong>${escapeHtml(route.distanceScope)}</span><span><strong>${escapeHtml(route.gain)}</strong>cumulative gain</span><span><strong>${escapeHtml(route.difficulty)}</strong>difficulty</span><span><strong>${escapeHtml(route.exposure)}</strong>exposure</span></div><p><strong>Return consideration:</strong> ${escapeHtml(route.returnConsiderations)}</p></article>`).join('');
+  return model.routes.map(route => `<article class="route-card"><p class="kicker">${escapeHtml(route.objective)}</p><h3>${escapeHtml(route.name)}</h3><div class="route-metrics"><span><strong>${escapeHtml(route.distance)}</strong>${escapeHtml(route.distanceScope)}</span><span><strong>${escapeHtml(route.gain)}</strong>cumulative gain</span><span><strong>${escapeHtml(route.difficulty)}</strong>difficulty</span><span><strong>${escapeHtml(route.exposure)}</strong>exposure</span></div>${route.fieldNote ? `<p><strong>Field note:</strong> ${escapeHtml(route.fieldNote)}</p>` : ''}<p><strong>Return consideration:</strong> ${escapeHtml(route.returnConsiderations)}</p></article>`).join('');
 }
 
 function routeBars(model) {

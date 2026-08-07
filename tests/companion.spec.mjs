@@ -54,9 +54,12 @@ test('navigates Timeline, Route, and one-action Emergency', async ({ page }) => 
   await expect(phoneLinks).toHaveCount(6);
   const expected = companionData.contacts.flatMap(contact => contact.phones.map(phone => phone.tel));
   expect(await phoneLinks.evaluateAll(nodes => nodes.map(node => node.getAttribute('href')))).toEqual(expected);
-  for (const county of ['Alamosa', 'Huerfano', 'Costilla']) {
-    await expect(page.getByRole('link', { name: `Call ${county} Dispatch` })).toBeVisible();
-    await expect(page.getByRole('link', { name: `Call ${county} Sheriff Office` })).toBeVisible();
+  for (const contact of companionData.contacts) {
+    const county = contact.agency.replace(/ County Sheriff’s Office$/, '');
+    for (const phone of contact.phones) {
+      const action = phone.kind === 'dispatch' ? 'Dispatch' : 'Sheriff Office';
+      await expect(page.getByRole('link', { name: `Call ${county} ${action}, ${phone.display}`, exact: true })).toBeVisible();
+    }
   }
   await expect(page.locator('#emergency-view')).not.toContainText(/called|call completed|contacted/i);
 });
@@ -140,6 +143,54 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('');
   await expect(page.locator('[data-private-field="note"]')).toHaveValue('');
+});
+
+test('falls back from unavailable native sharing to clipboard using only the public URL', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async value => { globalThis.__copiedPublicValue = value; } }
+    });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  expect(await page.evaluate(() => globalThis.__copiedPublicValue)).toBe(releaseMetadata.pwa_url);
+});
+
+test('documents a manual public-link fallback when share and clipboard are unavailable', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined });
+    document.execCommand = () => false;
+    globalThis.prompt = (message, value) => { globalThis.__manualCopy = { message, value }; };
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  const fallback = await page.evaluate(() => globalThis.__manualCopy);
+  expect(fallback).toEqual({ message: 'Copy this public Companion link:', value: releaseMetadata.pwa_url });
+});
+
+test('opens both PDFs through real online browser navigation with PDF responses', async ({ page, context }, testInfo) => {
+  test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Online PDF navigation runs once in Chromium desktop');
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  for (const [name, path] of [
+    ['Open Field Guide', '/generated/field-guide.pdf'],
+    ['Open Pocket Card', '/generated/pocket-card.pdf']
+  ]) {
+    const artifactPage = await context.newPage();
+    await artifactPage.goto('/');
+    const responsePromise = artifactPage.waitForResponse(response =>
+      new URL(response.url()).pathname === path && response.request().isNavigationRequest()
+    );
+    await artifactPage.getByRole('link', { name }).click();
+    const response = await responsePromise;
+    expect(response.headers()['content-type']).toContain('application/pdf');
+    expect(response.headers()['content-type']).not.toContain('text/html');
+    expect(new URL(response.url()).pathname).toBe(path);
+    await artifactPage.close();
+  }
 });
 
 test('shows factual installed state and verifies the complete offline bundle', async ({ page }) => {

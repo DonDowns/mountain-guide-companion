@@ -133,7 +133,7 @@ export function renderSetupPanel(target, options) {
 
   if (workerState.updateAvailable) {
     children.push(element('div', { className: 'update-note', role: 'status' }, [
-      element('strong', { text: 'Update ready' }),
+      element('strong', { text: 'Update downloaded' }),
       element('p', { text: 'Restart Companion to use it. This copy stays available until then.' }),
       element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'activate-update' }, text: 'Restart to use update' })
     ]));
@@ -341,7 +341,7 @@ export function renderRoutes() {
 export function renderEmergency() {
   const cards = companionData.contacts.map(contact => {
     const county = contact.agency.replace(/ County Sheriff’s Office$/, '');
-    const phones = contact.phones.map(phone => element('a', { className: 'phone-link', href: phone.tel, 'aria-label': `Call ${county} ${phone.kind === 'dispatch' ? 'Dispatch' : 'Sheriff Office'}` }, [
+    const phones = contact.phones.map(phone => element('a', { className: 'phone-link', href: phone.tel, 'aria-label': `Call ${county} ${phone.kind === 'dispatch' ? 'Dispatch' : 'Sheriff Office'}, ${phone.display}` }, [
       element('span', {}, [element('small', { text: phone.label }), element('strong', { text: phone.display })]),
       element('span', { 'aria-hidden': 'true', text: `Call ${phone.kind === 'dispatch' ? 'Dispatch' : 'Office'}` })
     ]));

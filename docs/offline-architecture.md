@@ -2,7 +2,7 @@
 
 ## Status and boundary
 
-Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets only, and Phase 6A.1 publishes `0.6.0-candidate.3` with simplified field-facing copy. Both preserve the offline transaction and safety contracts. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
+Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets, Phase 6A.1 simplifies field-facing copy, and the pre-Crew audit remediation publishes `0.6.0-candidate.4` with corrected navigation and lifecycle invariants. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
 
 The configured origin is `https://companion.vondadowns.com/`. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate `https://mountainguide.vondadowns.com/` origin.
 
@@ -29,16 +29,18 @@ Installation is marker-last and fail-closed:
 4. Create a candidate cache in the unique `ddmg-companion-release-` namespace.
 5. Fetch each required response and reject non-OK responses.
 6. Verify each response byte size and SHA-256 with Web Crypto before caching it.
-7. Write a synthetic `__ddmg_complete__.json` marker only after all required responses are cached.
-8. Re-read and verify the complete candidate cache.
+7. Re-read the candidate and verify exact membership/count, every resource hash, canonical identity, emergency-contact count, and release identity.
+8. Write the synthetic `__ddmg_complete__.json` marker with `complete:true` as the final candidate-cache mutation.
 
 Any fetch, response, hash, count, identity, cache-write, or quota failure rejects installation and removes only that incomplete candidate. A previously active complete release is left untouched. The install handler never calls `skipWaiting`.
 
 ## Activation, retention, and rollback
 
-Activation re-verifies the current bundle before claiming clients. Only then does cleanup run. The retention policy keeps at most two complete Companion caches: the newest complete cache for the current bundle and the newest complete cache for one distinct prior bundle. Incomplete or obsolete caches in the Companion namespace are removed after a successful activation. Unrelated cache namespaces are never enumerated for deletion.
+Activation re-verifies the current bundle before claiming clients. Only then does successful cleanup run. The retention policy keeps at most two complete Companion caches: the newest complete cache for the current bundle and the newest complete cache for one distinct prior bundle. Incomplete or obsolete caches in the Companion namespace are removed after a successful activation. When verification throws, bounded failure cleanup removes incomplete or invalid caches for the activating bundle, preserves prior complete releases within the same two-release limit, leaves unrelated namespaces untouched, does not claim clients, and rethrows the failure.
 
-The last known-complete release therefore remains operational while a candidate downloads and verifies. A verified update waits for an explicit Restart to use update action. If the candidate fails, the existing worker and release continue. Rollback in this phase is the retained prior complete cache behavior; release-level rollback to a tagged package remains a later gate.
+The last known-complete release therefore remains operational while a candidate downloads and verifies. A verified update waits for an explicit Restart to use update action. If the candidate fails installation or verification, the previous complete release remains. This retention is recovery protection during an update, not a general offline rollback UI; release-level rollback to a tagged package remains a later gate.
+
+After a verified replacement claims clients, every open Companion window is navigated to its current URL. Each candidate.4 page also reloads once when its controlling worker changes. These bounded behaviors prevent old parsed shells from continuing indefinitely against a new active release; first installation does not trigger the replacement-release navigation path.
 
 ## Deterministic fetch behavior
 
@@ -46,7 +48,8 @@ The worker handles only same-origin requests within its own scope. Field-critica
 
 | Request | Resolution |
 | --- | --- |
-| navigation and root HTML | verified active cache's `index.html` |
+| root and non-resource application navigation | verified active cache's `index.html` |
+| navigation naming an explicit bundle member | that exact verified cached resource |
 | JavaScript and CSS | exact listed response in the verified active cache |
 | web manifest and icons | exact listed response in the verified active cache |
 | canonical trip data and generated runtime data | exact listed response in the verified active cache |
@@ -59,7 +62,7 @@ Network access is used only for browser-managed update discovery and explicit re
 
 ## Offline Check and repair
 
-Offline Check sends `VERIFY_OFFLINE_BUNDLE` to the controlling production worker. The worker verifies:
+Offline Check first requires `navigator.serviceWorker.controller`, then sends `VERIFY_OFFLINE_BUNDLE` to that controlling production worker. A merely active registration is insufficient. The worker verifies:
 
 - active bundle and cache identity;
 - completion marker and expected resource count;
@@ -87,11 +90,11 @@ Red Display is applied by a synchronous local bootstrap and remains presentation
 
 The setup surface reports `navigator.storage.estimate()` when supported and labels it as an estimate. Browser persistence is not guaranteed, and Phase 5 does not request persistent storage. The current build report records exact bundle size, PDF contribution, and largest resources.
 
-Logic and browser failure tests cover missing JavaScript, missing canonical data, missing PDFs, wrong release identity, integrity corruption, and simulated low-storage/quota failure. Each case fails the candidate, preserves the prior complete release, and avoids a partial completion marker.
+The real service-worker runtime harness executes the generated worker against in-memory CacheStorage and fetch implementations. It verifies marker-last behavior, post-write verification failure, failed-activation cleanup, two-release retention, explicit PDF navigation, unrelated-cache preservation, and multi-client navigation. The separately labeled transaction model covers missing JavaScript, missing canonical data, missing PDFs, integrity mismatch, and a simulated quota case; it is model evidence, not browser execution of QuotaExceededError.
 
 ## Automated evidence and limits
 
-Chromium desktop and 390×844 tests cover online install, verified Offline Check, offline reload, new-page cold launch, persisted-profile browser close/reopen, Timeline, Route, Emergency, Red restoration, both PDFs, zero field-critical server requests, update interruption, previous-to-new activation, corrupt caches, repair, local-state preservation, and bounded cleanup.
+Chromium desktop and 390×844 tests cover online install, verified Offline Check, offline reload, new-page cold launch, persisted-profile browser close/reopen, Timeline, Route, Emergency, Red restoration, real browser navigation to both PDFs, zero field-critical server requests, update interruption, two-tab previous-to-new activation, corrupt caches, repair, controlling-worker absence, local-state preservation, and bounded cleanup.
 
 Playwright WebKit remains in the normal desktop and 390×844 runtime/accessibility matrix. Its service-worker-controlled offline navigation currently terminates with a Playwright WebKit internal error, so that scenario is recorded as a browser-engine/test-infrastructure limitation rather than a pass. Chromium coverage is not weakened.
 

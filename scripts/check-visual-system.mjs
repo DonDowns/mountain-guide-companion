@@ -30,6 +30,8 @@ const requiredDaylight = {
   'color-text-muted': '#45575a',
   'color-emergency': '#8b281f',
   'color-emergency-text': '#fff7f3',
+  'color-display-mode-active': '#7a2f25',
+  'color-display-mode-active-text': '#fff7f3',
   'color-status-candidate-bg': '#f1dcae',
   'color-status-candidate-border': '#8d6515',
   'color-status-candidate-text': '#3c2d0a',
@@ -77,6 +79,7 @@ requireContrast('daylight-header', daylight['color-header-text'], daylight['colo
 requireContrast('daylight-candidate-text', daylight['color-status-candidate-text'], daylight['color-status-candidate-bg'], 4.5);
 requireContrast('daylight-candidate-boundary', daylight['color-status-candidate-border'], daylight['color-status-candidate-bg'], 3);
 requireContrast('daylight-emergency', daylight['color-emergency-text'], daylight['color-emergency'], 4.5);
+requireContrast('daylight-display-mode-active', daylight['color-display-mode-active-text'], daylight['color-display-mode-active'], 4.5);
 requireContrast('daylight-focus', daylight['color-focus'], daylight['color-canvas'], 3);
 requireContrast('red-primary-text', red['color-text'], red['color-surface'], 4.5);
 requireContrast('red-primary-button', red['color-brand-primary-ink'], red['color-brand-primary'], 4.5);
@@ -85,6 +88,7 @@ requireContrast('red-header', red['color-header-text'], red['color-header-bg'], 
 requireContrast('red-candidate-text', red['color-status-candidate-text'], red['color-status-candidate-bg'], 4.5);
 requireContrast('red-candidate-boundary', red['color-status-candidate-border'], red['color-status-candidate-bg'], 3);
 requireContrast('red-emergency', red['color-emergency-text'], red['color-emergency'], 4.5);
+requireContrast('red-display-mode-active', red['color-display-mode-active-text'], red['color-display-mode-active'], 4.5);
 requireContrast('red-focus', red['color-focus'], red['color-canvas'], 3);
 
 const candidateRule = css.match(/\.brand small\s*\{([\s\S]*?)\n\}/)?.[1] || '';
@@ -101,6 +105,10 @@ if (!currentNavRule.includes('color-accent-gold') || /critical|emergency|brand-r
 }
 if (!css.includes('.primary-nav button[data-action="toggle-red"][aria-pressed="true"]')) {
   errors.push('literal Red Display control must retain a distinct pressed-state rule');
+}
+const redToggleRule = css.match(/\.primary-nav button\[data-action="toggle-red"\]\[aria-pressed="true"\]\s*\{([\s\S]*?)\n\}/)?.[1] || '';
+if (!redToggleRule.includes('color-display-mode-active') || /color-emergency/.test(redToggleRule)) {
+  errors.push('Red Display pressed state must use dedicated display-mode tokens, not emergency tokens');
 }
 if (!css.includes(':root[data-display="red"] .primary-nav .emergency-nav')) {
   errors.push('Red Display emergency navigation must retain readable explicit text');

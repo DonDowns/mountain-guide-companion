@@ -77,6 +77,23 @@ function routeReturnConsideration(route) {
   return ascii(route.return_considerations);
 }
 
+function routeFieldNote(route) {
+  const notes = ascii(route.route_notes);
+  if (['route-lake-como-approach-8000', 'route-lake-como-approach-8800'].includes(route.id)) {
+    if (!notes.includes('retained as upstream cumulative gain') || !notes.includes('not replaced by endpoint subtraction')) {
+      throw new Error(`Field Guide cumulative-gain transformation no longer matches canonical route_notes for ${route.id}`);
+    }
+    return 'Gain is published cumulative gain, not endpoint subtraction.';
+  }
+  if (route.id === 'route-blanca-ellingwood-combination') {
+    if (!notes.includes('connecting ridge has a Class 3 line') || !notes.includes('return to the standard trail before reascending')) {
+      throw new Error('Field Guide traverse transformation no longer matches canonical route_notes');
+    }
+    return 'Traverse optional - take the Class 3 connecting ridge, or return to the standard trail before reascending.';
+  }
+  return '';
+}
+
 function referenceContext(point) {
   return ascii(point.route_context)
     .replace(/^Frozen-source /, '')
@@ -136,7 +153,7 @@ export async function buildFieldGuideModel() {
     gain: `${formatNumber(route.elevation_gain_ft, 0)} ft`,
     difficulty: ascii(route.difficulty),
     exposure: ascii(route.exposure),
-    routeNotes: ascii(route.route_notes),
+    fieldNote: routeFieldNote(route),
     returnConsiderations: routeReturnConsideration(route),
     gainValue: route.elevation_gain_ft
   }));

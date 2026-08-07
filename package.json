@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.6.0",
+  "version": "0.6.0-candidate.4",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-6a-1-user-facing-copy-candidate",
+    "name": "pre-crew-audit-remediation-candidate",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },
@@ -33,6 +33,7 @@
     "check:artifact-parity": "node scripts/check-artifact-parity.mjs",
     "check:offline": "node scripts/check-offline.mjs",
     "check:service-worker": "node scripts/check-service-worker.mjs",
+    "test:service-worker:runtime": "node scripts/test-service-worker-runtime.mjs",
     "check:live": "node scripts/check-live-site.mjs",
     "test:offline:logic": "node scripts/test-offline-transaction.mjs",
     "serve:pwa": "node scripts/serve-pwa.mjs",

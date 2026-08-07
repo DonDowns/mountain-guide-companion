@@ -23,7 +23,9 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 6 publishes Companion through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 6A applies a restrained mountain-earth visual system, and Phase 6A.1 advances the current build to `0.6.0-candidate.3` with field-facing copy cleanup. Neither changes the Phase 5 zero-connectivity architecture, canonical dataset, or substantive artifact content. The static shell provides:
+Phase 6 publishes Companion through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 6A applies a restrained mountain-earth visual system, Phase 6A.1 cleans up field-facing copy, and the pre-Crew audit remediation advances the current build to `0.6.0-candidate.4` with verified PDF navigation, stronger offline transactions, and clearer CI evidence. None changes the canonical dataset. The static shell provides:
+
+`package.json`, the build configuration, generated release metadata, offline bundle, and service worker all use the exact candidate version. The PWA contract rejects version drift so package metadata cannot become a second release authority.
 
 1. Timeline — three canonical objectives, six planning values, actual-start/elapsed local state, five decision gates, and nine local-only milestones.
 2. Route — four canonical route comparisons and visibly withheld Lily Lake location values.

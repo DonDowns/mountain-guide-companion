@@ -181,6 +181,9 @@ def draw_route_card(pdf, route, x, y_top, width, height):
     y = draw_text(pdf, metrics, x + 10, y, width - 20, 'Helvetica-Bold', 10.2, 12, max_lines=2)
     y = draw_text(pdf, f"{route['difficulty']} | {route['exposure']} exposure", x + 10, y, width - 20, 'Helvetica-Bold', 9.7, 11.5, max_lines=2)
     y -= 2
+    if route['fieldNote']:
+        y = draw_text(pdf, route['fieldNote'], x + 10, y, width - 20, 'Helvetica-Bold', 9.0, 10.5, color=TEAL, max_lines=3)
+        y -= 1
     y = draw_text(pdf, 'Return consideration: ' + route['returnConsiderations'], x + 10, y, width - 20, 'Helvetica', 9.0, 10.7, max_lines=4)
     if y < y_top - height + 7:
         raise ValueError(f"Route card overflow: {route['name']}")
@@ -190,11 +193,11 @@ def page_two(pdf, model):
     draw_header(pdf, model, 2, 'Route Profile Summary', 'Schematic comparison - not navigation-grade geometry')
     card_width = (PAGE_WIDTH - 2 * MARGIN - 12) / 2
     positions = [
-        (MARGIN, 688), (MARGIN + card_width + 12, 688),
+        (MARGIN, 694), (MARGIN + card_width + 12, 694),
         (MARGIN, 542), (MARGIN + card_width + 12, 542)
     ]
     for route, (x, y) in zip(model['routes'], positions):
-        draw_route_card(pdf, route, x, y, card_width, 134)
+        draw_route_card(pdf, route, x, y, card_width, 140)
 
     left_x = MARGIN
     left_w = 300

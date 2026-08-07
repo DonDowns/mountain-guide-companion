@@ -128,8 +128,8 @@ async function handleAction(action, button) {
     store.update(state => { state.setup.airplaneModeTestCompletedAt = ''; });
   }
   if (action === 'activate-update') {
-    navigator.serviceWorker?.addEventListener('controllerchange', () => location.reload(), { once: true });
-    await activateWaitingUpdate();
+    const activated = await activateWaitingUpdate();
+    if (!activated) showToast('No downloaded update is waiting.');
   }
   if (action === 'start-objective') {
     recordActualStart(button.dataset.objectiveId);

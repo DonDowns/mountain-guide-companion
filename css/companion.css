@@ -15,6 +15,8 @@
   --color-border: #687876;
   --color-emergency: #8b281f;
   --color-emergency-text: #fff7f3;
+  --color-display-mode-active: #7a2f25;
+  --color-display-mode-active-text: #fff7f3;
   --color-focus: #163d46;
   --color-focus-ring: #d6a23a;
   --color-status-candidate-bg: #f1dcae;
@@ -56,6 +58,8 @@
   --color-border: #d56859;
   --color-emergency: #b43a2d;
   --color-emergency-text: #fff1ed;
+  --color-display-mode-active: #7d261d;
+  --color-display-mode-active-text: #fff1ed;
   --color-focus: #fff1ed;
   --color-focus-ring: #ffd067;
   --color-status-candidate-bg: #310907;
@@ -954,9 +958,9 @@ textarea {
 }
 
 .primary-nav button[data-action="toggle-red"][aria-pressed="true"] {
-  background: var(--color-emergency);
-  color: var(--color-emergency-text);
-  box-shadow: inset 0 0 0 2px var(--color-emergency-text);
+  background: var(--color-display-mode-active);
+  color: var(--color-display-mode-active-text);
+  box-shadow: inset 0 0 0 2px var(--color-display-mode-active-text);
 }
 
 .primary-nav .emergency-nav {
