@@ -1,0 +1,177 @@
+@page {
+  size: 3.5in 5in;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #d9dde0;
+  color: #18222b;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.draft-banner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  padding: 3px 5px;
+  border: 1px solid #18222b;
+  background: #ffffff;
+  color: #18222b;
+  font-size: 7pt;
+  font-weight: 800;
+}
+
+.card-side {
+  position: relative;
+  width: 3.5in;
+  height: 5in;
+  margin: 12px auto;
+  padding: 0.14in 0.14in 0.25in;
+  overflow: hidden;
+  break-after: page;
+  background: #ffffff;
+  box-shadow: 0 2px 9px rgba(0, 0, 0, 0.18);
+}
+
+.card-side:last-of-type {
+  break-after: auto;
+}
+
+.side-label {
+  margin: 0 0 4px;
+  color: #344854;
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  padding: 6px;
+  border: 3px solid #18222b;
+  background: #6f1d1b;
+  color: #ffffff;
+  font-size: 20pt;
+  line-height: 1;
+  text-align: center;
+}
+
+h2 {
+  font-size: 12pt;
+  line-height: 1.1;
+}
+
+p,
+li,
+td,
+th {
+  font-size: 9.5pt;
+  line-height: 1.16;
+}
+
+.box {
+  margin-top: 5px;
+  padding: 5px;
+  border: 1.5px solid #263b4a;
+  background: #f1f3f4;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.contact {
+  padding: 4px 3px;
+  border: 1.5px solid #526674;
+}
+
+.contact h2 {
+  font-size: 10.5pt;
+}
+
+.phone {
+  font-size: 10.5pt;
+  font-weight: 800;
+}
+
+.write-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px;
+  align-items: end;
+  margin-top: 3px;
+}
+
+.write-line {
+  min-width: 20px;
+  height: 11px;
+  border-bottom: 1px solid #18222b;
+}
+
+.milestones {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.milestones td {
+  height: 13px;
+  padding: 1px 3px;
+  border: 1px solid #526674;
+}
+
+.checkbox {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border: 1px solid #18222b;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.footer {
+  position: absolute;
+  right: 0.14in;
+  bottom: 0.02in;
+  left: 0.14in;
+  color: #344854;
+  font-size: 5.3pt;
+  line-height: 1.08;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff;
+  }
+
+  .draft-banner {
+    display: none;
+  }
+
+  .card-side {
+    margin: 0;
+    box-shadow: none;
+  }
+}

@@ -49,12 +49,14 @@ export async function runPrivacy(options = {}) {
     createHash('sha256').update(await readFile(resolve(repoRoot, 'data/trip-manifest.json'))).digest('hex'),
     manifest.metadata.source_commit
   ]);
-  try {
-    allowedProvenanceFingerprints.add(
-      createHash('sha256').update(await readFile(resolve(repoRoot, 'generated/field-guide.pdf'))).digest('hex')
-    );
-  } catch {
-    // The Phase 1 data-only state has no generated PDF.
+  for (const artifact of ['field-guide.pdf', 'pocket-card.pdf']) {
+    try {
+      allowedProvenanceFingerprints.add(
+        createHash('sha256').update(await readFile(resolve(repoRoot, 'generated', artifact))).digest('hex')
+      );
+    } catch {
+      // Earlier phases do not have every generated print artifact.
+    }
   }
 
   const allowedPhones = new Set(

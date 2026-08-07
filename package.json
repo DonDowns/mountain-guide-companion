@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-2-print-draft",
+    "name": "phase-3-pocket-card-draft",
     "runtime_allowed": false,
     "print_artifacts_allowed": true
   },
@@ -20,6 +20,9 @@
     "build:field-guide": "node scripts/build-field-guide.mjs",
     "check:field-guide": "node scripts/verify-field-guide.mjs",
     "check:pdf": "node scripts/verify-field-guide.mjs --render",
+    "build:pocket-card": "node scripts/build-pocket-card.mjs",
+    "check:pocket-card": "node scripts/verify-pocket-card.mjs",
+    "check:pocket-card-pdf": "node scripts/verify-pocket-card.mjs --render",
     "pr:open": "node scripts/open-pr.mjs",
     "main:sync": "node scripts/sync-main.mjs",
     "release:tag": "node scripts/tag-release.mjs"

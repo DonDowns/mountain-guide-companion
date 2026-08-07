@@ -30,7 +30,8 @@ function isRuntimeFile(path) {
 
 function isPermittedPrintFile(path) {
   const extension = extname(path).toLowerCase();
-  return (path.startsWith('print/') && ['.html', '.css'].includes(extension)) || path === 'generated/field-guide.html';
+  return ((path.startsWith('print/') || path.startsWith('pocket-card/')) && ['.html', '.css'].includes(extension)) ||
+    ['generated/field-guide.html', 'generated/pocket-card.html'].includes(path);
 }
 
 async function main() {

@@ -101,7 +101,8 @@ async function main() {
   exec('git', ['pull', '--ff-only', 'origin', 'main'], { inherit: true });
   for (const script of [
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
-    'build:field-guide', 'check:field-guide', 'check:pdf'
+    'build:field-guide', 'check:field-guide', 'check:pdf',
+    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }
