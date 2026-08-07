@@ -99,7 +99,16 @@ jobs:
       - name: Run PDF page, content, and render contracts
         run: npm run check:pdf
 
-      - name: Verify generated artifacts reproduce committed bytes
+      - name: Build deterministic two-sided Pocket Card
+        run: npm run build:pocket-card
+
+      - name: Run Pocket Card manifest-parity contract
+        run: npm run check:pocket-card
+
+      - name: Run Pocket Card page, content, and render contracts
+        run: npm run check:pocket-card-pdf
+
+      - name: Verify all generated artifacts reproduce committed bytes
         run: git diff --exit-code -- generated
 
       - name: Determine canonical manifest SHA-256

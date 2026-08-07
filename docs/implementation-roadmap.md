@@ -190,9 +190,13 @@ High: fixed-page layout, readability, deterministic generation, and content hier
 
 Create the smallest complete, laminatable emergency/communication reference from the same canonical public dataset.
 
+### Draft status
+
+Implemented in Phase 3: a deterministic, source-controlled, exactly two-sided 3.5 × 5-inch portrait Pocket Card; manifest-derived public contacts and milestones; PDF metadata/checksum evidence; exact geometry and essential-font checks; and color, grayscale, and low-light rendering checks. This remains draft evidence only.
+
 ### Deliverables
 
-- 3.5 × 5-inch one-page or two-sided layout.
+- Exactly two 3.5 × 5-inch portrait sides.
 - CALL 911 FIRST and exact-location reporting hierarchy.
 - Verified public contacts and contextual-jurisdiction language.
 - Communication/check-in procedure.
@@ -215,6 +219,8 @@ Create the smallest complete, laminatable emergency/communication reference from
 - No rescue/delivery confirmation language.
 - Both sides, if used, identify orientation and provenance.
 - Headlamp, daylight, glove, wet-hand, pocket extraction, lamination, and second-person tests pass.
+
+The final criterion remains open for field release. The generated draft and automated low-light simulation do not replace actual-size physical testing.
 
 ### Complexity
 

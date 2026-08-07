@@ -23,15 +23,14 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 2 produces the first draft Printable Field Guide while preserving the approved Phase 0 architecture and Phase 1 canonical dataset. The deterministic build generates exactly three US Letter portrait pages:
+Phase 3 produces the first draft Emergency & Communication Pocket Card while preserving the approved canonical dataset and the Phase 2 Field Guide byte-for-byte. The deterministic Pocket Card build generates exactly two portrait pages at 3.5 × 5 inches:
 
-1. Operational Timeline + Decision Gates.
-2. Route Profile Summary + Return Considerations.
-3. Emergency + Communication.
+1. Front — CALL 911 FIRST, reporting prompts, all six verified public numbers, cautious geographic context, and blank current-location fields.
+2. Back — all nine canonical communication milestones, blank handwritten personal fields, weather/staleness fields, and concise decision-support language.
 
-The generated HTML, PDF, and non-circular artifact checksum record are source-controlled release artifacts. They are rebuilt from `data/trip-manifest.json`; the HTML/CSS template contains no independent canonical trip facts. No browser runtime, Pocket Card, PWA, service worker, network dependency, or deployment is introduced in Phase 2.
+The Field Guide and Pocket Card HTML, PDF, and non-circular artifact checksum records are source-controlled generated artifacts. Both derive public facts from `data/trip-manifest.json`; their HTML/CSS templates contain no independent canonical values. No browser runtime, PWA, service worker, network dependency, print-sheet imposition, tag, or deployment is introduced in Phase 3.
 
-This Field Guide is a draft, not a field release. The Lily Lake operational trailhead point remains `pending_external_verification`. Its unresolved coordinate/elevation is visibly withheld, and any artifact that requires that value remains blocked from final field release until authoritative verification. Actual-size physical print, sleeve/waterproof, daylight, headlamp, glove, wet-hand, and second-person tests also remain release gates.
+Both physical artifacts remain drafts, not field releases. The Lily Lake operational trailhead point remains `pending_external_verification`; no Lily Lake coordinate or elevation appears on the Pocket Card. Actual-size measurement, duplex orientation, lamination, daylight, headlamp, glove, wet-hand, pocket-extraction, and second-person tests remain release gates.
 
 ## Zero-connectivity requirement
 
@@ -121,6 +120,18 @@ npm run check:pdf
 
 The build is fail-closed on canonical parity, Lily Lake hold semantics, artifact identity, exact three-page geometry, printable bounds, essential type size, public-contact allowlisting, prohibited safety language, and rendered-page integrity. `check:pdf` renders all pages in color and grayscale to ignored temporary files for visual review. CI rebuilds the committed outputs and fails if their bytes drift.
 
+## Emergency Pocket Card build
+
+The Pocket Card uses the same pinned Python/Poppler print environment:
+
+```sh
+npm run build:pocket-card
+npm run check:pocket-card
+npm run check:pocket-card-pdf
+```
+
+The build fails closed on manifest identity, exactly two 252 × 360-point pages, 9.5-point minimum essential text, six allowlisted public numbers, nine canonical milestones, empty handwritten fields, prohibited safety language, Lily Lake secondary values, and checksum drift. The PDF check produces ignored color, grayscale, and low-light simulation renders for visual review.
+
 The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/trip-manifest.json`, including whitespace and the final newline. It is deliberately not embedded in the manifest. The aggregate runner computes it twice and requires the results to match.
 
 ## Architecture documents
@@ -135,7 +146,8 @@ The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/t
 - docs/data-verification-report.md — Phase 1 inventory, verification results, exclusions, and owner-review questions.
 - docs/repository-automation.md — protected branch, CI, auto-merge, synchronization, release-tagging, and future Pages policy.
 - docs/field-guide-design.md — Phase 2 page architecture, manifest-only fact flow, typography, print geometry, provenance, Lily Lake withholding, grayscale behavior, and release gates.
+- docs/pocket-card-design.md — Phase 3 side architecture, exact dimensions, emergency hierarchy, handwritten fields, provenance, grayscale/low-light behavior, and release gates.
 
 ## Repository status
 
-The public repository is `DonDowns/mountain-guide-companion`. Phase 0, Phase 1, and the Phase 2 draft Field Guide are on protected `main` after their respective automated workflows complete. Nothing is deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Field release, tagging, and physical signoff remain human gates; Phase 3 has not started.
+The public repository is `DonDowns/mountain-guide-companion`. Phase 0, Phase 1, the Phase 2 Field Guide draft, and the Phase 3 Pocket Card draft are on protected `main` after their respective automated workflows complete. Nothing is deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Field release, tagging, and physical signoff remain human gates; Phase 4 PWA work has not started.

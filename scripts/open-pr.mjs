@@ -23,7 +23,8 @@ function option(name, fallback = '') {
 }
 
 function isRuntimeFile(path) {
-  if (path.startsWith('print/') || path === 'generated/field-guide.html') return false;
+  if (path.startsWith('print/') || path.startsWith('pocket-card/') ||
+      ['generated/field-guide.html', 'generated/pocket-card.html'].includes(path)) return false;
   return ['.html', '.css', '.js', '.webmanifest'].includes(extname(path).toLowerCase()) ||
     ['app/', 'assets/', 'public/', 'src/'].some(directory => path.startsWith(directory));
 }
@@ -58,7 +59,8 @@ async function main() {
   exec('git', ['fetch', 'origin', 'main']);
   for (const script of [
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
-    'build:field-guide', 'check:field-guide', 'check:pdf'
+    'build:field-guide', 'check:field-guide', 'check:pdf',
+    'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }
@@ -71,9 +73,10 @@ async function main() {
   if (!files.length) throw new Error('branch has no changes relative to origin/main');
   const dataChanged = files.some(path => path.startsWith('data/'));
   const runtimeChanged = files.some(isRuntimeFile);
-  const printChanged = files.some(path => path.startsWith('print/') || path.startsWith('generated/') || /field.guide/i.test(path));
+  const printChanged = files.some(path => path.startsWith('print/') || path.startsWith('pocket-card/') || path.startsWith('generated/') || /field.guide|pocket.card/i.test(path));
   const manifest = JSON.parse(await readFile(resolve(repoRoot, 'data/trip-manifest.json'), 'utf8'));
   const fieldGuideArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/field-guide-artifact.json'), 'utf8'));
+  const pocketCardArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/pocket-card-artifact.json'), 'utf8'));
   const pending = [];
   const visit = value => {
     if (Array.isArray(value)) value.forEach(visit);
@@ -98,6 +101,9 @@ async function main() {
     '- `npm run build:field-guide`',
     '- `npm run check:field-guide`',
     '- `npm run check:pdf`',
+    '- `npm run build:pocket-card`',
+    '- `npm run check:pocket-card`',
+    '- `npm run check:pocket-card-pdf`',
     '- `npm run check:policy`', '',
     'Manifest SHA-256: `' + hash + '` (' + (dataChanged ? 'data changed' : 'data unchanged') + ')', '',
     '## Printable Field Guide', '',
@@ -105,6 +111,13 @@ async function main() {
     'Page result: ' + fieldGuideArtifact.page_count + ' US Letter portrait pages.', '',
     'Field Guide PDF SHA-256: `' + fieldGuideArtifact.field_guide_pdf_sha256 + '`.', '',
     'Canonical data version: `' + fieldGuideArtifact.data_version + '`.', '',
+    'Artifact status: draft, not a field release.', '',
+    '## Emergency & Communication Pocket Card', '',
+    'Exact artifact: `' + pocketCardArtifact.artifact_path + '`.', '',
+    'Physical result: ' + pocketCardArtifact.page_count + ' portrait sides at ' + pocketCardArtifact.page_size + ' each.', '',
+    'Pocket Card PDF SHA-256: `' + pocketCardArtifact.pocket_card_pdf_sha256 + '`.', '',
+    'Canonical data version: `' + pocketCardArtifact.data_version + '`.', '',
+    'Lily Lake treatment: no coordinate or elevation is printed; the scoped canonical hold remains unchanged.', '',
     'Artifact status: draft, not a field release.', '',
     'Privacy result: pass; no non-allowlisted private value detected.', '',
     'Safety result: pass; no prohibited authorization or false confirmation detected.', '',
@@ -116,7 +129,7 @@ async function main() {
     'Printable artifact files changed: ' + (printChanged ? 'yes' : 'no') + '.', '',
     runtimeChanged
       ? 'Physical testing is required before field release; this pull request does not assert physical signoff.'
-      : 'No browser runtime was introduced. Actual-size print, sleeve/waterproof, daylight, headlamp, glove, wet-hand, and second-person signoff remain mandatory before field release.'
+      : 'No browser runtime was introduced. Actual-size print, sleeve/waterproof or lamination, daylight, headlamp, glove, wet-hand, pocket-extraction, and second-person signoff remain mandatory before field release.'
   ].join('\n');
 
   exec('git', ['push', '-u', 'origin', branch], { inherit: true });
