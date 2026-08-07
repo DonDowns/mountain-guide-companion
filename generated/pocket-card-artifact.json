@@ -2,7 +2,7 @@
   "artifact_id": "emergency-pocket-card-v1",
   "artifact_status": "draft_not_field_release",
   "artifact_path": "generated/pocket-card.pdf",
-  "pocket_card_pdf_sha256": "a8662d218b5ae01ae78c8dbf3e4964c164ebbb9c75d7481a3e5c631f1cb45818",
+  "pocket_card_pdf_sha256": "f477e3599a8038300412323d833728e96bcc1b689d6653469ff05f119c2d8465",
   "trip_manifest_path": "data/trip-manifest.json",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "data_version": "1.0.0",

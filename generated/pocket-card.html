@@ -4,7 +4,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Emergency &amp; Communication Pocket Card</title>
-  <style>@page {
+  <style>:root {
+  --print-brand-primary: #163d46;
+  --print-brand-red: #b93d2e;
+  --print-accent-gold: #a96f12;
+  --print-stone: #e8dfcf;
+  --print-earth: #66503c;
+  --print-canvas: #ded7ca;
+  --print-surface: #fffdf8;
+  --print-text: #18222b;
+  --print-text-muted: #45545a;
+  --print-border: #60706f;
+  --print-emergency: #8b281f;
+  --print-emergency-text: #ffffff;
+}
+
+@page {
   size: 3.5in 5in;
   margin: 0;
 }
@@ -17,8 +32,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #d9dde0;
-  color: #18222b;
+  background: var(--print-canvas);
+  color: var(--print-text);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -28,9 +43,9 @@ body {
   right: 0;
   z-index: 5;
   padding: 3px 5px;
-  border: 1px solid #18222b;
-  background: #ffffff;
-  color: #18222b;
+  border: 1px solid var(--print-text);
+  background: var(--print-surface);
+  color: var(--print-text);
   font-size: 7pt;
   font-weight: 800;
 }
@@ -43,7 +58,7 @@ body {
   padding: 0.14in 0.14in 0.25in;
   overflow: hidden;
   break-after: page;
-  background: #ffffff;
+  background: var(--print-surface);
   box-shadow: 0 2px 9px rgba(0, 0, 0, 0.18);
 }
 
@@ -53,7 +68,7 @@ body {
 
 .side-label {
   margin: 0 0 4px;
-  color: #344854;
+  color: var(--print-earth);
   font-size: 9.5pt;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -68,9 +83,9 @@ p {
 
 h1 {
   padding: 6px;
-  border: 3px solid #18222b;
-  background: #6f1d1b;
-  color: #ffffff;
+  border: 3px solid var(--print-text);
+  background: var(--print-emergency);
+  color: var(--print-emergency-text);
   font-size: 20pt;
   line-height: 1;
   text-align: center;
@@ -92,8 +107,9 @@ th {
 .box {
   margin-top: 5px;
   padding: 5px;
-  border: 1.5px solid #263b4a;
-  background: #f1f3f4;
+  border: 1.5px solid var(--print-brand-primary);
+  border-left: 4px solid var(--print-accent-gold);
+  background: color-mix(in srgb, var(--print-surface) 58%, var(--print-stone));
 }
 
 .contact-grid {
@@ -105,7 +121,7 @@ th {
 
 .contact {
   padding: 4px 3px;
-  border: 1.5px solid #526674;
+  border: 1.5px solid var(--print-border);
 }
 
 .contact h2 {
@@ -128,7 +144,7 @@ th {
 .write-line {
   min-width: 20px;
   height: 11px;
-  border-bottom: 1px solid #18222b;
+  border-bottom: 1px solid var(--print-text);
 }
 
 .milestones {
@@ -139,7 +155,7 @@ th {
 .milestones td {
   height: 13px;
   padding: 1px 3px;
-  border: 1px solid #526674;
+  border: 1px solid var(--print-border);
 }
 
 .checkbox {
@@ -147,7 +163,7 @@ th {
   width: 8px;
   height: 8px;
   margin-right: 4px;
-  border: 1px solid #18222b;
+  border: 1px solid var(--print-text);
 }
 
 .field-grid {
@@ -161,7 +177,7 @@ th {
   right: 0.14in;
   bottom: 0.02in;
   left: 0.14in;
-  color: #344854;
+  color: var(--print-text-muted);
   font-size: 5.3pt;
   line-height: 1.08;
 }
@@ -186,6 +202,6 @@ th {
 <body>
   <div class="draft-banner">DRAFT - NOT A FIELD RELEASE</div>
   <section class="card-side"><p class="side-label">Front | Emergency</p><h1>CALL 911 FIRST.</h1><div class="box"><strong>GIVE:</strong> Exact location; mountain / route; elevation; coordinates if available; injuries; party size; weather / conditions.</div><div class="box"><strong>Dispatch determines the responding agency from the exact incident location.</strong> You do not need to choose a county before calling.</div><div class="contact-grid"><section class="contact"><h2>Alamosa</h2><p>dispatch</p><p class="phone">719-589-5807</p><p>office</p><p class="phone">719-589-6608</p></section><section class="contact"><h2>Huerfano</h2><p>dispatch</p><p class="phone">719-738-1044</p><p>office</p><p class="phone">719-738-1600</p></section><section class="contact"><h2>Costilla</h2><p>dispatch</p><p class="phone">719-672-3302</p><p>office</p><p class="phone">719-672-0673</p></section></div><div><p>Lake Como and the Alamosa-side approach may involve Alamosa County.</p><p>Lily Lake and trailhead-side incidents may involve Huerfano County.</p><p>Summit-area incidents on Blanca Peak, Ellingwood Point, or Mount Lindsey may involve Costilla County.</p></div><div class="box"><h2>Current location</h2><div class="write-row"><strong>Mountain / route:</strong><span class="write-line"></span></div><div class="write-row"><strong>Elevation:</strong><span class="write-line"></span></div><div class="write-row"><strong>Coordinates:</strong><span class="write-line"></span></div><div class="write-row"><strong>Time:</strong><span class="write-line"></span></div></div><footer class="footer">Don Downs Mountain Guide Companion | Trip Data v1.0.0 | Based on Mountain Guide v15.3.10<br>Generated: Aug 7, 2026 | Verified: Aug 7, 2026 | Manifest: 3cda95d4e6b1... | DRAFT | FRONT</footer></section><section class="card-side"><p class="side-label">Back | Communication <span>Time / initials</span></p><table class="milestones"><tbody><tr><td><span class="checkbox"></span>Vehicle departure</td><td></td></tr><tr><td><span class="checkbox"></span>Lake Como camp</td><td></td></tr><tr><td><span class="checkbox"></span>Summit start</td><td></td></tr><tr><td><span class="checkbox"></span>Summit or high point</td><td></td></tr><tr><td><span class="checkbox"></span>Below exposed terrain</td><td></td></tr><tr><td><span class="checkbox"></span>Back at camp</td><td></td></tr><tr><td><span class="checkbox"></span>Back at vehicle</td><td></td></tr><tr><td><span class="checkbox"></span>Fort Garland</td><td></td></tr><tr><td><span class="checkbox"></span>Home</td><td></td></tr></tbody></table><div class="box"><strong>Drafted/copied communication does not prove delivery.</strong></div><div class="box"><h2>Personal contact</h2><p><strong>Complete by hand after printing.</strong></p><div class="field-grid"><div><strong>Name:</strong><span class="write-line"></span></div><div><strong>Phone:</strong><span class="write-line"></span></div><div><strong>Alternate:</strong><span class="write-line"></span></div></div><p><strong>Optional medical / personal notes</strong></p><span class="write-line"></span><span class="write-line"></span></div><div class="box"><div class="field-grid"><div><strong>Saved weather refreshed:</strong><span class="write-line"></span></div><div><strong>Actual sky/wind:</strong><span class="write-line"></span></div></div><p><strong>Saved weather may be stale. Weather is evidence, not permission.</strong></p></div><div class="box"><strong>Decision support, not permission. Actual sky, wind, terrain, access, pace, descent requirements, and group condition govern field decisions.</strong></div><footer class="footer">Don Downs Mountain Guide Companion | Trip Data v1.0.0 | Based on Mountain Guide v15.3.10<br>Generated: Aug 7, 2026 | Verified: Aug 7, 2026 | Manifest: 3cda95d4e6b1... | DRAFT | BACK</footer></section>
-  <script type="application/json" id="artifact-metadata">{"artifact_id":"emergency-pocket-card-v1","artifact_status":"draft_not_field_release","artifact_path":"generated/pocket-card.pdf","pocket_card_pdf_sha256":"a8662d218b5ae01ae78c8dbf3e4964c164ebbb9c75d7481a3e5c631f1cb45818","trip_manifest_path":"data/trip-manifest.json","trip_manifest_sha256":"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758","data_version":"1.0.0","source_release":"v15.3.10","source_commit":"fb711292b2642c2296eb76c0cfe2531606029609","generated_at":"2026-08-07T09:18:42Z","page_count":2,"page_size":"3.5 x 5 inches","page_size_points":[252,360],"orientation":"portrait","sides":["front","back"]}</script>
+  <script type="application/json" id="artifact-metadata">{"artifact_id":"emergency-pocket-card-v1","artifact_status":"draft_not_field_release","artifact_path":"generated/pocket-card.pdf","pocket_card_pdf_sha256":"f477e3599a8038300412323d833728e96bcc1b689d6653469ff05f119c2d8465","trip_manifest_path":"data/trip-manifest.json","trip_manifest_sha256":"3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758","data_version":"1.0.0","source_release":"v15.3.10","source_commit":"fb711292b2642c2296eb76c0cfe2531606029609","generated_at":"2026-08-07T09:18:42Z","page_count":2,"page_size":"3.5 x 5 inches","page_size_points":[252,360],"orientation":"portrait","sides":["front","back"]}</script>
 </body>
 </html>

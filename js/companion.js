@@ -84,8 +84,9 @@ async function handleAction(action, button) {
   if (action === 'open-companion') {
     document.body.classList.add('companion-open');
     store.update(state => { state.setup.companionOpened = true; });
+    document.body.getBoundingClientRect();
     navigateTo('timeline');
-    document.querySelector('#app-main').focus();
+    document.querySelector('#app-main').focus({ preventScroll: true });
   }
   if (action === 'show-setup') {
     document.body.classList.remove('companion-open');
@@ -173,6 +174,7 @@ function bindEvents() {
     const nav = event.target.closest('[data-nav]');
     if (nav) {
       document.body.classList.add('companion-open');
+      document.body.getBoundingClientRect();
       navigateTo(nav.dataset.nav);
       return;
     }

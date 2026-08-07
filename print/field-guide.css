@@ -1,3 +1,18 @@
+:root {
+  --print-brand-primary: #163d46;
+  --print-brand-red: #b93d2e;
+  --print-accent-gold: #a96f12;
+  --print-stone: #e8dfcf;
+  --print-earth: #66503c;
+  --print-canvas: #ded7ca;
+  --print-surface: #fffdf8;
+  --print-text: #18222b;
+  --print-text-muted: #45545a;
+  --print-border: #60706f;
+  --print-emergency: #8b281f;
+  --print-emergency-text: #ffffff;
+}
+
 @page {
   size: Letter portrait;
   margin: 0;
@@ -11,8 +26,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #d9dde0;
-  color: #18222b;
+  background: var(--print-canvas);
+  color: var(--print-text);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -22,9 +37,9 @@ body {
   right: 0;
   z-index: 5;
   padding: 5px 10px;
-  border: 2px solid #18222b;
-  background: #ffffff;
-  color: #18222b;
+  border: 2px solid var(--print-text);
+  background: var(--print-surface);
+  color: var(--print-text);
   font-size: 9pt;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -38,7 +53,7 @@ body {
   padding: 0.5in 0.52in 0.55in;
   overflow: hidden;
   break-after: page;
-  background: #ffffff;
+  background: var(--print-surface);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
 }
 
@@ -47,14 +62,25 @@ body {
 }
 
 .page-header {
+  position: relative;
   padding-bottom: 9px;
-  border-bottom: 3px solid #263b4a;
+  border-bottom: 3px solid var(--print-brand-primary);
+}
+
+.page-header::after {
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 72px;
+  height: 3px;
+  background: var(--print-accent-gold);
+  content: "";
 }
 
 .eyebrow,
 .kicker {
   margin: 0 0 3px;
-  color: #3e5667;
+  color: var(--print-earth);
   font-size: 9pt;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -63,14 +89,14 @@ body {
 
 h1 {
   margin: 0;
-  color: #182f3e;
+  color: var(--print-brand-primary);
   font-size: 19pt;
   line-height: 1.08;
 }
 
 h2 {
   margin: 0 0 7px;
-  color: #182f3e;
+  color: var(--print-brand-primary);
   font-size: 16pt;
   line-height: 1.12;
 }
@@ -119,9 +145,9 @@ li {
 .section-box,
 .route-card,
 .contact-card {
-  border: 1.5px solid #526674;
+  border: 1.5px solid var(--print-border);
   border-radius: 5px;
-  background: #ffffff;
+  background: var(--print-surface);
 }
 
 .card,
@@ -136,7 +162,8 @@ li {
 
 .section-box {
   padding: 10px 11px;
-  background: #f1f3f4;
+  border-top: 2px solid var(--print-accent-gold);
+  background: color-mix(in srgb, var(--print-surface) 58%, var(--print-stone));
 }
 
 .section-box + .section-box {
@@ -147,8 +174,9 @@ li {
 .emergency-rule {
   margin-top: 10px;
   padding: 9px 11px;
-  border: 2px solid #182f3e;
-  background: #e6eaec;
+  border: 2px solid var(--print-brand-primary);
+  border-left: 6px solid var(--print-accent-gold);
+  background: color-mix(in srgb, var(--print-surface) 54%, var(--print-stone));
   font-size: 11pt;
   font-weight: 800;
 }
@@ -195,13 +223,13 @@ li {
 .bar-track {
   height: 13px;
   margin: 5px 0 7px;
-  border: 1px solid #5d6e79;
-  background: #ffffff;
+  border: 1px solid var(--print-border);
+  background: var(--print-surface);
 }
 
 .bar-fill {
   height: 100%;
-  background: #536d7d;
+  background: var(--print-brand-primary);
 }
 
 table {
@@ -212,22 +240,22 @@ table {
 th,
 td {
   padding: 5px 6px;
-  border: 1px solid #71818b;
+  border: 1px solid var(--print-border);
   text-align: left;
   vertical-align: top;
 }
 
 th {
-  background: #e5e9eb;
+  background: var(--print-stone);
   font-weight: 800;
 }
 
 .emergency-headline {
   margin: 10px 0 8px;
   padding: 10px 12px;
-  border: 4px solid #202020;
-  background: #6f1d1b;
-  color: #ffffff;
+  border: 4px solid var(--print-text);
+  background: var(--print-emergency);
+  color: var(--print-emergency-text);
   font-size: 24pt;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -239,7 +267,7 @@ th {
   width: 13px;
   height: 13px;
   margin-right: 5px;
-  border: 1.5px solid #202020;
+  border: 1.5px solid var(--print-text);
   vertical-align: -1px;
 }
 
@@ -247,7 +275,7 @@ th {
   display: block;
   height: 20px;
   margin: 4px 0;
-  border-bottom: 1px solid #303030;
+  border-bottom: 1px solid var(--print-text);
 }
 
 .page-footer {
@@ -256,14 +284,14 @@ th {
   bottom: 0.25in;
   left: 0.52in;
   padding-top: 5px;
-  border-top: 1px solid #697985;
-  color: #344854;
+  border-top: 1px solid var(--print-border);
+  color: var(--print-text-muted);
   font-size: 7.5pt;
   line-height: 1.2;
 }
 
 .page-footer strong {
-  color: #182f3e;
+  color: var(--print-brand-primary);
 }
 
 @media print {

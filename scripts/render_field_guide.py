@@ -13,12 +13,13 @@ PAGE_WIDTH, PAGE_HEIGHT = letter
 MARGIN = 38
 FOOTER_TOP = 52
 INK = HexColor('#18222b')
-NAVY = HexColor('#183342')
-SLATE = HexColor('#536d7d')
-MID = HexColor('#71818b')
-LIGHT = HexColor('#eef1f2')
-PALE = HexColor('#f7f8f8')
-EMERGENCY = HexColor('#6f1d1b')
+TEAL = HexColor('#163d46')
+GOLD = HexColor('#a96f12')
+EARTH = HexColor('#66503c')
+BORDER = HexColor('#60706f')
+STONE = HexColor('#e8dfcf')
+PALE = HexColor('#f7f5ef')
+EMERGENCY = HexColor('#8b281f')
 
 
 def wrap_lines(text, font, size, width):
@@ -59,7 +60,7 @@ def draw_centered(pdf, text, x, y, width, font='Helvetica-Bold', size=10, color=
     pdf.drawCentredString(x + width / 2, y, text)
 
 
-def box(pdf, x, y_top, width, height, fill=white, stroke=MID, line_width=1.1, radius=4):
+def box(pdf, x, y_top, width, height, fill=white, stroke=BORDER, line_width=1.1, radius=4):
     pdf.setLineWidth(line_width)
     pdf.setStrokeColor(stroke)
     pdf.setFillColor(fill)
@@ -67,33 +68,35 @@ def box(pdf, x, y_top, width, height, fill=white, stroke=MID, line_width=1.1, ra
 
 
 def section_heading(pdf, text, x, y, size=16):
-    pdf.setFillColor(NAVY)
+    pdf.setFillColor(TEAL)
     pdf.setFont('Helvetica-Bold', size)
     pdf.drawString(x, y, text)
     return y - size * 1.2
 
 
 def draw_header(pdf, model, page_number, title, subtitle):
-    pdf.setFillColor(SLATE)
+    pdf.setFillColor(EARTH)
     pdf.setFont('Helvetica-Bold', 9)
     pdf.drawString(MARGIN, PAGE_HEIGHT - 35, f'PRINTABLE FIELD GUIDE | PAGE {page_number}')
-    pdf.setFillColor(NAVY)
+    pdf.setFillColor(TEAL)
     pdf.setFont('Helvetica-Bold', 18)
     pdf.drawString(MARGIN, PAGE_HEIGHT - 57, title)
     pdf.setFillColor(INK)
     pdf.setFont('Helvetica-Bold', 10.5)
     pdf.drawString(MARGIN, PAGE_HEIGHT - 75, subtitle)
-    pdf.setStrokeColor(NAVY)
+    pdf.setStrokeColor(TEAL)
     pdf.setLineWidth(2.5)
     pdf.line(MARGIN, PAGE_HEIGHT - 84, PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 84)
+    pdf.setStrokeColor(GOLD)
+    pdf.line(MARGIN, PAGE_HEIGHT - 84, MARGIN + 72, PAGE_HEIGHT - 84)
 
 
 def draw_footer(pdf, model, page_number):
     p = model['provenance']
-    pdf.setStrokeColor(MID)
+    pdf.setStrokeColor(BORDER)
     pdf.setLineWidth(0.7)
     pdf.line(MARGIN, FOOTER_TOP, PAGE_WIDTH - MARGIN, FOOTER_TOP)
-    pdf.setFillColor(NAVY)
+    pdf.setFillColor(TEAL)
     pdf.setFont('Helvetica-Bold', 7.4)
     pdf.drawString(MARGIN, 40, f"{p['product']} | Trip Data v{p['dataVersion']} | Based on Mountain Guide {p['sourceRelease']}")
     pdf.setFillColor(INK)
@@ -103,10 +106,13 @@ def draw_footer(pdf, model, page_number):
 
 def draw_timeline_card(pdf, item, x, y_top, width, height):
     box(pdf, x, y_top, width, height, fill=PALE)
+    pdf.setStrokeColor(GOLD)
+    pdf.setLineWidth(2)
+    pdf.line(x + 4, y_top, x + 54, y_top)
     y = y_top - 16
-    y = draw_text(pdf, f"{item['role'].upper()} | {item['plannedDate']}", x + 10, y, width - 20, 'Helvetica-Bold', 9.0, color=SLATE, max_lines=1)
+    y = draw_text(pdf, f"{item['role'].upper()} | {item['plannedDate']}", x + 10, y, width - 20, 'Helvetica-Bold', 9.0, color=EARTH, max_lines=1)
     y -= 2
-    y = draw_text(pdf, item['name'], x + 10, y, width - 20, 'Helvetica-Bold', 12, 14, color=NAVY, max_lines=2)
+    y = draw_text(pdf, item['name'], x + 10, y, width - 20, 'Helvetica-Bold', 12, 14, color=TEAL, max_lines=2)
     for entry in item['times']:
         y -= 2
         pdf.setFont('Helvetica-Bold', 11.5)
@@ -121,8 +127,8 @@ def draw_timeline_card(pdf, item, x, y_top, width, height):
 
 def page_one(pdf, model):
     draw_header(pdf, model, 1, model['trip']['name'], model['trip']['dateRange'])
-    box(pdf, MARGIN, 696, PAGE_WIDTH - 2 * MARGIN, 30, fill=LIGHT, stroke=NAVY, line_width=1.8)
-    draw_centered(pdf, f"{model['weatherRule']} {model['actualConditionsRule']}", MARGIN + 6, 677, PAGE_WIDTH - 2 * MARGIN - 12, size=10.4, color=NAVY)
+    box(pdf, MARGIN, 696, PAGE_WIDTH - 2 * MARGIN, 30, fill=STONE, stroke=TEAL, line_width=1.8)
+    draw_centered(pdf, f"{model['weatherRule']} {model['actualConditionsRule']}", MARGIN + 6, 677, PAGE_WIDTH - 2 * MARGIN - 12, size=10.4, color=TEAL)
 
     left_x = MARGIN
     left_w = 334
@@ -134,21 +140,21 @@ def page_one(pdf, model):
     for item, height in zip(model['timeline'], heights):
         draw_timeline_card(pdf, item, left_x, card_top, left_w, height)
         card_top -= height + 8
-    box(pdf, left_x, card_top, left_w, 72, fill=LIGHT, stroke=NAVY, line_width=1.5)
-    draw_text(pdf, model['planningRule'], left_x + 10, card_top - 16, left_w - 20, 'Helvetica-Bold', 9.6, 12, color=NAVY, max_lines=5)
+    box(pdf, left_x, card_top, left_w, 72, fill=STONE, stroke=TEAL, line_width=1.5)
+    draw_text(pdf, model['planningRule'], left_x + 10, card_top - 16, left_w - 20, 'Helvetica-Bold', 9.6, 12, color=TEAL, max_lines=5)
 
     section_heading(pdf, 'Decision Gates', right_x, 645)
     box(pdf, right_x, 620, right_w, 348, fill=PALE)
     y = 602
     for prompt in model['decisionGates']:
-        pdf.setFillColor(NAVY)
+        pdf.setFillColor(GOLD)
         pdf.circle(right_x + 10, y + 2, 2.2, stroke=0, fill=1)
         y = draw_text(pdf, prompt, right_x + 18, y, right_w - 28, 'Helvetica', 9.2, 11.3, max_lines=8)
         y -= 7
     if y < 281:
         raise ValueError('Decision Gates overflow')
 
-    box(pdf, right_x, 260, right_w, 174, fill=LIGHT, stroke=NAVY, line_width=1.4)
+    box(pdf, right_x, 260, right_w, 174, fill=STONE, stroke=TEAL, line_width=1.4)
     y = section_heading(pdf, 'Field weather record', right_x + 10, 241, size=11.5)
     y = draw_text(pdf, model['weatherLog']['refreshLabel'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.3, max_lines=2)
     pdf.setStrokeColor(INK)
@@ -157,16 +163,19 @@ def page_one(pdf, model):
     y = draw_text(pdf, model['weatherLog']['observationLabel'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.3, max_lines=2)
     pdf.line(right_x + 10, y - 2, right_x + right_w - 10, y - 2)
     y -= 18
-    draw_text(pdf, model['weatherLog']['warning'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.1, 11, color=NAVY, max_lines=5)
+    draw_text(pdf, model['weatherLog']['warning'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.1, 11, color=TEAL, max_lines=5)
     draw_footer(pdf, model, 1)
     pdf.showPage()
 
 
 def draw_route_card(pdf, route, x, y_top, width, height):
     box(pdf, x, y_top, width, height, fill=PALE)
+    pdf.setStrokeColor(TEAL)
+    pdf.setLineWidth(2)
+    pdf.line(x + 4, y_top, x + 54, y_top)
     y = y_top - 15
-    y = draw_text(pdf, route['objective'].upper(), x + 10, y, width - 20, 'Helvetica-Bold', 9.0, color=SLATE, max_lines=1)
-    y = draw_text(pdf, route['name'], x + 10, y - 1, width - 20, 'Helvetica-Bold', 11, 13, color=NAVY, max_lines=2)
+    y = draw_text(pdf, route['objective'].upper(), x + 10, y, width - 20, 'Helvetica-Bold', 9.0, color=EARTH, max_lines=1)
+    y = draw_text(pdf, route['name'], x + 10, y - 1, width - 20, 'Helvetica-Bold', 11, 13, color=TEAL, max_lines=2)
     y -= 2
     metrics = f"{route['distance']} {route['distanceScope']} | {route['gain']} gain"
     y = draw_text(pdf, metrics, x + 10, y, width - 20, 'Helvetica-Bold', 10.2, 12, max_lines=2)
@@ -191,16 +200,16 @@ def page_two(pdf, model):
     left_w = 300
     right_x = left_x + left_w + 14
     right_w = PAGE_WIDTH - MARGIN - right_x
-    box(pdf, left_x, 394, left_w, 112, fill=LIGHT)
+    box(pdf, left_x, 394, left_w, 112, fill=STONE)
     y = section_heading(pdf, 'Cumulative gain comparison', left_x + 10, 376, size=11.5)
     maximum = max(route['gainValue'] for route in model['routes'])
     for route in model['routes']:
         label = f"{route['name']} - {route['gain']}"
         y = draw_text(pdf, label, left_x + 10, y, left_w - 20, 'Helvetica-Bold', 9.0, 10.2, max_lines=1)
         bar_width = (left_w - 20) * route['gainValue'] / maximum
-        pdf.setFillColor(SLATE)
+        pdf.setFillColor(EARTH)
         pdf.rect(left_x + 10, y - 1, bar_width, 6, stroke=0, fill=1)
-        pdf.setStrokeColor(MID)
+        pdf.setStrokeColor(BORDER)
         pdf.rect(left_x + 10, y - 1, left_w - 20, 6, stroke=1, fill=0)
         y -= 13
 
@@ -209,21 +218,21 @@ def page_two(pdf, model):
     for point in model['referencePoints']:
         y = draw_text(pdf, f"{point['name']} | {point['coordinate']} | {point['elevation']}", left_x + 10, y, left_w - 20, 'Helvetica-Bold', 9.1, 10.6, max_lines=2)
         if point['name'] == 'Lake Como area':
-            y = draw_text(pdf, point['context'], left_x + 10, y, left_w - 20, 'Helvetica', 9.0, 10.2, color=SLATE, max_lines=3)
+            y = draw_text(pdf, point['context'], left_x + 10, y, left_w - 20, 'Helvetica', 9.0, 10.2, color=EARTH, max_lines=3)
         y -= 3
-    y = draw_text(pdf, f"{model['lilyLake']['name']}: {model['lilyLake']['holdText']}", left_x + 10, y, left_w - 20, 'Helvetica-Bold', 9.1, 10.7, color=NAVY, max_lines=3)
+    y = draw_text(pdf, f"{model['lilyLake']['name']}: {model['lilyLake']['holdText']}", left_x + 10, y, left_w - 20, 'Helvetica-Bold', 9.1, 10.7, color=TEAL, max_lines=3)
     if y < 78:
         raise ValueError('Reference point box overflow')
 
-    box(pdf, right_x, 394, right_w, 220, fill=LIGHT, stroke=NAVY, line_width=1.5)
+    box(pdf, right_x, 394, right_w, 220, fill=STONE, stroke=TEAL, line_width=1.5)
     y = section_heading(pdf, 'Mount Lindsey access', right_x + 10, 376, size=12)
-    y = draw_text(pdf, model['access']['fact'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.1, 11, color=NAVY, max_lines=5)
+    y = draw_text(pdf, model['access']['fact'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.1, 11, color=TEAL, max_lines=5)
     y -= 4
     y = draw_text(pdf, model['access']['restrictions'], right_x + 10, y, right_w - 20, 'Helvetica', 9.0, 10.7, max_lines=9)
     y -= 4
     y = draw_text(pdf, model['access']['recheck'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.7, max_lines=6)
     y -= 4
-    y = draw_text(pdf, model['access']['noGrant'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9, 10.8, color=NAVY, max_lines=3)
+    y = draw_text(pdf, model['access']['noGrant'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9, 10.8, color=TEAL, max_lines=3)
     if y < 183:
         raise ValueError('Mount Lindsey access box overflow')
 
@@ -237,12 +246,12 @@ def page_two(pdf, model):
 def draw_contact_card(pdf, contact, x, y_top, width, height):
     box(pdf, x, y_top, width, height, fill=PALE)
     y = y_top - 16
-    y = draw_text(pdf, contact['shortName'], x + 8, y, width - 16, 'Helvetica-Bold', 11.5, 13, color=NAVY, max_lines=2)
+    y = draw_text(pdf, contact['shortName'], x + 8, y, width - 16, 'Helvetica-Bold', 11.5, 13, color=TEAL, max_lines=2)
     for phone in contact['phones']:
         y = draw_text(pdf, f"{phone['label']}: {phone['value']}", x + 8, y - 1, width - 16, 'Helvetica-Bold', 9.2, 10.8, max_lines=2)
     y -= 2
     y = draw_text(pdf, contact['context'], x + 8, y, width - 16, 'Helvetica', 9.0, 10.2, max_lines=6)
-    y = draw_text(pdf, 'Verified: ' + contact['verified'], x + 8, y - 1, width - 16, 'Helvetica-Bold', 9.0, 10.2, color=SLATE, max_lines=2)
+    y = draw_text(pdf, 'Verified: ' + contact['verified'], x + 8, y - 1, width - 16, 'Helvetica-Bold', 9.0, 10.2, color=EARTH, max_lines=2)
     if y < y_top - height + 6:
         raise ValueError(f"Contact card overflow: {contact['shortName']}")
 
@@ -252,13 +261,13 @@ def page_three(pdf, model):
     box(pdf, MARGIN, 696, PAGE_WIDTH - 2 * MARGIN, 44, fill=EMERGENCY, stroke=INK, line_width=3, radius=2)
     draw_centered(pdf, model['emergency']['headline'], MARGIN, 668, PAGE_WIDTH - 2 * MARGIN, size=24, color=white)
 
-    box(pdf, MARGIN, 642, PAGE_WIDTH - 2 * MARGIN, 92, fill=LIGHT, stroke=NAVY, line_width=1.5)
+    box(pdf, MARGIN, 642, PAGE_WIDTH - 2 * MARGIN, 92, fill=STONE, stroke=TEAL, line_width=1.5)
     y = 625
-    y = draw_text(pdf, 'Give:', MARGIN + 10, y, 38, 'Helvetica-Bold', 10.5, 12, color=NAVY, max_lines=1)
+    y = draw_text(pdf, 'Give:', MARGIN + 10, y, 38, 'Helvetica-Bold', 10.5, 12, color=TEAL, max_lines=1)
     give_text = ' '.join(model['emergency']['sequence'][1:3])
     y = draw_text(pdf, give_text, MARGIN + 50, 625, PAGE_WIDTH - 2 * MARGIN - 60, 'Helvetica-Bold', 9.5, 11.8, max_lines=4)
     y -= 2
-    y = draw_text(pdf, model['emergency']['jurisdiction'], MARGIN + 10, y, PAGE_WIDTH - 2 * MARGIN - 20, 'Helvetica-Bold', 9.4, 11.5, color=NAVY, max_lines=2)
+    y = draw_text(pdf, model['emergency']['jurisdiction'], MARGIN + 10, y, PAGE_WIDTH - 2 * MARGIN - 20, 'Helvetica-Bold', 9.4, 11.5, color=TEAL, max_lines=2)
     draw_text(pdf, model['emergency']['countyChoice'], MARGIN + 10, y, PAGE_WIDTH - 2 * MARGIN - 20, 'Helvetica', 9.3, 11.2, max_lines=2)
 
     contact_gap = 8
@@ -276,7 +285,7 @@ def page_three(pdf, model):
     col1 = 188
     col2 = 58
     col3 = left_w - col1 - col2
-    pdf.setFillColor(LIGHT)
+    pdf.setFillColor(STONE)
     pdf.rect(left_x, table_top - row_height, left_w, row_height, stroke=1, fill=1)
     pdf.setFillColor(INK)
     pdf.setFont('Helvetica-Bold', 9.0)
@@ -296,7 +305,7 @@ def page_three(pdf, model):
         pdf.line(left_x + col1, bottom, left_x + col1, top)
         pdf.line(left_x + col1 + col2, bottom, left_x + col1 + col2, top)
     table_bottom = table_top - row_height * 10
-    draw_text(pdf, model['communication']['draftBehavior'], left_x, table_bottom - 13, left_w, 'Helvetica-Bold', 9.0, 10.5, color=NAVY, max_lines=5)
+    draw_text(pdf, model['communication']['draftBehavior'], left_x, table_bottom - 13, left_w, 'Helvetica-Bold', 9.0, 10.5, color=TEAL, max_lines=5)
 
     personal_box_bottom = 210
     box(pdf, right_x, 374, right_w, 374 - personal_box_bottom, fill=PALE)
@@ -310,24 +319,24 @@ def page_three(pdf, model):
     for _ in range(2):
         pdf.line(right_x + 10, y - 2, right_x + right_w - 10, y - 2)
         y -= 16
-    y = draw_text(pdf, model['personal']['completion'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.4, color=NAVY, max_lines=2)
+    y = draw_text(pdf, model['personal']['completion'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.4, color=TEAL, max_lines=2)
     if y + 10.4 < personal_box_bottom + 2:
         raise ValueError('Personal contact box overflow')
 
     weather_box_top = 198
     weather_box_bottom = 96
-    box(pdf, right_x, weather_box_top, right_w, weather_box_top - weather_box_bottom, fill=LIGHT)
+    box(pdf, right_x, weather_box_top, right_w, weather_box_top - weather_box_bottom, fill=STONE)
     y = section_heading(pdf, 'Weather / staleness', right_x + 10, 181, size=11.2)
     for label in [model['weatherLog']['refreshLabel'], model['weatherLog']['observationLabel']]:
         y = draw_text(pdf, label, right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.4, max_lines=2)
         pdf.line(right_x + 10, y - 2, right_x + right_w - 10, y - 2)
         y -= 12
-    y = draw_text(pdf, model['weatherLog']['warning'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.2, color=NAVY, max_lines=4)
+    y = draw_text(pdf, model['weatherLog']['warning'], right_x + 10, y, right_w - 20, 'Helvetica-Bold', 9.0, 10.2, color=TEAL, max_lines=4)
     if y + 10.2 < weather_box_bottom + 2:
         raise ValueError('Weather / staleness box overflow')
 
-    box(pdf, MARGIN, 88, PAGE_WIDTH - 2 * MARGIN, 32, fill=LIGHT, stroke=NAVY, line_width=1.4)
-    draw_text(pdf, model['finalSafety'], MARGIN + 10, 73, PAGE_WIDTH - 2 * MARGIN - 20, 'Helvetica-Bold', 9.0, 10.5, color=NAVY, max_lines=3)
+    box(pdf, MARGIN, 88, PAGE_WIDTH - 2 * MARGIN, 32, fill=STONE, stroke=TEAL, line_width=1.4)
+    draw_text(pdf, model['finalSafety'], MARGIN + 10, 73, PAGE_WIDTH - 2 * MARGIN - 20, 'Helvetica-Bold', 9.0, 10.5, color=TEAL, max_lines=3)
     draw_footer(pdf, model, 3)
     pdf.showPage()
 

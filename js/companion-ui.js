@@ -385,7 +385,7 @@ export function navigateTo(view) {
     else button.removeAttribute('aria-current');
   }
   const target = document.querySelector(`[data-view="${view}"]`);
-  target?.scrollIntoView({ block: 'start' });
+  globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   target?.focus?.({ preventScroll: true });
 }
 

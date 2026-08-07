@@ -23,7 +23,7 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 6 publishes Companion `0.6.0-candidate.1` through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 5's zero-connectivity architecture, canonical dataset, Field Guide, and Pocket Card remain unchanged. The static shell provides:
+Phase 6 publishes Companion `0.6.0-candidate.2` through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 6A applies a restrained mountain-earth visual system without changing the Phase 5 zero-connectivity architecture, canonical dataset, or substantive artifact content. The static shell provides:
 
 1. Timeline — three canonical objectives, six planning values, actual-start/elapsed local state, five decision gates, and nine local-only milestones.
 2. Route — four canonical route comparisons and visibly withheld Lily Lake location values.
@@ -144,6 +144,7 @@ npm ci
 npm run build:pwa
 npm run build:offline
 npm run check:pwa
+npm run check:visual-system
 npm run check:pwa:privacy
 npm run check:pwa:safety
 npm run check:artifact-parity
@@ -173,6 +174,7 @@ The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/t
 - docs/field-guide-design.md — Phase 2 page architecture, manifest-only fact flow, typography, print geometry, provenance, Lily Lake withholding, grayscale behavior, and release gates.
 - docs/pocket-card-design.md — Phase 3 side architecture, exact dimensions, emergency hierarchy, handwritten fields, provenance, grayscale/low-light behavior, and release gates.
 - docs/pwa-design.md — Phase 5 shell, generated data, friend install/setup, local state, sharing, Red Display, accessibility, and remaining physical boundary.
+- docs/visual-system.md — Phase 6A semantic palette, hierarchy, accessibility, Red Display, print, and icon rules.
 - docs/offline-architecture.md — explicit bundle, atomic install, coherent fetches, retention, update/repair, storage behavior, automated evidence, and physical-device checklist.
 - docs/crew-distribution-contract.md — stable public URL, candidate metadata, QR/share privacy, and Mountain Guide Crew integration boundary.
 - docs/phase-6-physical-test-checklist.md — unmarked primary, backup, and friend iPhone acceptance checklist.

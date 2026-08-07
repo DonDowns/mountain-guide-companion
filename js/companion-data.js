@@ -8,16 +8,16 @@ function deepFreeze(value) {
 }
 export const companionData = deepFreeze({
   "identity": {
-    "companionVersion": "0.6.0-candidate.1",
+    "companionVersion": "0.6.0-candidate.2",
     "releaseStatus": "candidate",
     "dataVersion": "1.0.0",
     "sourceRelease": "v15.3.10",
     "sourceCommit": "fb711292b2642c2296eb76c0cfe2531606029609",
-    "generatedAt": "2026-08-07T15:31:07Z",
+    "generatedAt": "2026-08-07T18:44:59Z",
     "verifiedAt": "2026-08-07T07:45:17Z",
     "manifestSha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
     "manifestShort": "3cda95d4e6b1",
-    "bundleId": "ddmg-companion-0-6-0-candidate-1-data-3cda95d4e6b1-b1",
+    "bundleId": "ddmg-companion-0-6-0-candidate-2-data-3cda95d4e6b1-b1",
     "offlineBundleVersion": 1,
     "publicBaseUrl": "https://companion.vondadowns.com/"
   },
@@ -337,24 +337,24 @@ export const companionData = deepFreeze({
   "artifacts": {
     "fieldGuide": {
       "url": "./generated/field-guide.pdf",
-      "sha256": "36aab02baae706ecc622d7af8938a0023e9644fdfdd72a5074ebd73478379936"
+      "sha256": "498b14128d44a2c9a7ed58b8ff516e99c836e2c371ffee18e6673193af4527ba"
     },
     "pocketCard": {
       "url": "./generated/pocket-card.pdf",
-      "sha256": "a8662d218b5ae01ae78c8dbf3e4964c164ebbb9c75d7481a3e5c631f1cb45818"
+      "sha256": "f477e3599a8038300412323d833728e96bcc1b689d6653469ff05f119c2d8465"
     }
   }
 });
 export const releaseMetadata = deepFreeze({
-  "companion_version": "0.6.0-candidate.1",
+  "companion_version": "0.6.0-candidate.2",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
-  "generated_at": "2026-08-07T15:31:07Z",
+  "generated_at": "2026-08-07T18:44:59Z",
   "verified_at": "2026-08-07T07:45:17Z",
   "release_status": "candidate",
-  "bundle_id": "ddmg-companion-0-6-0-candidate-1-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-2-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",

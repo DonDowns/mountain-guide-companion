@@ -121,6 +121,9 @@ jobs:
       - name: Run Companion PWA structural contract
         run: npm run check:pwa
 
+      - name: Run mountain-earth visual-system and contrast contract
+        run: npm run check:visual-system
+
       - name: Run Companion PWA privacy contract
         run: npm run check:pwa:privacy
 

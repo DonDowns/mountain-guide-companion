@@ -104,7 +104,7 @@ async function main() {
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
     'build:field-guide', 'check:field-guide', 'check:pdf',
     'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf',
-    'build:pwa', 'build:offline', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity',
+    'build:pwa', 'build:offline', 'check:pwa', 'check:visual-system', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity',
     'check:offline', 'check:service-worker', 'build:pages', 'test:offline:logic', 'test:browser', 'test:offline'
   ]) {
     exec('npm', ['run', script], { inherit: true });
