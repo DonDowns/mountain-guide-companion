@@ -39,6 +39,7 @@ jobs:
         run: |
           node --version
           npm --version
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           test -z "$(git status --porcelain)"
 
       - name: Install pinned browser-test dependencies
