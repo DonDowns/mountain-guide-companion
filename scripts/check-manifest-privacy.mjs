@@ -7,7 +7,7 @@ import { runValidation } from './validate-manifest.mjs';
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = resolve(dirname(scriptPath), '..');
-const scanExtensions = new Set(['.json', '.md', '.mjs', '.html', '.css', '.py', '.txt']);
+const scanExtensions = new Set(['.json', '.md', '.mjs', '.js', '.html', '.css', '.py', '.txt', '.webmanifest', '.svg']);
 function repositoryTextFiles() {
   return execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
     cwd: repoRoot,

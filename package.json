@@ -1,11 +1,11 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-3-pocket-card-draft",
-    "runtime_allowed": false,
+    "name": "phase-4-companion-pwa-draft",
+    "runtime_allowed": true,
     "print_artifacts_allowed": true
   },
   "scripts": {
@@ -23,8 +23,21 @@
     "build:pocket-card": "node scripts/build-pocket-card.mjs",
     "check:pocket-card": "node scripts/verify-pocket-card.mjs",
     "check:pocket-card-pdf": "node scripts/verify-pocket-card.mjs --render",
+    "build:pwa": "node scripts/build-pwa.mjs",
+    "check:pwa": "node scripts/check-pwa.mjs",
+    "check:pwa:privacy": "node scripts/check-pwa-privacy.mjs",
+    "check:pwa:safety": "node scripts/check-pwa-safety.mjs",
+    "check:artifact-parity": "node scripts/check-artifact-parity.mjs",
+    "serve:pwa": "node scripts/serve-pwa.mjs",
+    "test:browser": "playwright test",
+    "test:browser:chromium": "playwright test --project=chromium-desktop --project=chromium-mobile",
+    "test:browser:webkit": "playwright test --project=webkit-desktop --project=webkit-mobile",
     "pr:open": "node scripts/open-pr.mjs",
     "main:sync": "node scripts/sync-main.mjs",
     "release:tag": "node scripts/tag-release.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@playwright/test": "1.62.1"
   }
 }

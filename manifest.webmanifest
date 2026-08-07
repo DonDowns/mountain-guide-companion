@@ -1,0 +1,30 @@
+{
+  "name": "Mountain Guide Companion",
+  "short_name": "Companion",
+  "description": "A lightweight crew-facing field reference for the current Mountain Guide trip.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef2ec",
+  "theme_color": "#163d46",
+  "categories": [
+    "travel",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icons/companion-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/companion-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

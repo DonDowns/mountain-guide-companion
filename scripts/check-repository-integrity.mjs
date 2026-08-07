@@ -40,6 +40,7 @@ async function main() {
   const packageJson = JSON.parse(await readFile(resolve(repoRoot, 'package.json'), 'utf8'));
   const jsonFiles = files.filter(path => extname(path).toLowerCase() === '.json');
   const moduleFiles = files.filter(path => extname(path).toLowerCase() === '.mjs');
+  const browserJavaScriptFiles = files.filter(path => extname(path).toLowerCase() === '.js');
   const pythonFiles = files.filter(path => extname(path).toLowerCase() === '.py');
 
   for (const path of jsonFiles) {
@@ -51,6 +52,14 @@ async function main() {
   }
 
   for (const path of moduleFiles) {
+    const result = spawnSync(process.execPath, ['--check', resolve(repoRoot, path)], {
+      cwd: repoRoot,
+      encoding: 'utf8'
+    });
+    if (result.status !== 0) errors.push(path + ' has invalid JavaScript syntax: ' + (result.stderr || result.stdout).trim());
+  }
+
+  for (const path of browserJavaScriptFiles) {
     const result = spawnSync(process.execPath, ['--check', resolve(repoRoot, path)], {
       cwd: repoRoot,
       encoding: 'utf8'
@@ -91,6 +100,7 @@ async function main() {
   console.log('runtime_allowed=' + packageJson.companion_phase.runtime_allowed);
   console.log('json_files_parsed=' + jsonFiles.length);
   console.log('mjs_files_syntax_checked=' + moduleFiles.length);
+  console.log('browser_js_files_syntax_checked=' + browserJavaScriptFiles.length);
   console.log('python_files_syntax_checked=' + pythonFiles.length);
   console.log('git_whitespace_integrity=pass');
 }

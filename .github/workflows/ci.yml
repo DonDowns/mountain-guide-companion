@@ -17,7 +17,10 @@ jobs:
   validate:
     name: Validate repository
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --user root
     steps:
       - name: Check out Companion
         uses: actions/checkout@v7
@@ -36,21 +39,22 @@ jobs:
         run: |
           node --version
           npm --version
-          test ! -f package-lock.json
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           test -z "$(git status --porcelain)"
+
+      - name: Install pinned browser-test dependencies
+        run: npm ci
 
       - name: Set up Python for deterministic print tooling
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-          cache: pip
-          cache-dependency-path: requirements-print.txt
 
       - name: Install pinned print dependencies and Poppler
         shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes poppler-utils
+          apt-get update
+          apt-get install --yes poppler-utils
           python -m pip install --requirement requirements-print.txt
 
       - name: Check out pinned Mountain Guide source
@@ -108,8 +112,26 @@ jobs:
       - name: Run Pocket Card page, content, and render contracts
         run: npm run check:pocket-card-pdf
 
+      - name: Build deterministic Companion PWA data and release metadata
+        run: npm run build:pwa
+
+      - name: Run Companion PWA structural contract
+        run: npm run check:pwa
+
+      - name: Run Companion PWA privacy contract
+        run: npm run check:pwa:privacy
+
+      - name: Run Companion PWA safety contract
+        run: npm run check:pwa:safety
+
+      - name: Run three-artifact parity contract
+        run: npm run check:artifact-parity
+
+      - name: Run Chromium and WebKit browser, install-flow, and accessibility tests
+        run: npm run test:browser
+
       - name: Verify all generated artifacts reproduce committed bytes
-        run: git diff --exit-code -- generated
+        run: git diff --exit-code -- generated js/companion-data.js release.json
 
       - name: Determine canonical manifest SHA-256
         run: sha256sum data/trip-manifest.json

@@ -239,6 +239,10 @@ Medium–High: the data transform is small, but extreme space and emergency hier
 
 Implement the accessible current-trip interaction shell without yet claiming full offline hardening.
 
+### Draft status
+
+Implemented as a draft in Phase 4: a static dependency-light shell, manifest-derived runtime data/release metadata, friend first-open and install guidance, standalone setup status, a deliberately structural Offline Check, public-only sharing, versioned device-local state, Red Display, and Chromium/WebKit accessibility and responsive tests. Nothing is deployed or tagged, and the development service worker does not cache assets.
+
 ### Deliverables
 
 - Timeline, Route, and Emergency destinations.
@@ -246,8 +250,11 @@ Implement the accessible current-trip interaction shell without yet claiming ful
 - Current objective/status and provenance.
 - Manual phase selection and user-confirmed elapsed-time model.
 - Decision-prompt presentation with no aggregate verdict.
-- device-local actual-start/current-phase operational state with visible clock uncertainty and no rewrite of canonical planning facts.
-- no initial personal-contact, medical, or sophisticated private-data overlay; that design is deferred until after the trip.
+- versioned device-local actual-start/current-phase/milestone/status state with visible clock uncertainty and no rewrite of canonical planning facts;
+- optional empty-by-default local contact fields with confirmed deletion, no export/share/synchronization, and no medical-data capability;
+- friend-facing browser install guidance and standalone setup/provenance surfaces;
+- one configured public base URL and generated draft `release.json` for future Mountain Guide Crew distribution;
+- a structural Offline Check that explicitly withholds field-ready offline claims until Phase 5.
 - responsive/accessibility browser tests.
 
 ### Dependencies
@@ -255,7 +262,7 @@ Implement the accessible current-trip interaction shell without yet claiming ful
 - Approved Phase 0 information architecture.
 - Stable schema/data and artifact content model.
 - Selected browser/platform baseline and target iPhone models.
-- Approved local operational-state lifecycle; sophisticated private-overlay decisions are not a Phase 4 dependency because that capability is deferred.
+- Approved bounded local operational-state lifecycle; medical data, cloud synchronization, export, and sophisticated private-overlay behavior remain deferred.
 - Completed Field Guide/Pocket Card content hierarchy as fallback references.
 
 ### Acceptance criteria
@@ -268,6 +275,9 @@ Implement the accessible current-trip interaction shell without yet claiming ful
 - No runtime external dependency exists in a core path.
 - The 390 × 844 minimum automated reference viewport passes; identified primary and backup iPhones still require physical validation.
 - Contract F and browser portions of I pass.
+- The friend first-open action and install explanation are visible at the 390 × 844 reference viewport.
+- Public sharing contains only the configured Companion URL and never device-local state.
+- Setup never marks offline cold launch or physical Airplane Mode testing complete.
 
 ### Complexity
 

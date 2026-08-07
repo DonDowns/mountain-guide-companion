@@ -9,6 +9,10 @@ dist/
 build/
 node_modules/
 tmp/pdfs/
+tmp/playwright/
+tmp/visual-audit/
+playwright-report/
+test-results/
 .env
 .env.*
 !.env.example
