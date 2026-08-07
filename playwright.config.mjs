@@ -1,9 +1,10 @@
 import { defineConfig } from '@playwright/test';
 
-const baseURL = 'http://127.0.0.1:4173';
+const baseURL = 'http://127.0.0.1:4183';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: ['**/offline*.spec.mjs'],
   timeout: 30000,
   expect: { timeout: 7000 },
   fullyParallel: false,
@@ -21,9 +22,9 @@ export default defineConfig({
     trace: 'retain-on-failure'
   },
   webServer: {
-    command: 'npm run serve:pwa',
+    command: 'env PORT=4183 npm run serve:pwa',
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 30000
   },
   projects: [

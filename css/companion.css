@@ -393,6 +393,47 @@ h3 {
   background: var(--surface-alt);
 }
 
+.offline-result p,
+.update-note p,
+.storage-note {
+  margin: 5px 0 0;
+}
+
+.update-note {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.update-note button {
+  justify-self: start;
+}
+
+.airplane-test {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.airplane-test summary {
+  min-height: 44px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.airplane-test h3 {
+  margin-top: 12px;
+}
+
+.storage-note {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 .artifact-grid,
 .route-grid,
 .contact-grid {

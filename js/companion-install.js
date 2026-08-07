@@ -1,4 +1,5 @@
 let deferredInstallPrompt = null;
+let serviceWorkerRegistration = null;
 
 export function isStandalone() {
   if (globalThis.__COMPANION_TEST_STANDALONE__ === true) return true;
@@ -61,12 +62,91 @@ export async function sharePublicCompanion(publicUrl, title) {
   return { method: 'copy', completed: copied };
 }
 
-export async function registerDevelopmentServiceWorker() {
-  if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return false;
+function waitForController(timeoutMs = 8000) {
+  if (navigator.serviceWorker?.controller) return Promise.resolve(navigator.serviceWorker.controller);
+  return new Promise(resolve => {
+    const timeout = globalThis.setTimeout(() => resolve(navigator.serviceWorker?.controller || null), timeoutMs);
+    navigator.serviceWorker?.addEventListener('controllerchange', () => {
+      globalThis.clearTimeout(timeout);
+      resolve(navigator.serviceWorker.controller);
+    }, { once: true });
+  });
+}
+
+function sendWorkerMessage(worker, type, timeoutMs = 30000) {
+  if (!worker) return Promise.resolve({ complete: false, error: 'Production service worker does not control this page.' });
+  return new Promise(resolve => {
+    const channel = new MessageChannel();
+    const timeout = globalThis.setTimeout(() => resolve({ complete: false, error: 'Service-worker verification timed out.' }), timeoutMs);
+    channel.port1.onmessage = event => {
+      globalThis.clearTimeout(timeout);
+      resolve(event.data);
+    };
+    worker.postMessage({ type }, [channel.port2]);
+  });
+}
+
+export async function registerProductionServiceWorker(onChange) {
+  if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) {
+    onChange?.({ supported: false, controlled: false, updateAvailable: false });
+    return null;
+  }
   try {
-    await navigator.serviceWorker.register('./service-worker.dev.js', { scope: './' });
-    return true;
+    serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js', {
+      scope: './',
+      updateViaCache: 'none'
+    });
+    const publish = () => onChange?.({
+      supported: true,
+      controlled: Boolean(navigator.serviceWorker.controller),
+      updateAvailable: Boolean(serviceWorkerRegistration.waiting),
+      registration: serviceWorkerRegistration
+    });
+    serviceWorkerRegistration.addEventListener('updatefound', () => {
+      const installing = serviceWorkerRegistration.installing;
+      installing?.addEventListener('statechange', publish);
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', publish);
+    await navigator.serviceWorker.ready;
+    await waitForController();
+    publish();
+    return serviceWorkerRegistration;
   } catch {
-    return false;
+    onChange?.({ supported: true, controlled: false, updateAvailable: false });
+    return null;
+  }
+}
+
+export async function verifyOfflineResources() {
+  if (!serviceWorkerRegistration) await navigator.serviceWorker?.ready;
+  const worker = navigator.serviceWorker?.controller || serviceWorkerRegistration?.active || null;
+  return sendWorkerMessage(worker, 'VERIFY_OFFLINE_BUNDLE');
+}
+
+export async function repairOfflineCopy() {
+  const registration = serviceWorkerRegistration || await navigator.serviceWorker?.ready;
+  if (!registration) return { complete: false, error: 'Production service worker is unavailable.' };
+  try {
+    await registration.update();
+  } catch {
+    // The active worker can still attempt a bounded repair with the current release identity.
+  }
+  return sendWorkerMessage(navigator.serviceWorker.controller || registration.active, 'REPAIR_OFFLINE_COPY', 60000);
+}
+
+export async function activateWaitingUpdate() {
+  const registration = serviceWorkerRegistration || await navigator.serviceWorker?.ready;
+  if (!registration?.waiting) return false;
+  registration.waiting.postMessage({ type: 'ACTIVATE_VERIFIED_UPDATE' });
+  return true;
+}
+
+export async function storageEstimate() {
+  if (!navigator.storage?.estimate) return null;
+  try {
+    const estimate = await navigator.storage.estimate();
+    return { usage: estimate.usage || 0, quota: estimate.quota || 0, persisted: navigator.storage.persisted ? await navigator.storage.persisted() : false };
+  } catch {
+    return null;
   }
 }

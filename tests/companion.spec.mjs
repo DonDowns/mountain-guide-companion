@@ -2,15 +2,16 @@ import { expect, test as base } from '@playwright/test';
 import { companionData, releaseMetadata } from '../js/companion-data.js';
 
 const test = base.extend({
-  consoleGate: [async ({ page }, use) => {
+  consoleGate: [async ({ page, baseURL }, use) => {
     const errors = [];
+    const allowedOrigin = new URL(baseURL).origin;
     page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
     page.on('console', message => {
       if (message.type() === 'error') errors.push(`console: ${message.text()}`);
     });
     page.on('request', request => {
       const url = new URL(request.url());
-      if (/^https?:$/.test(url.protocol) && url.origin !== 'http://127.0.0.1:4173') errors.push(`external request: ${url.origin}`);
+      if (/^https?:$/.test(url.protocol) && url.origin !== allowedOrigin) errors.push(`external request: ${url.origin}`);
     });
     await use();
     expect(errors).toEqual([]);
@@ -126,16 +127,57 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   await expect(page.locator('[data-private-field="note"]')).toHaveValue('');
 });
 
-test('shows factual installed state and bounded structural Offline Check', async ({ page }) => {
+test('shows factual installed state and verifies the complete offline bundle', async ({ page }) => {
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
   await expect(page.getByText('INSTALLED COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByText('INSTALL FOR OFFLINE USE', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.getByText('Local Companion resources present', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Full offline cold-launch verification not yet completed/)).toBeVisible();
-  await expect(page.locator('#install-panel')).not.toContainText(/offline verified|all clear|good to go/i);
-  await expect(page.getByText('Phase 5 cache and cold-launch verification is not implemented.')).toBeVisible();
+  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await expect(page.getByText('This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Physical cold-launch test still required.', { exact: true })).toBeVisible();
+  await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
+});
+
+test('migrates Phase 4 local state to schema version 2 without losing operational or private values', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('mgc-companion-local-state', JSON.stringify({
+      schemaVersion: 1,
+      selectedObjectiveId: 'objective-mount-lindsey',
+      actualStarts: { 'objective-mount-lindsey': '2026-08-07T10:00:00.000Z' },
+      elapsedBasis: { 'objective-mount-lindsey': { startedAt: '2026-08-07T10:00:00.000Z', deviceTimeZoneOffsetMinutes: 360 } },
+      checkedMilestones: { 0: true },
+      redDisplay: true,
+      statusNote: 'z',
+      privateContact: { name: 'x', phone: '', alternate: 'y', note: '' },
+      setup: { companionOpened: true, structuralCheckCompletedAt: '2026-08-07T10:05:00.000Z' }
+    }));
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
+  await expect(page.locator('[data-milestone="0"]')).toBeChecked();
+  await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
+  await page.getByText('Optional private fields on this device').click();
+  await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
+  expect(stored.schemaVersion).toBe(2);
+  expect(stored.statusNote).toBe('z');
+  expect(stored.setup.legacyStructuralCheckCompletedAt).toBe('2026-08-07T10:05:00.000Z');
+  expect(stored.setup.offlineVerifiedAt).toBe('');
+});
+
+test('records the physical Airplane Mode test only after explicit confirmation', async ({ page }) => {
+  await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
+  await page.goto('/');
+  await page.getByText('Airplane Mode test instructions').click();
+  await expect(page.getByRole('heading', { name: 'AIRPLANE MODE TEST' })).toBeVisible();
+  await expect(page.locator('.airplane-test li')).toHaveCount(11);
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Record Airplane Mode Test' }).click();
+  await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
+  expect(stored.setup.airplaneModeTestCompletedAt).toBeTruthy();
 });
 
 test('exposes an install action only after a supported browser prompt', async ({ page }) => {
@@ -174,6 +216,7 @@ test('provides semantic landmarks, visible focus, and named global controls', as
   await expect(page.getByRole('navigation', { name: 'Companion sections' })).toBeVisible();
   const red = page.getByRole('button', { name: /Red/ });
   await expect(red).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
   await page.keyboard.press('Tab');
   const focused = await page.evaluate(() => ({
     tag: document.activeElement?.tagName,

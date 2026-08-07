@@ -2,9 +2,9 @@
 
 ## Status and product boundary
 
-The Phase 4 Companion is a draft, crew-facing static PWA shell. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
+The Phase 5 Companion is a draft, crew-facing static PWA with a production offline runtime. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Nothing is deployed or tagged in Phase 4. The shell does not yet claim zero-connectivity readiness. Phase 5 owns production caching, atomic updates, cold launch, mixed-version prevention, recovery, and physical Airplane Mode evidence.
+Nothing is deployed or tagged in Phase 5. Production caching, atomic updates, cold launch, mixed-version prevention, and repair are implemented and tested technically. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -27,16 +27,19 @@ Standalone detection uses the display-mode media query and iOS `navigator.standa
 
 ## Setup and Offline Check boundary
 
-The setup checklist can truthfully complete only packaged-resource checks in Phase 4:
+The setup checklist can truthfully complete packaged-resource checks in Phase 5:
 
 - trip data loaded;
 - emergency contacts loaded;
-- runtime/release manifest identity matches;
+- production worker control and runtime/release/bundle identity match;
+- every required resource passes byte-size and SHA-256 verification;
 - installed/standalone detection when observed.
 
-Offline resources and Airplane Mode remain incomplete. Offline Check verifies only the current loaded shell, canonical identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, and rendered core sections. Its result is Local Companion resources present followed by an explicit statement that full offline cold-launch verification is not completed.
+Offline Check verifies the controlling worker's complete active bundle locally: exact cache/bundle identity, completion marker, resource count, every listed asset, canonical/release identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, rendered core sections, and both PDFs. Its result is `OFFLINE RESOURCES VERIFIED` or `OFFLINE RESOURCES INCOMPLETE`, followed by an explicit statement that software-resource verification does not verify mountain conditions, access, weather, or route safety.
 
-`service-worker.dev.js` is a development-only, non-caching installability shell. It has no fetch handler, Cache API use, offline response, cache version, or update claim.
+`scripts/build-offline.mjs` generates the explicit `offline-bundle.json` and production `service-worker.js` from actual bytes. Installation is marker-last and hash-verified; a failed candidate is deleted without replacing the last complete release. Field-critical fetches resolve only from one verified active cache, preventing network/cache or old/new mixing. See `docs/offline-architecture.md` for lifecycle, retention, repair, storage, and test details.
+
+The physical Airplane Mode checklist remains pending until a user displays the eleven instructions and records completion on that phone. Automation never sets this mark.
 
 ## Navigation and field hierarchy
 
@@ -50,7 +53,7 @@ Route renders the four canonical profiles as comparison cards with round-trip di
 
 Emergency begins with CALL 911 FIRST, reporting prompts, dispatch/jurisdiction language, and all six canonical public numbers as `tel:` links. Opening a phone intent is explicitly not proof that a call occurred.
 
-## Local-state schema version 1
+## Local-state schema version 2
 
 The separate local store contains only:
 
@@ -60,9 +63,9 @@ The separate local store contains only:
 - Red Display state;
 - brief local status note;
 - optional private contact name, phone, alternate, and note;
-- setup/open/check progress.
+- setup/open/check progress, bundle-scoped offline verification, and physical Airplane Mode user attestation.
 
-The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. A migration hook is present for future schema versions. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, URL encoding, or share inclusion.
+The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema version 1 preserves operational/private values but does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, URL encoding, or share inclusion. Service workers neither read nor cache the local store.
 
 Milestone checks mean Marked locally only. The canonical delivery disclaimer remains visible.
 
@@ -80,8 +83,8 @@ The shell uses semantic header/main/nav/footer landmarks, native controls, visib
 
 ## Physical artifacts
 
-The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. Draft PDF links are local package-relative URLs. Phase 5 must include both PDFs in the atomic cache/version contract before any offline claim.
+The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. Draft PDF links are local package-relative URLs. Both PDFs are members of the atomic, hash-verified offline bundle and are exercised through offline browser fetches.
 
-## Phase 5 requirements
+## Remaining release gates
 
-Phase 5 must replace the development service worker with a versioned production implementation; precache the complete compatible shell/data/PDF set; prevent mixed versions; preserve the last complete release; verify cache identity; handle interrupted updates and recovery; prove cold launch after force quit/reboot; and complete primary/backup iPhone Airplane Mode testing. Deployment and custom-domain activation remain separately gated.
+Technical Phase 5 requirements are implemented. Field release still requires the physical primary/backup/friend iPhone plan, actual force-quit and reboot evidence, physical print/readability checks, owner review, remaining scoped Lily Lake disposition for any artifact that requires the unresolved field, and a separate deployment/tag decision. Custom-domain activation remains gated.

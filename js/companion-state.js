@@ -23,29 +23,39 @@ export function defaultLocalState(defaultObjectiveId = '') {
     privateContact: emptyPrivateContact(),
     setup: {
       companionOpened: false,
-      structuralCheckCompletedAt: ''
+      offlineVerifiedAt: '',
+      offlineVerifiedBundleId: '',
+      airplaneModeTestCompletedAt: '',
+      legacyStructuralCheckCompletedAt: ''
     }
   };
 }
 
-function stringRecord(value) {
+function stringRecord(value, maximumEntries = 12) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  return Object.fromEntries(Object.entries(value).filter(([, child]) => typeof child === 'string'));
+  return Object.fromEntries(Object.entries(value).slice(0, maximumEntries).filter(([key, child]) =>
+    typeof key === 'string' && key.length <= 160 && typeof child === 'string' && child.length <= 160
+  ));
 }
 
 function booleanRecord(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  return Object.fromEntries(Object.entries(value).filter(([, child]) => typeof child === 'boolean'));
+  return Object.fromEntries(Object.entries(value).slice(0, 24).filter(([key, child]) =>
+    typeof key === 'string' && key.length <= 160 && typeof child === 'boolean'
+  ));
 }
 
 function elapsedRecord(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  return Object.fromEntries(Object.entries(value).filter(([, child]) =>
-    child && typeof child === 'object' && typeof child.startedAt === 'string'
-  ));
+  return Object.fromEntries(Object.entries(value).slice(0, 12).filter(([key, child]) =>
+    typeof key === 'string' && key.length <= 160 && child && typeof child === 'object' && typeof child.startedAt === 'string'
+  ).map(([key, child]) => [key, {
+    startedAt: child.startedAt.slice(0, 160),
+    deviceTimeZoneOffsetMinutes: Number.isFinite(child.deviceTimeZoneOffsetMinutes) ? child.deviceTimeZoneOffsetMinutes : 0
+  }]));
 }
 
-function sanitizeV1(raw, defaultObjectiveId) {
+function sanitizeCurrent(raw, defaultObjectiveId) {
   const fallback = defaultLocalState(defaultObjectiveId);
   const privateContact = raw.privateContact && typeof raw.privateContact === 'object' ? raw.privateContact : {};
   const setup = raw.setup && typeof raw.setup === 'object' ? raw.setup : {};
@@ -65,14 +75,19 @@ function sanitizeV1(raw, defaultObjectiveId) {
     },
     setup: {
       companionOpened: setup.companionOpened === true,
-      structuralCheckCompletedAt: typeof setup.structuralCheckCompletedAt === 'string' ? setup.structuralCheckCompletedAt : ''
+      offlineVerifiedAt: typeof setup.offlineVerifiedAt === 'string' ? setup.offlineVerifiedAt.slice(0, 160) : '',
+      offlineVerifiedBundleId: typeof setup.offlineVerifiedBundleId === 'string' ? setup.offlineVerifiedBundleId.slice(0, 200) : '',
+      airplaneModeTestCompletedAt: typeof setup.airplaneModeTestCompletedAt === 'string' ? setup.airplaneModeTestCompletedAt.slice(0, 160) : '',
+      legacyStructuralCheckCompletedAt: typeof setup.legacyStructuralCheckCompletedAt === 'string'
+        ? setup.legacyStructuralCheckCompletedAt.slice(0, 160)
+        : typeof setup.structuralCheckCompletedAt === 'string' ? setup.structuralCheckCompletedAt.slice(0, 160) : ''
     }
   };
 }
 
 export function migrateLocalState(raw, defaultObjectiveId = '') {
   if (!raw || typeof raw !== 'object') return defaultLocalState(defaultObjectiveId);
-  if (raw.schemaVersion === 1) return sanitizeV1(raw, defaultObjectiveId);
+  if (raw.schemaVersion === 1 || raw.schemaVersion === 2) return sanitizeCurrent(raw, defaultObjectiveId);
   return defaultLocalState(defaultObjectiveId);
 }
 

@@ -61,7 +61,8 @@ async function main() {
     'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
     'build:field-guide', 'check:field-guide', 'check:pdf',
     'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf',
-    'build:pwa', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity', 'test:browser'
+    'build:pwa', 'build:offline', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity',
+    'check:offline', 'check:service-worker', 'test:offline:logic', 'test:browser', 'test:offline'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }
@@ -79,6 +80,7 @@ async function main() {
   const fieldGuideArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/field-guide-artifact.json'), 'utf8'));
   const pocketCardArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/pocket-card-artifact.json'), 'utf8'));
   const companionRelease = JSON.parse(await readFile(resolve(repoRoot, 'release.json'), 'utf8'));
+  const offlineBundle = JSON.parse(await readFile(resolve(repoRoot, 'offline-bundle.json'), 'utf8'));
   const pending = [];
   const visit = value => {
     if (Array.isArray(value)) value.forEach(visit);
@@ -107,11 +109,16 @@ async function main() {
     '- `npm run check:pocket-card`',
     '- `npm run check:pocket-card-pdf`',
     '- `npm run build:pwa`',
+    '- `npm run build:offline`',
     '- `npm run check:pwa`',
     '- `npm run check:pwa:privacy`',
     '- `npm run check:pwa:safety`',
     '- `npm run check:artifact-parity`',
+    '- `npm run check:offline`',
+    '- `npm run check:service-worker`',
+    '- `npm run test:offline:logic`',
     '- `npm run test:browser` (Chromium/WebKit, desktop/390×844, install/setup/share/accessibility)',
+    '- `npm run test:offline` (Chromium cold launch/zero-request/update/corruption/repair; WebKit offline navigation limitation documented)',
     '- `npm run check:policy`', '',
     'Manifest SHA-256: `' + hash + '` (' + (dataChanged ? 'data changed' : 'data unchanged') + ')', '',
     '## Printable Field Guide', '',
@@ -131,9 +138,12 @@ async function main() {
     'DRAFT Companion version: `' + companionRelease.companion_version + '`.', '',
     'Designed for future Mountain Guide Crew distribution at the one configured public URL: `' + companionRelease.pwa_url + '`.', '',
     'Browser result: Chromium and WebKit desktop/mobile interaction, friend install, standalone setup, share privacy, responsive, and accessibility checks pass.', '',
+    'Offline browser result: Chromium desktop and 390×844 cold launch, zero-request field operation, previous→new update, interruption, corruption, repair, and local-state survival pass. Playwright WebKit offline navigation remains an explicitly documented engine limitation.', '',
     'Privacy result: pass; optional local fields remain device-local and sharing contains only the public Companion URL.', '',
     'Safety result: pass; Emergency stays one action away and no authorization, rescue, delivery, or field-ready offline claim is made.', '',
-    'Offline status: structural resources check only. Phase 5 remains required for production caching, cold launch, mixed-version prevention, update recovery, and physical Airplane Mode proof.', '',
+    'Offline bundle ID: `' + offlineBundle.bundle_id + '`.', '',
+    'Offline bundle: ' + offlineBundle.entry_count + ' required resources / ' + offlineBundle.total_bytes + ' bytes; content SHA-256 `' + offlineBundle.bundle_content_sha256 + '`.', '',
+    'Offline status: production service worker, atomic hash-verified cache transaction, coherent active-cache fetches, previous-release retention, real Offline Check, and repair are implemented. Physical iPhone Airplane Mode/force-quit/reboot proof remains outstanding.', '',
     'Deployment status: no deployment and no release tag.', '',
     '## Release holds', '',
     pending.length ? 'Approved scoped holds: ' + pending.map(id => '`' + id + '`').join(', ') + '.' : 'No pending canonical record.', '',

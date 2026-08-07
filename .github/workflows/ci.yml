@@ -115,6 +115,9 @@ jobs:
       - name: Build deterministic Companion PWA data and release metadata
         run: npm run build:pwa
 
+      - name: Build explicit offline bundle and production service worker
+        run: npm run build:offline
+
       - name: Run Companion PWA structural contract
         run: npm run check:pwa
 
@@ -124,14 +127,26 @@ jobs:
       - name: Run Companion PWA safety contract
         run: npm run check:pwa:safety
 
+      - name: Run offline bundle byte-integrity contract
+        run: npm run check:offline
+
+      - name: Run production service-worker atomicity and scope contract
+        run: npm run check:service-worker
+
+      - name: Test marker-last transaction and quota-failure logic
+        run: npm run test:offline:logic
+
       - name: Run three-artifact parity contract
         run: npm run check:artifact-parity
 
       - name: Run Chromium and WebKit browser, install-flow, and accessibility tests
         run: npm run test:browser
 
+      - name: Run zero-connectivity, interrupted-update, corruption, and repair browser tests
+        run: npm run test:offline
+
       - name: Verify all generated artifacts reproduce committed bytes
-        run: git diff --exit-code -- generated js/companion-data.js release.json
+        run: git diff --exit-code -- generated js/companion-data.js release.json offline-bundle.json service-worker.js
 
       - name: Determine canonical manifest SHA-256
         run: sha256sum data/trip-manifest.json
