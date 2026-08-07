@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-6-physical-test-candidate",
+    "name": "phase-6a-mountain-earth-candidate",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },
@@ -27,6 +27,7 @@
     "build:offline": "node scripts/build-offline.mjs",
     "build:pages": "node scripts/build-pages.mjs",
     "check:pwa": "node scripts/check-pwa.mjs",
+    "check:visual-system": "node scripts/check-visual-system.mjs",
     "check:pwa:privacy": "node scripts/check-pwa-privacy.mjs",
     "check:pwa:safety": "node scripts/check-pwa-safety.mjs",
     "check:artifact-parity": "node scripts/check-artifact-parity.mjs",

@@ -2,7 +2,7 @@
 
 ## Status and boundary
 
-Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that exact architecture as `0.6.0-candidate.1` for physical testing. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
+Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture as `0.6.0-candidate.2` for physical testing; Phase 6A changes presentation assets only and preserves the offline transaction and safety contracts. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
 
 The configured origin is `https://companion.vondadowns.com/`. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate `https://mountainguide.vondadowns.com/` origin.
 

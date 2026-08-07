@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.1` at the configured Companion origin solely to enable physical tests. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.2` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system without changing canonical data, safety meaning, privacy behavior, or offline architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 

@@ -50,6 +50,7 @@ jobs:
       - name: Recheck deployable contracts
         run: |
           npm run check:pwa
+          npm run check:visual-system
           npm run check:pwa:privacy
           npm run check:pwa:safety
           npm run check:artifact-parity

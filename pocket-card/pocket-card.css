@@ -1,3 +1,18 @@
+:root {
+  --print-brand-primary: #163d46;
+  --print-brand-red: #b93d2e;
+  --print-accent-gold: #a96f12;
+  --print-stone: #e8dfcf;
+  --print-earth: #66503c;
+  --print-canvas: #ded7ca;
+  --print-surface: #fffdf8;
+  --print-text: #18222b;
+  --print-text-muted: #45545a;
+  --print-border: #60706f;
+  --print-emergency: #8b281f;
+  --print-emergency-text: #ffffff;
+}
+
 @page {
   size: 3.5in 5in;
   margin: 0;
@@ -11,8 +26,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #d9dde0;
-  color: #18222b;
+  background: var(--print-canvas);
+  color: var(--print-text);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -22,9 +37,9 @@ body {
   right: 0;
   z-index: 5;
   padding: 3px 5px;
-  border: 1px solid #18222b;
-  background: #ffffff;
-  color: #18222b;
+  border: 1px solid var(--print-text);
+  background: var(--print-surface);
+  color: var(--print-text);
   font-size: 7pt;
   font-weight: 800;
 }
@@ -37,7 +52,7 @@ body {
   padding: 0.14in 0.14in 0.25in;
   overflow: hidden;
   break-after: page;
-  background: #ffffff;
+  background: var(--print-surface);
   box-shadow: 0 2px 9px rgba(0, 0, 0, 0.18);
 }
 
@@ -47,7 +62,7 @@ body {
 
 .side-label {
   margin: 0 0 4px;
-  color: #344854;
+  color: var(--print-earth);
   font-size: 9.5pt;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -62,9 +77,9 @@ p {
 
 h1 {
   padding: 6px;
-  border: 3px solid #18222b;
-  background: #6f1d1b;
-  color: #ffffff;
+  border: 3px solid var(--print-text);
+  background: var(--print-emergency);
+  color: var(--print-emergency-text);
   font-size: 20pt;
   line-height: 1;
   text-align: center;
@@ -86,8 +101,9 @@ th {
 .box {
   margin-top: 5px;
   padding: 5px;
-  border: 1.5px solid #263b4a;
-  background: #f1f3f4;
+  border: 1.5px solid var(--print-brand-primary);
+  border-left: 4px solid var(--print-accent-gold);
+  background: color-mix(in srgb, var(--print-surface) 58%, var(--print-stone));
 }
 
 .contact-grid {
@@ -99,7 +115,7 @@ th {
 
 .contact {
   padding: 4px 3px;
-  border: 1.5px solid #526674;
+  border: 1.5px solid var(--print-border);
 }
 
 .contact h2 {
@@ -122,7 +138,7 @@ th {
 .write-line {
   min-width: 20px;
   height: 11px;
-  border-bottom: 1px solid #18222b;
+  border-bottom: 1px solid var(--print-text);
 }
 
 .milestones {
@@ -133,7 +149,7 @@ th {
 .milestones td {
   height: 13px;
   padding: 1px 3px;
-  border: 1px solid #526674;
+  border: 1px solid var(--print-border);
 }
 
 .checkbox {
@@ -141,7 +157,7 @@ th {
   width: 8px;
   height: 8px;
   margin-right: 4px;
-  border: 1px solid #18222b;
+  border: 1px solid var(--print-text);
 }
 
 .field-grid {
@@ -155,7 +171,7 @@ th {
   right: 0.14in;
   bottom: 0.02in;
   left: 0.14in;
-  color: #344854;
+  color: var(--print-text-muted);
   font-size: 5.3pt;
   line-height: 1.08;
 }

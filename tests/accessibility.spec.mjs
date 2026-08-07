@@ -23,4 +23,14 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
 
   await page.getByRole('button', { name: /Red/ }).click();
   await audit(page, 'Emergency Red Display');
+
+  await page.getByRole('button', { name: /Timeline/ }).last().click();
+  await audit(page, 'Timeline Red Display');
+
+  await page.getByRole('button', { name: /Red/ }).click();
+  await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
+  await page.reload();
+  await page.getByRole('button', { name: 'Offline Check' }).click();
+  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await audit(page, 'installed setup and Offline Check');
 });
