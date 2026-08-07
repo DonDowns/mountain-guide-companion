@@ -3,11 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "companion_phase": {
+    "name": "phase-1-data-only",
+    "runtime_allowed": false
+  },
   "scripts": {
     "check:data": "node scripts/run-data-checks.mjs",
     "check:manifest": "node scripts/validate-manifest.mjs",
     "check:provenance": "node scripts/check-manifest-provenance.mjs",
     "check:privacy": "node scripts/check-manifest-privacy.mjs",
-    "check:safety": "node scripts/check-manifest-safety.mjs"
+    "check:safety": "node scripts/check-manifest-safety.mjs",
+    "check:repository": "node scripts/check-repository-integrity.mjs"
   }
 }

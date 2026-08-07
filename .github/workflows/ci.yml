@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out Companion
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node 24 LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Confirm dependency-free setup and clean checkout
+        shell: bash
+        run: |
+          node --version
+          npm --version
+          test ! -f package-lock.json
+          test -z "$(git status --porcelain)"
+
+      - name: Check out pinned Mountain Guide source
+        uses: actions/checkout@v7
+        with:
+          repository: DonDowns/mountain-guide
+          ref: v15.3.10
+          fetch-depth: 0
+          persist-credentials: false
+          path: .upstream/mountain-guide
+
+      - name: Parse JSON, check JavaScript syntax, and enforce phase scope
+        run: npm run check:repository
+
+      - name: Run aggregate data contracts
+        env:
+          MOUNTAIN_GUIDE_REPO: ${{ github.workspace }}/.upstream/mountain-guide
+        run: npm run check:data
+
+      - name: Run manifest contract
+        run: npm run check:manifest
+
+      - name: Run source provenance contract
+        env:
+          MOUNTAIN_GUIDE_REPO: ${{ github.workspace }}/.upstream/mountain-guide
+        run: npm run check:provenance
+
+      - name: Run privacy contract
+        run: npm run check:privacy
+
+      - name: Run safety contract
+        run: npm run check:safety
+
+      - name: Determine canonical manifest SHA-256
+        run: sha256sum data/trip-manifest.json
+
+      - name: Verify final tracked-file and whitespace integrity
+        shell: bash
+        run: |
+          git diff --check
+          git diff --cached --check
+          test -z "$(git status --porcelain --untracked-files=no)"
