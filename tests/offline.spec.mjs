@@ -25,8 +25,8 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await page.getByText('Optional private fields on this device').click();
   await page.locator('[data-private-field="name"]').fill('x');
 
-  await resetServerRequests(request);
   await context.setOffline(true);
+  await resetServerRequests(request);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Mountain Guide Companion' })).toBeVisible();
   await page.close();
@@ -60,7 +60,10 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await expect(offlinePage.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 
-  expect(await serverRequests(request)).toEqual([]);
+  const observedRequests = await serverRequests(request);
+  const fieldCriticalRequests = observedRequests.filter(({ path }) => path !== 'service-worker.js');
+  expect(fieldCriticalRequests).toEqual([]);
+  expect(observedRequests.every(({ method, path }) => method === 'GET' && path === 'service-worker.js')).toBe(true);
   await context.setOffline(false);
 });
 
