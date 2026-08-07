@@ -149,8 +149,7 @@ async function main() {
     })),
     communication: {
       milestones: manifest.communications.check_in_protocol,
-      emergencySequence: manifest.communications.emergency_sequence,
-      deliveryDisclaimer: manifest.communications.draft_behavior
+      emergencySequence: manifest.communications.emergency_sequence
     },
     invariants: {
       weather: manifest.safety_invariants.weather,

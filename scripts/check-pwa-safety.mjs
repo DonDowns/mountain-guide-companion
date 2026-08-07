@@ -14,7 +14,8 @@ async function main() {
   const { companionData } = await import(pathToFileURL(resolve(repoRoot, 'js/companion-data.js')).href + `?safety=${Date.now()}`);
   const prohibited = [
     'all clear', 'safe to proceed', 'route is safe', 'weather permits', 'approved to continue',
-    'go/no-go', 'rescue requested', 'rescue activated', 'help is on the way', 'message sent'
+    'go/no-go', 'rescue requested', 'rescue activated', 'help is on the way', 'message sent',
+    'call completed', 'recipient notified'
   ];
   const found = prohibited.filter(phrase => runtime.includes(phrase));
   const errors = found.map(phrase => `PWA runtime contains prohibited affirmative concept ${JSON.stringify(phrase)}`);
@@ -23,8 +24,8 @@ async function main() {
     companionData.invariants.emergency,
     companionData.invariants.jurisdiction,
     'Planning targets remain planning values.',
-    'Opening a phone intent does not prove that a call occurred.',
-    'This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.'
+    'This confirms Companion resources on this phone. It does not evaluate weather, access, terrain, or route conditions.',
+    'Each phone must complete its own Offline Check and Airplane Mode test.'
   ]) {
     if (!runtime.includes(required.toLowerCase())) errors.push(`PWA runtime is missing safety boundary ${JSON.stringify(required)}`);
   }

@@ -36,7 +36,7 @@ async function checkOnce() {
   const release = JSON.parse(releaseBytes.toString('utf8'));
   const bundle = JSON.parse(bundleBytes.toString('utf8'));
   const errors = [];
-  if (release.companion_version !== '0.6.0-candidate.2') errors.push('candidate version mismatch');
+  if (release.companion_version !== '0.6.0-candidate.3') errors.push('candidate version mismatch');
   if (release.release_status !== 'candidate') errors.push('release status mismatch');
   if (release.pwa_url !== expectedPublicBase) errors.push('public URL contract mismatch');
   if (release.manifest_sha256 !== sha256(localManifestBytes)) errors.push('canonical manifest fingerprint mismatch');

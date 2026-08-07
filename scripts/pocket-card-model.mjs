@@ -92,7 +92,7 @@ export async function buildPocketCardModel() {
     locationFields: ['Mountain / route:', 'Elevation:', 'Coordinates:', 'Time:'],
     communication: {
       milestones: manifest.communications.check_in_protocol.map(ascii),
-      draftBehavior: 'Drafted/copied communication does not prove delivery.'
+      draftBehavior: 'Confirm delivery in the sending app.'
     },
     personal: {
       fields: ['Name:', 'Phone:', 'Alternate:'],

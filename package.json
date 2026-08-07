@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-6a-mountain-earth-candidate",
+    "name": "phase-6a-1-user-facing-copy-candidate",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },

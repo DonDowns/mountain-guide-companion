@@ -57,6 +57,32 @@ function requireRecord(records, id, kind) {
   return record;
 }
 
+function planningNote(planning) {
+  const notes = {
+    'planning-lake-como-start': 'Road clearance, conditions, and driver judgment determine the actual starting point and time.',
+    'planning-lake-como-camp-target': 'Use this target to preserve recovery margin; reassess actual conditions.',
+    'planning-blanca-ellingwood-start': 'This is the current trip plan. Actual conditions govern the start.',
+    'planning-blanca-ellingwood-exit-target': 'User-set target. Reassess weather, terrain, pace, descent time, and group condition.',
+    'planning-mount-lindsey-start': 'Current access, route conditions, and group judgment govern the actual climb.',
+    'planning-mount-lindsey-return-target': 'Reassess access, weather, terrain, pace, and group condition.'
+  };
+  if (!notes[planning.id]) throw new Error(`Field Guide requires a reviewed note for ${planning.id}`);
+  return notes[planning.id];
+}
+
+function routeReturnConsideration(route) {
+  if (route.id === 'route-mount-lindsey-standard') {
+    return 'Trailhead elevation remains unverified; no net descent figure is shown.';
+  }
+  return ascii(route.return_considerations);
+}
+
+function referenceContext(point) {
+  return ascii(point.route_context)
+    .replace(/^Frozen-source /, '')
+    .replace('not asserted as an exact campsite coordinate', 'not an exact campsite location');
+}
+
 export async function buildFieldGuideModel() {
   const [{ manifest }, hash, buildConfig] = await Promise.all([
     runValidation({ silent: true }),
@@ -97,7 +123,7 @@ export async function buildFieldGuideModel() {
       value: formatTime(planning.local_time),
       kind: planning.kind,
       semantics: planning.semantics,
-      note: ascii(planning.safety_note)
+      note: planningNote(planning)
     }))
   }));
 
@@ -111,7 +137,7 @@ export async function buildFieldGuideModel() {
     difficulty: ascii(route.difficulty),
     exposure: ascii(route.exposure),
     routeNotes: ascii(route.route_notes),
-    returnConsiderations: ascii(route.return_considerations),
+    returnConsiderations: routeReturnConsideration(route),
     gainValue: route.elevation_gain_ft
   }));
 
@@ -130,7 +156,7 @@ export async function buildFieldGuideModel() {
       name: ascii(point.name),
       coordinate: `${formatCoordinate(point.latitude)}, ${formatCoordinate(point.longitude)}`,
       elevation: `${formatNumber(point.elevation_ft, 0)} ft`,
-      context: ascii(point.route_context)
+      context: referenceContext(point)
     };
   });
 
@@ -184,7 +210,7 @@ export async function buildFieldGuideModel() {
     referencePoints,
     lilyLake: {
       name: ascii(lily.name),
-      holdText: 'Exact canonical coordinate/elevation pending final verification.'
+      holdText: 'Exact coordinate/elevation is pending verification and is not shown.'
     },
     access: {
       fact: ascii(accessEvidence.fact_verified),
@@ -201,7 +227,7 @@ export async function buildFieldGuideModel() {
     contacts,
     communication: {
       milestones: manifest.communications.check_in_protocol.map(ascii),
-      draftBehavior: ascii(manifest.communications.draft_behavior)
+      draftBehavior: 'Confirm delivery in the sending app before marking an update.'
     },
     weatherLog: {
       refreshLabel: 'Saved weather last refreshed:',

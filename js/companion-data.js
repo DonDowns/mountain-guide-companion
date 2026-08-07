@@ -8,16 +8,16 @@ function deepFreeze(value) {
 }
 export const companionData = deepFreeze({
   "identity": {
-    "companionVersion": "0.6.0-candidate.2",
+    "companionVersion": "0.6.0-candidate.3",
     "releaseStatus": "candidate",
     "dataVersion": "1.0.0",
     "sourceRelease": "v15.3.10",
     "sourceCommit": "fb711292b2642c2296eb76c0cfe2531606029609",
-    "generatedAt": "2026-08-07T18:44:59Z",
+    "generatedAt": "2026-08-07T19:26:53Z",
     "verifiedAt": "2026-08-07T07:45:17Z",
     "manifestSha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
     "manifestShort": "3cda95d4e6b1",
-    "bundleId": "ddmg-companion-0-6-0-candidate-2-data-3cda95d4e6b1-b1",
+    "bundleId": "ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1",
     "offlineBundleVersion": 1,
     "publicBaseUrl": "https://companion.vondadowns.com/"
   },
@@ -324,8 +324,7 @@ export const companionData = deepFreeze({
       "Provide exact location, mountain, route, elevation, and coordinates if available.",
       "Provide injuries, party size, weather, and current conditions.",
       "Let dispatch determine the responding agency."
-    ],
-    "deliveryDisclaimer": "Text and email actions create drafts for review. A draft or copied update is not evidence of delivery; only external transport confirmation establishes delivery."
+    ]
   },
   "invariants": {
     "weather": "Weather is evidence, not permission.",
@@ -337,24 +336,24 @@ export const companionData = deepFreeze({
   "artifacts": {
     "fieldGuide": {
       "url": "./generated/field-guide.pdf",
-      "sha256": "498b14128d44a2c9a7ed58b8ff516e99c836e2c371ffee18e6673193af4527ba"
+      "sha256": "c5cfaca1996f7dc12bedb2ec325f0ab6f5049cc8db914992df865f1ab5af64c1"
     },
     "pocketCard": {
       "url": "./generated/pocket-card.pdf",
-      "sha256": "f477e3599a8038300412323d833728e96bcc1b689d6653469ff05f119c2d8465"
+      "sha256": "99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958"
     }
   }
 });
 export const releaseMetadata = deepFreeze({
-  "companion_version": "0.6.0-candidate.2",
+  "companion_version": "0.6.0-candidate.3",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
-  "generated_at": "2026-08-07T18:44:59Z",
+  "generated_at": "2026-08-07T19:26:53Z",
   "verified_at": "2026-08-07T07:45:17Z",
   "release_status": "candidate",
-  "bundle_id": "ddmg-companion-0-6-0-candidate-2-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",

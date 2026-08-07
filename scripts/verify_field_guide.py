@@ -115,7 +115,8 @@ def main():
         'Go/No-Go', 'safe bailout', 'emergency escape route', 'safe descent',
         'safe to proceed', 'all clear', 'route is safe', 'weather permits',
         'approved to continue', 'rescue requested', 'rescue activated',
-        'help is on the way', 'message sent', '37.62361', '-105.47278',
+        'help is on the way', 'message sent', 'phone intent', 'does not prove',
+        'drafted/copied', 'frozen-source', '37.62361', '-105.47278',
         '37.623486', '-105.472903', '\ufffd', '\u25a0'
     ]
     for value in prohibited:

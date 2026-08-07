@@ -21,7 +21,7 @@ The front does not claim rescue activation, delivery, or agency exclusivity.
 
 ## Back architecture
 
-The back contains all nine canonical communication milestones in manifest order, each with a checkbox and time/initials area. It states that drafted/copied communication does not prove delivery.
+The back contains all nine canonical communication milestones in manifest order, each with a checkbox and time/initials area. Its direct instruction is: Confirm delivery in the sending app.
 
 The remaining regions provide blank handwritten name, phone, alternate, optional medical/personal notes, saved-weather refresh, and actual sky/wind fields. They include the staleness warning, Weather is evidence, not permission, and the concise decision-support statement.
 

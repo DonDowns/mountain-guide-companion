@@ -54,7 +54,7 @@ async function runOfflineCheck({ record = true } = {}) {
   offlineResult = {
     ...workerResult,
     complete: runtimeChecks.every(Boolean),
-    error: runtimeChecks.every(Boolean) ? '' : workerResult.error || 'Active release identity or required field resources did not verify.'
+    error: runtimeChecks.every(Boolean) ? '' : workerResult.error || 'Required Companion resources did not verify.'
   };
   if (record) {
     store.update(state => {
@@ -120,7 +120,7 @@ async function handleAction(action, button) {
     await runOfflineCheck();
   }
   if (action === 'record-airplane-test') {
-    if (!globalThis.confirm('Record that you personally completed every Airplane Mode test step on this phone? This records your statement only and does not verify mountain conditions, access, weather, or route safety.')) return;
+    if (!globalThis.confirm('Record that you completed every Airplane Mode test step on this phone? This is a local record, not a check of mountain conditions.')) return;
     store.update(state => { state.setup.airplaneModeTestCompletedAt = new Date().toISOString(); });
   }
   if (action === 'clear-airplane-test') {
@@ -226,7 +226,7 @@ registerProductionServiceWorker(state => {
 }).then(async registration => {
   if (registration) await runOfflineCheck({ record: false });
   else {
-    offlineResult = { complete: false, error: 'Production service worker is unavailable.' };
+    offlineResult = { complete: false, error: 'Offline setup is unavailable.' };
     renderState();
   }
 });

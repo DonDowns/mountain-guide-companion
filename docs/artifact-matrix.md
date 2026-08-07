@@ -61,7 +61,7 @@ Every released Companion artifact must expose or internally record the same `dat
 - jurisdiction-context language;
 - communication/check-in sequence;
 - blank/local-only private fields;
-- explicit language that drafted/copied communication is not proof of delivery.
+- direct instruction to confirm delivery in the sending app before marking an update.
 
 The Phase 2 generated HTML, PDF, and artifact checksum record are committed. CI rebuilds them from the manifest and rejects byte drift. Rendered PNG verification images remain ignored temporary evidence until a later approved baseline-regression phase.
 

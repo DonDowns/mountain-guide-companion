@@ -2,7 +2,7 @@
 
 ## Scope
 
-Phase 6A gives Companion `0.6.0-candidate.2` one restrained visual language across the PWA, three-page Field Guide, and two-sided Pocket Card. This layer changes presentation only. Canonical facts, planning values, emergency instructions, decision prompts, privacy boundaries, local-state behavior, offline transactions, and the Lily Lake release hold are unchanged.
+Phase 6A gives Companion one restrained visual language across the PWA, three-page Field Guide, and two-sided Pocket Card. Phase 6A.1 carries that approved system into `0.6.0-candidate.3` while simplifying field-facing copy. Canonical facts, planning values, emergency instructions, decision prompts, privacy boundaries, local-state behavior, offline transactions, and the Lily Lake release hold are unchanged.
 
 The existing teal mountain mark remains the identity seed. Its recognizable silhouette and application/maskable icon geometry remain unchanged because the audit found no usability, legibility, or platform-mask defect that justified redesign.
 

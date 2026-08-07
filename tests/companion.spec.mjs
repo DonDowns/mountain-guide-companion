@@ -22,16 +22,15 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Mountain Guide Companion', level: 1 })).toBeVisible();
   await expect(page.getByText('CANDIDATE', { exact: true })).toBeVisible();
-  await expect(page.getByText(/PHYSICAL TESTING IN PROGRESS/)).toBeVisible();
+  await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
   await expect(page.getByText('INSTALL FOR OFFLINE USE', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Install for Offline Use', exact: true })).toBeVisible();
-  await expect(page.getByText(`Manifest ${companionData.identity.manifestShort}…`)).toBeVisible();
   expect(companionData.identity.manifestSha256).toBe(releaseMetadata.manifest_sha256);
   if (testInfo.project.name === 'webkit-mobile') {
-    await expect(page.getByText('Open this page in Safari.')).toBeVisible();
-    await expect(page.getByText('Choose Add to Home Screen.')).toBeVisible();
+    await expect(page.getByText('Open in Safari.')).toBeVisible();
+    await expect(page.getByText('Add to Home Screen.')).toBeVisible();
   }
 });
 
@@ -55,7 +54,20 @@ test('navigates Timeline, Route, and one-action Emergency', async ({ page }) => 
   await expect(phoneLinks).toHaveCount(6);
   const expected = companionData.contacts.flatMap(contact => contact.phones.map(phone => phone.tel));
   expect(await phoneLinks.evaluateAll(nodes => nodes.map(node => node.getAttribute('href')))).toEqual(expected);
-  await expect(page.getByText('Opening a phone intent does not prove that a call occurred.', { exact: true }).first()).toBeVisible();
+  for (const county of ['Alamosa', 'Huerfano', 'Costilla']) {
+    await expect(page.getByRole('link', { name: `Call ${county} Dispatch` })).toBeVisible();
+    await expect(page.getByRole('link', { name: `Call ${county} Sheriff Office` })).toBeVisible();
+  }
+  await expect(page.locator('#emergency-view')).not.toContainText(/called|call completed|contacted/i);
+});
+
+test('uses field-facing copy without implementation disclaimers or false confirmations', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await page.getByRole('button', { name: /Emergency/ }).last().click();
+  const visibleText = await page.locator('body').innerText();
+  expect(visibleText).not.toMatch(/phone intent|browser intent|does not prove|drafted\/copied|service worker|cache|sha-256|fingerprint/i);
+  expect(visibleText).not.toMatch(/message sent|delivered|call completed|rescue requested|recipient notified|help is on the way/i);
 });
 
 test('persists Red Display and objective selection without safety meaning', async ({ page }) => {
@@ -98,7 +110,7 @@ test('persists milestones as local marks only', async ({ page }) => {
   const milestone = companionData.communication.milestones[0];
   const checkbox = page.getByRole('checkbox', { name: `Mark ${milestone} locally` });
   await checkbox.check();
-  await expect(page.getByText('Marked locally only', { exact: true })).toBeVisible();
+  await expect(page.getByText('Marked locally', { exact: true })).toBeVisible();
   await page.reload();
   await expect(page.getByRole('checkbox', { name: `Mark ${milestone} locally` })).toBeChecked();
   await expect(page.locator('#milestone-list')).not.toContainText(/sent|delivered|confirmed/i);
@@ -110,7 +122,7 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   });
   await page.goto('/');
   await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
   await page.locator('[data-private-field="alternate"]').fill('y');
   await page.locator('[data-private-field="note"]').fill('z');
@@ -121,11 +133,11 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   expect(page.url()).not.toContain('?');
   await page.reload();
   await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Clear Private Data' }).click();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('');
   await expect(page.locator('[data-private-field="note"]')).toHaveValue('');
 });
@@ -137,8 +149,8 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await expect(page.getByText('INSTALL FOR OFFLINE USE', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Offline Check' }).click();
   await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
-  await expect(page.getByText('This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.', { exact: true })).toBeVisible();
-  await expect(page.getByText('Physical cold-launch test still required.', { exact: true })).toBeVisible();
+  await expect(page.getByText('This confirms Companion resources on this phone. It does not evaluate weather, access, terrain, or route conditions.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Still required on this phone.', { exact: true })).toBeVisible();
   await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
 });
 
@@ -161,7 +173,7 @@ test('migrates Phase 4 local state to schema version 2 without losing operationa
   await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
   await expect(page.locator('[data-milestone="0"]')).toBeChecked();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
   expect(stored.schemaVersion).toBe(2);
@@ -178,7 +190,7 @@ test('records the physical Airplane Mode test only after explicit confirmation',
   await expect(page.locator('.airplane-test li')).toHaveCount(11);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Record Airplane Mode Test' }).click();
-  await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
+  await expect(page.getByText(/Marked complete on this phone:/)).toBeVisible();
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
   expect(stored.setup.airplaneModeTestCompletedAt).toBeTruthy();
 });
@@ -201,7 +213,7 @@ test('withholds Lily Lake location and prevents horizontal overflow with usable 
   await page.goto('/');
   await page.getByRole('button', { name: 'Open Companion' }).first().click();
   await page.getByRole('button', { name: /Route/ }).last().click();
-  await expect(page.locator('#lily-status')).toContainText('Exact canonical coordinate/elevation pending final verification.');
+  await expect(page.locator('#lily-status')).toContainText('Exact coordinate/elevation is pending verification and is not shown.');
   await expect(page.locator('body')).not.toContainText(/37\.62361|-105\.47278|37\.623486|-105\.472903/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
