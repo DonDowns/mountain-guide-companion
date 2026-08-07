@@ -2,9 +2,9 @@
 
 ## Status and product boundary
 
-The Phase 5 Companion is a draft, crew-facing static PWA with a production offline runtime. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
+The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Nothing is deployed or tagged in Phase 5. Production caching, atomic updates, cold launch, mixed-version prevention, and repair are implemented and tested technically. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.1` at the configured Companion origin solely to enable physical tests. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -13,7 +13,7 @@ The runtime is plain HTML, modern CSS, ES modules, local SVG icons, a web app ma
 `scripts/build-pwa.mjs` validates `data/trip-manifest.json`, computes its exact SHA-256, verifies both print artifact records, and deterministically generates:
 
 - `js/companion-data.js` — immutable selected current-trip facts and runtime identity;
-- `release.json` — the draft metadata contract intended for a future Mountain Guide Crew tab.
+- `release.json` — the candidate metadata contract consumed optionally by the Mountain Guide Crew tab.
 
 Hand-maintained HTML, CSS, and JavaScript contain UI structure and safety-boundary copy, not trip dates, objective names, planning times, route values, phone numbers, data version, source release/commit, or manifest fingerprint. Automated checks reject those canonical literals outside the generated module.
 
@@ -73,7 +73,7 @@ Milestone checks mean Marked locally only. The canonical delivery disclaimer rem
 
 Share uses `navigator.share` when available and otherwise copies the single configured public URL. The payload contains only title, public explanatory text, and that URL. It never includes query parameters, local state, actual start, milestones, status notes, contact fields, or storage content.
 
-No external QR API is used. The stable public URL is directly QR-encodable without state; QR presentation remains the responsibility of the future Mountain Guide Crew tab.
+No external QR API is used. The stable public URL is directly QR-encodable without state; QR presentation belongs to the separate Mountain Guide Crew tab.
 
 ## Display and accessibility
 
@@ -83,8 +83,8 @@ The shell uses semantic header/main/nav/footer landmarks, native controls, visib
 
 ## Physical artifacts
 
-The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. Draft PDF links are local package-relative URLs. Both PDFs are members of the atomic, hash-verified offline bundle and are exercised through offline browser fetches.
+The landing experience presents the Interactive Companion, 3-Page Field Guide, and Emergency Pocket Card without duplicating PDF content. PDF links are local package-relative URLs. Both PDFs are members of the atomic, hash-verified offline bundle and are exercised through offline browser fetches. Public candidate access does not make either PDF a field release.
 
 ## Remaining release gates
 
-Technical Phase 5 requirements are implemented. Field release still requires the physical primary/backup/friend iPhone plan, actual force-quit and reboot evidence, physical print/readability checks, owner review, remaining scoped Lily Lake disposition for any artifact that requires the unresolved field, and a separate deployment/tag decision. Custom-domain activation remains gated.
+Technical Phase 5 requirements are implemented and Phase 6 provides the candidate deployment path. Field release still requires the physical primary/backup/friend iPhone plan, actual force-quit and reboot evidence, physical print/readability checks, owner review, remaining scoped Lily Lake disposition for any artifact that requires the unresolved field, and a separate final tag decision.

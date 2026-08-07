@@ -35,7 +35,7 @@ async function main() {
     ['source_release', manifest.metadata.source_release],
     ['source_commit', manifest.metadata.source_commit],
     ['verified_at', manifest.metadata.verified_at],
-    ['release_status', 'draft']
+    ['release_status', 'candidate']
   ]) {
     if (release[key] !== expected) errors.push(`release.json ${key} mismatch`);
     if (releaseMetadata[key] !== expected) errors.push(`generated release metadata ${key} mismatch`);
@@ -56,7 +56,7 @@ async function main() {
 
   for (const required of [
     'Mountain Guide Companion', 'Open Companion', 'Timeline', 'Route', 'Emergency', 'Red',
-    'CALL 911 FIRST', 'Three Companion Artifacts'
+    'CALL 911 FIRST', 'Three Companion Artifacts', 'CANDIDATE', 'not yet a field release'
   ]) requireText(html.toLowerCase(), required.toLowerCase(), 'index.html', errors);
   for (const required of ['env(safe-area-inset-bottom)', 'min-height: 48px', '[data-display="red"]', 'overflow-x: hidden']) {
     requireText(css, required, 'companion.css', errors);
@@ -76,7 +76,7 @@ async function main() {
   }
   const sw = await readFile(resolve(repoRoot, 'service-worker.js'), 'utf8');
   for (const requiredWorkerBehavior of ['caches.open', "addEventListener('fetch'", 'respondWith(', 'VERIFY_OFFLINE_BUNDLE']) {
-    if (!sw.includes(requiredWorkerBehavior)) errors.push(`Phase 5 service worker is missing ${requiredWorkerBehavior}`);
+    if (!sw.includes(requiredWorkerBehavior)) errors.push(`Companion service worker is missing ${requiredWorkerBehavior}`);
   }
 
   const templateText = [html, css, sourceText].join('\n');

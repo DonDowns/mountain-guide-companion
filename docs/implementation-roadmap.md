@@ -299,9 +299,9 @@ Prove that one complete compatible release survives zero connectivity, force qui
 
 ### Draft status
 
-Implemented technically in Phase 5: a generated explicit resource manifest, deterministic release/cache identity, marker-last hash-verified installation, active-cache-only field fetches, one-prior-release retention, verified Offline Check, neutral update activation, connected repair, state-schema migration, and adversarial Chromium browser/logic tests. Normal WebKit runtime tests remain active; Playwright WebKit's internal failure on service-worker-controlled offline navigation is documented as infrastructure evidence rather than a false pass. Nothing is deployed or tagged.
+Implemented technically in Phase 5: a generated explicit resource manifest, deterministic release/cache identity, marker-last hash-verified installation, active-cache-only field fetches, one-prior-release retention, verified Offline Check, neutral update activation, connected repair, state-schema migration, and adversarial Chromium browser/logic tests. Normal WebKit runtime tests remain active; Playwright WebKit's internal failure on service-worker-controlled offline navigation is documented as infrastructure evidence rather than a false pass. Phase 6 publishes the same architecture as a physical-test candidate; no field-release tag is created.
 
-Primary, backup, and friend iPhone force-quit/reboot/Airplane Mode testing, physical field-use evidence, and owner release approval remain Phase 6/release gates. The in-app physical-test mark is a user attestation and is never set by automation.
+Primary, backup, and friend iPhone force-quit/reboot/Airplane Mode testing, physical field-use evidence, and owner release approval remain Phase 7/release gates. The in-app physical-test mark is a user attestation and is never set by automation.
 
 ### Deliverables
 
@@ -348,7 +348,7 @@ Very high: browser/PWA lifecycle, iOS storage behavior, atomicity, and field fai
 
 ### Goal
 
-Make Contracts A–I repeatable for every candidate while preserving the rule that automation does not replace physical testing.
+Make Contracts A–I repeatable for every candidate, publish the validated candidate at the stable Companion origin, and enable the separate Mountain Guide Crew distribution flow while preserving the rule that automation does not replace physical testing.
 
 ### Deliverables
 
@@ -363,6 +363,9 @@ Make Contracts A–I repeatable for every candidate while preserving the rule th
 - print geometry/content checks;
 - release manifest/checksum verification;
 - CI workflow and protected release checks, if a remote/public CI is approved.
+- protected-main GitHub Pages deployment from the exact successful CI commit;
+- live HTTPS identity and byte-integrity verification;
+- separate-origin Mountain Guide Crew links, local QR, share privacy, and offline instructions.
 
 ### Dependencies
 

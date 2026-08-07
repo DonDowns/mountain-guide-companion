@@ -2,13 +2,13 @@
 
 ## Status and boundary
 
-Phase 5 implements the draft Companion's zero-connectivity runtime architecture. It does not deploy, tag, or promote the Companion to a field release. Automated browser evidence is technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
+Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that exact architecture as `0.6.0-candidate.1` for physical testing. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
 
-The configured future origin is `https://companion.vondadowns.com/`. It is architectural only. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate Mountain Guide origin.
+The configured origin is `https://companion.vondadowns.com/`. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate `https://mountainguide.vondadowns.com/` origin.
 
 ## Generated bundle and identity
 
-`npm run build:pwa` derives runtime data and draft release metadata from the canonical manifest. `npm run build:offline` then hashes the actual required files and generates:
+`npm run build:pwa` derives runtime data and candidate release metadata from the canonical manifest. `npm run build:offline` then hashes the actual required files and generates:
 
 - `offline-bundle.json`, the explicit resource inventory;
 - `service-worker.js`, the production worker with the exact bundle identity, metadata, resource list, and expected offline-manifest hash embedded.
@@ -97,7 +97,7 @@ Playwright WebKit remains in the normal desktop and 390×844 runtime/accessibili
 
 ## Physical-device checklist still required
 
-Run this checklist separately on the primary iPhone, backup iPhone, and at least one friend/second-person iPhone if available. Phase 5 does not mark any item passed:
+Run this checklist separately on the primary iPhone, backup iPhone, and at least one friend/second-person iPhone if available. Candidate deployment does not mark any item passed:
 
 1. Install from Safari with Add to Home Screen.
 2. Open once while connected and complete Offline Check.

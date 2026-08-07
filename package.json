@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-5-offline-hardening-draft",
+    "name": "phase-6-physical-test-candidate",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },
@@ -25,12 +25,14 @@
     "check:pocket-card-pdf": "node scripts/verify-pocket-card.mjs --render",
     "build:pwa": "node scripts/build-pwa.mjs",
     "build:offline": "node scripts/build-offline.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
     "check:pwa": "node scripts/check-pwa.mjs",
     "check:pwa:privacy": "node scripts/check-pwa-privacy.mjs",
     "check:pwa:safety": "node scripts/check-pwa-safety.mjs",
     "check:artifact-parity": "node scripts/check-artifact-parity.mjs",
     "check:offline": "node scripts/check-offline.mjs",
     "check:service-worker": "node scripts/check-service-worker.mjs",
+    "check:live": "node scripts/check-live-site.mjs",
     "test:offline:logic": "node scripts/test-offline-transaction.mjs",
     "serve:pwa": "node scripts/serve-pwa.mjs",
     "test:browser": "playwright test",

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('captures the Phase 5 visual-audit matrix', async ({ page }, testInfo) => {
+test('captures the Phase 6 candidate visual-audit matrix', async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === 'chromium-mobile';
   const desktop = testInfo.project.name === 'chromium-desktop';
   test.skip(!mobile && !desktop, 'Visual matrix uses Chromium reference renders');

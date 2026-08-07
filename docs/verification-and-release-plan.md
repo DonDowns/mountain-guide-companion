@@ -247,6 +247,12 @@ Browser automation cannot certify outdoor readability, glove operation, waterpro
 
 Playwright WebKit continues to run the normal shell/runtime/accessibility matrix. Its service-worker-controlled offline navigation currently reports an internal engine error on both configured viewports, so that case is documented as infrastructure-limited and is not counted as a pass. Physical Safari/iPhone evidence remains mandatory.
 
+### Phase 6 candidate-deployment evidence
+
+The Pages workflow runs only after the `CI` workflow succeeds for protected `main`. It checks out the exact validated SHA, regenerates the runtime and bundle identities, reruns PWA, parity, privacy, safety, offline, and service-worker contracts, builds an explicit flattened site artifact, and deploys through the GitHub Pages environment. `npm run check:live -- <deployment-url>` then verifies HTTPS, candidate version/status, canonical manifest fingerprint, bundle identity, service-worker identity, and every published resource byte against `offline-bundle.json`.
+
+The configured public address is `https://companion.vondadowns.com/`. Candidate availability exists to permit real-phone validation. It is not evidence of Airplane Mode, force-quit, reboot, Safari installation, print usability, communication delivery, route conditions, or field readiness.
+
 ## Service-worker upgrade tests
 
 The release shell, canonical dataset, and critical assets form one atomic compatibility unit.

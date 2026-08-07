@@ -21,6 +21,9 @@ const test = base.extend({
 test('loads canonical identity and friend first-open setup', async ({ page }, testInfo) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Mountain Guide Companion', level: 1 })).toBeVisible();
+  await expect(page.getByText('CANDIDATE', { exact: true })).toBeVisible();
+  await expect(page.getByText(/PHYSICAL TESTING IN PROGRESS/)).toBeVisible();
+  expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
   await expect(page.getByText('INSTALL FOR OFFLINE USE', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Install for Offline Use', exact: true })).toBeVisible();

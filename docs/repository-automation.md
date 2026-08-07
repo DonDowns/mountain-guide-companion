@@ -47,18 +47,18 @@ Future tagging uses `npm run release:tag` with a version, complete release manif
 
 The helper verifies clean synchronized `main`, successful CI on the exact commit, all local contracts, canonical hash parity, artifact checksums, rollback target, and tag nonexistence before creating and pushing an annotated tag.
 
-## Future GitHub Pages deployment
+## GitHub Pages candidate deployment
 
-Phase 1B does not enable Pages, create a CNAME, or add runtime assets. When Phase 4 creates the PWA, add a Pages workflow that:
+Phase 6 adds a Pages workflow that:
 
 - runs only for a successful `CI` workflow on `main` or a separately approved release event;
 - rebuilds from the exact validated commit rather than an arbitrary branch tip;
 - reruns runtime, parity, privacy, safety, staleness, and offline contracts;
 - uploads one immutable Pages artifact and deploys through the GitHub Pages environment;
 - treats Pages backend or artifact-service failure as infrastructure, with one bounded retry; and
-- configures no custom domain until the owner separately chooses and verifies one.
+- verifies the deployed HTTPS bytes against the exact validated offline bundle.
 
-Candidate domains remain `companion.vondadowns.com` and `fieldguide.vondadowns.com`; neither is configured in this phase.
+The selected candidate domain is `companion.vondadowns.com`. DNS and certificate establishment are one-time external gates when they cannot be completed through authenticated repository tooling. The Mountain Guide domain and worker remain separate and unchanged by the Companion deployment.
 
 ## Bootstrap sequence
 

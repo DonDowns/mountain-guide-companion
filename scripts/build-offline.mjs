@@ -35,7 +35,9 @@ async function entryFor([path, role]) {
 
 function assertIdentity(release, config) {
   if (release.companion_version !== config.companion_version) throw new Error('release/config Companion version mismatch');
-  if (release.release_status !== 'draft') throw new Error('Phase 5 release status must remain draft');
+  if (release.release_status !== config.release_status || config.release_status !== 'candidate') {
+    throw new Error('Phase 6 release status must remain candidate');
+  }
   if (release.offline_bundle_version !== config.offline_bundle_version) throw new Error('offline bundle version mismatch');
   if (!release.bundle_id?.startsWith(`${config.cache_namespace}-`)) throw new Error('bundle identity is outside the Companion cache namespace');
 }

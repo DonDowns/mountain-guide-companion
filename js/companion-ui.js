@@ -195,7 +195,7 @@ export function renderStaticIdentity() {
   document.querySelector('#jurisdiction-copy').textContent = `${companionData.invariants.jurisdiction} You do not need to choose a county before calling.`;
   const provenance = document.querySelector('#provenance');
   clearAndAppend(provenance,
-    element('strong', { text: 'DRAFT COMPANION' }),
+    element('strong', { text: companionData.identity.releaseStatus === 'candidate' ? 'COMPANION CANDIDATE · PHYSICAL TESTING IN PROGRESS' : 'DRAFT COMPANION' }),
     element('span', { text: `Companion ${companionData.identity.companionVersion} · Trip Data v${companionData.identity.dataVersion}` }),
     element('span', { text: `Based on Mountain Guide ${companionData.identity.sourceRelease} · Verified ${formatDate(companionData.identity.verifiedAt)}` }),
     element('span', { text: `Manifest ${companionData.identity.manifestShort}…` })

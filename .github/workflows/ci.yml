@@ -133,6 +133,16 @@ jobs:
       - name: Run production service-worker atomicity and scope contract
         run: npm run check:service-worker
 
+      - name: Build flattened GitHub Pages candidate artifact
+        run: |
+          npm run build:pages
+          test -f .pages-site/index.html
+          test -f .pages-site/service-worker.js
+          test -f .pages-site/release.json
+          test -f .pages-site/offline-bundle.json
+          test -f .pages-site/generated/field-guide.pdf
+          test -f .pages-site/generated/pocket-card.pdf
+
       - name: Test marker-last transaction and quota-failure logic
         run: npm run test:offline:logic
 
