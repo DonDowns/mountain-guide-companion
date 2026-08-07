@@ -8,7 +8,7 @@ Build and maintain a separate, trip-scoped, zero-connectivity field companion to
 
 1. Never modify the existing Mountain Guide from this repository.
 2. Treat Mountain Guide release v15.3.10 and commit fb711292b2642c2296eb76c0cfe2531606029609 as the pinned upstream source for the initial Companion.
-3. Do not create a remote, push, publish, deploy, or open a pull request without explicit owner instruction.
+3. Repository automation may create branches, validate, commit, push, open pull requests, enable approved auto-merge, and synchronize `main`; deployment and field release still require their defined gates.
 4. During Phase 0, create documentation and repository-governance files only. Do not create runtime code, manifests, service workers, PDFs, or production data.
 
 ## Phase 1 data-only rules
@@ -24,10 +24,21 @@ Build and maintain a separate, trip-scoped, zero-connectivity field companion to
 
 1. Once implementation begins, main is production/release-ready only.
 2. Perform implementation on a named feature or release branch.
-3. Do not merge directly to main without owner approval.
+3. Do not push routine changes directly to `main`; use the protected pull-request workflow and required checks.
 4. Do not rewrite or delete prior release history.
 5. Every release must have a version, ordinary annotated Git tag, immutable source commit, artifact checksums, canonical-data version, provenance stamp, verification evidence, and rollback target.
 6. Cryptographic tag signing is out of scope unless deliberately approved later.
+
+## Repository automation policy
+
+1. Codex may automatically create an approved project branch, validate, commit, push, open its pull request, enable native auto-merge, wait for required checks, and fast-forward local `main` after merge.
+2. Approved routine prefixes are `feature/`, `fix/`, `docs/`, and `automation/`.
+3. Never auto-merge around a failed, skipped, missing, or stale required check.
+4. Stop for factual conflict, an unapproved pending release blocker, privacy or safety finding, failed validation, destructive Git operation, authentication/permission change, field-release approval, or physical-test signoff.
+5. Labels `human-review-required`, `release-hold`, `data-conflict`, `privacy-hold`, and `safety-hold` block auto-merge.
+6. A hosted-runner, GitHub internal, Pages backend, or artifact-service failure before tests execute is infrastructure rather than an application regression. Retry it at most once, then report an infrastructure hold.
+7. Routine annotated release tagging may be automated only after all release evidence exists. A field release always requires explicit owner, physical iPhone, print, and communication signoff.
+8. Never force-push, rewrite published history, disable protection to hide a failed check, or use destructive reset to synchronize branches.
 
 ## Fact and provenance rules
 
@@ -118,4 +129,6 @@ Stop and request review when:
 - safety language implies authorization or rescue confirmation;
 - a route alternative lacks source and verification;
 - physical validation reveals an unreadable, unreachable, or ambiguous critical workflow;
+- GitHub authentication or permissions must change;
+- required CI fails or an infrastructure failure recurs after one bounded retry;
 - the requested work would modify the existing Mountain Guide.

@@ -23,7 +23,7 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 0 architecture is approved and preserved on `main` at commit `ec69e9dd8083411f94e5367a00b4c4e25d768601`. The Phase 1 canonical dataset and controlled Phase 1A external-verification pass are owner-approved on `feature/canonical-trip-data-v1`. Phase 2 has not started.
+Phase 0 architecture and the owner-approved Phase 1 canonical dataset are preserved on `main`. Repository automation is being added without beginning Phase 2.
 
 The Phase 1 dataset adds only:
 
@@ -106,6 +106,8 @@ npm run check:manifest
 npm run check:provenance
 npm run check:privacy
 npm run check:safety
+npm run check:repository
+npm run check:policy -- --repository-only
 ```
 
 The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/trip-manifest.json`, including whitespace and the final newline. It is deliberately not embedded in the manifest. The aggregate runner computes it twice and requires the results to match.
@@ -120,7 +122,8 @@ The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/t
 - docs/implementation-roadmap.md — phased implementation from schema through physical field validation and release.
 - docs/source-ledger.md — fact-group provenance, source locators, verification status, and qualifications.
 - docs/data-verification-report.md — Phase 1 inventory, verification results, exclusions, and owner-review questions.
+- docs/repository-automation.md — protected branch, CI, auto-merge, synchronization, release-tagging, and future Pages policy.
 
 ## Repository status
 
-This is a local repository with no remote. The first commit on `main` is the approved Phase 0 baseline. The Phase 1 canonical dataset is owner-approved on `feature/canonical-trip-data-v1`; Phase 2 has not started, and nothing has been pushed, published, or deployed.
+The public repository is `DonDowns/mountain-guide-companion`. Phase 0 and Phase 1 are on protected `main`; Phase 2 has not started and nothing has been deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Field release and physical signoff remain human gates.

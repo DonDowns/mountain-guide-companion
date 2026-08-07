@@ -13,6 +13,11 @@
     "check:provenance": "node scripts/check-manifest-provenance.mjs",
     "check:privacy": "node scripts/check-manifest-privacy.mjs",
     "check:safety": "node scripts/check-manifest-safety.mjs",
-    "check:repository": "node scripts/check-repository-integrity.mjs"
+    "check:repository": "node scripts/check-repository-integrity.mjs",
+    "check:policy": "node scripts/check-pr-policy.mjs",
+    "test:automation": "node scripts/test-automation-policy.mjs",
+    "pr:open": "node scripts/open-pr.mjs",
+    "main:sync": "node scripts/sync-main.mjs",
+    "release:tag": "node scripts/tag-release.mjs"
   }
 }

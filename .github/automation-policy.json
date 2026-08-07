@@ -1,0 +1,31 @@
+{
+  "approved_branch_prefixes": [
+    "feature/",
+    "fix/",
+    "docs/",
+    "automation/"
+  ],
+  "human_review_labels": [
+    "human-review-required",
+    "release-hold",
+    "data-conflict",
+    "privacy-hold",
+    "safety-hold"
+  ],
+  "release_hold_markers": [
+    ".release-hold",
+    "RELEASE_HOLD.md",
+    ".github/release-hold"
+  ],
+  "approved_scoped_holds": [
+    {
+      "canonical_record_id": "waypoint-lily-lake-trailhead",
+      "scope": "final_release_only_when_artifact_requires_coordinate_or_elevation",
+      "drafting_allowed_when_omitted_or_visibly_withheld": true
+    }
+  ],
+  "required_status_checks": [
+    "Validate repository",
+    "Auto-merge eligibility"
+  ]
+}
