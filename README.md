@@ -23,16 +23,15 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 0 architecture and the owner-approved Phase 1 canonical dataset are preserved on `main`. Repository automation is being added without beginning Phase 2.
+Phase 2 produces the first draft Printable Field Guide while preserving the approved Phase 0 architecture and Phase 1 canonical dataset. The deterministic build generates exactly three US Letter portrait pages:
 
-The Phase 1 dataset adds only:
+1. Operational Timeline + Decision Gates.
+2. Route Profile Summary + Return Considerations.
+3. Emergency + Communication.
 
-- the canonical public trip manifest and its JSON Schema;
-- dependency-free data, provenance, privacy, and safety validators;
-- a source ledger, external-verification evidence, and data-verification report; and
-- repository guidance for the data-only phase.
+The generated HTML, PDF, and non-circular artifact checksum record are source-controlled release artifacts. They are rebuilt from `data/trip-manifest.json`; the HTML/CSS template contains no independent canonical trip facts. No browser runtime, Pocket Card, PWA, service worker, network dependency, or deployment is introduced in Phase 2.
 
-It adds no HTML, CSS, browser JavaScript, PWA manifest, service worker, PDF, image, print artifact, or runtime feature. No fact is approved for field release merely because it passes source-consistency checks. The Lily Lake operational trailhead point remains `pending_external_verification`, but it does not block Phase 2 or Phase 3 drafting. An artifact may omit the unresolved coordinate/elevation; any artifact that requires it remains blocked from final field release until authoritative verification.
+This Field Guide is a draft, not a field release. The Lily Lake operational trailhead point remains `pending_external_verification`. Its unresolved coordinate/elevation is visibly withheld, and any artifact that requires that value remains blocked from final field release until authoritative verification. Actual-size physical print, sleeve/waterproof, daylight, headlamp, glove, wet-hand, and second-person tests also remain release gates.
 
 ## Zero-connectivity requirement
 
@@ -110,6 +109,18 @@ npm run check:repository
 npm run check:policy -- --repository-only
 ```
 
+## Printable Field Guide build
+
+Install the pinned Python packages in `requirements-print.txt` and Poppler, then run:
+
+```sh
+npm run build:field-guide
+npm run check:field-guide
+npm run check:pdf
+```
+
+The build is fail-closed on canonical parity, Lily Lake hold semantics, artifact identity, exact three-page geometry, printable bounds, essential type size, public-contact allowlisting, prohibited safety language, and rendered-page integrity. `check:pdf` renders all pages in color and grayscale to ignored temporary files for visual review. CI rebuilds the committed outputs and fails if their bytes drift.
+
 The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/trip-manifest.json`, including whitespace and the final newline. It is deliberately not embedded in the manifest. The aggregate runner computes it twice and requires the results to match.
 
 ## Architecture documents
@@ -123,7 +134,8 @@ The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/t
 - docs/source-ledger.md — fact-group provenance, source locators, verification status, and qualifications.
 - docs/data-verification-report.md — Phase 1 inventory, verification results, exclusions, and owner-review questions.
 - docs/repository-automation.md — protected branch, CI, auto-merge, synchronization, release-tagging, and future Pages policy.
+- docs/field-guide-design.md — Phase 2 page architecture, manifest-only fact flow, typography, print geometry, provenance, Lily Lake withholding, grayscale behavior, and release gates.
 
 ## Repository status
 
-The public repository is `DonDowns/mountain-guide-companion`. Phase 0 and Phase 1 are on protected `main`; Phase 2 has not started and nothing has been deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Field release and physical signoff remain human gates.
+The public repository is `DonDowns/mountain-guide-companion`. Phase 0, Phase 1, and the Phase 2 draft Field Guide are on protected `main` after their respective automated workflows complete. Nothing is deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Field release, tagging, and physical signoff remain human gates; Phase 3 has not started.

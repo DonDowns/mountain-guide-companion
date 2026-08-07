@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "phase-1-data-only",
-    "runtime_allowed": false
+    "name": "phase-2-print-draft",
+    "runtime_allowed": false,
+    "print_artifacts_allowed": true
   },
   "scripts": {
     "check:data": "node scripts/run-data-checks.mjs",
@@ -16,6 +17,9 @@
     "check:repository": "node scripts/check-repository-integrity.mjs",
     "check:policy": "node scripts/check-pr-policy.mjs",
     "test:automation": "node scripts/test-automation-policy.mjs",
+    "build:field-guide": "node scripts/build-field-guide.mjs",
+    "check:field-guide": "node scripts/verify-field-guide.mjs",
+    "check:pdf": "node scripts/verify-field-guide.mjs --render",
     "pr:open": "node scripts/open-pr.mjs",
     "main:sync": "node scripts/sync-main.mjs",
     "release:tag": "node scripts/tag-release.mjs"

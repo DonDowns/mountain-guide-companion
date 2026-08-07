@@ -137,7 +137,11 @@ High: factual verification, schema design, privacy classification, source tracea
 
 ### Goal
 
-Create a deterministic, actual-size, approximately three-page US Letter Field Guide from the canonical public dataset.
+Create a deterministic, actual-size, exactly three-page US Letter portrait Field Guide draft from the canonical public dataset.
+
+### Draft status
+
+Implemented in Phase 2: manifest-derived model, semantic HTML, deterministic PDF, non-circular artifact record, exact page-count/content checks, color and grayscale rendering checks, privacy/safety scans, and CI reproducibility enforcement. This is draft evidence only and does not satisfy the physical field-release gates below.
 
 ### Deliverables
 
@@ -145,9 +149,9 @@ Create a deterministic, actual-size, approximately three-page US Letter Field Gu
 - Page 2 Route Profile + Junctions + Return/Descent Considerations.
 - Page 3 Emergency + Communication Protocol.
 - Deterministic print generator and presentation configuration.
-- Public print output and checksums.
-- Manifest-to-page traceability report.
-- Print accessibility and physical test checklist/results.
+- Source-controlled public HTML/PDF output and a non-circular checksum record.
+- Build-time manifest parity and PDF content/geometry/render checks.
+- Documented print accessibility and remaining physical-test checklist.
 
 ### Dependencies
 
@@ -166,6 +170,8 @@ Create a deterministic, actual-size, approximately three-page US Letter Field Gu
 - Route alternatives show source/status/date/uncertainty.
 - Emergency page preserves 911-first hierarchy and location prompts.
 - Actual print passes daylight, headlamp, glove, wet-hand, sleeve/waterproof, and second-person review.
+
+The last criterion remains open for final field release. No Phase 2 draft merge or generated checksum is physical approval.
 
 ### Complexity
 

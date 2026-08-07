@@ -23,6 +23,7 @@ function option(name, fallback = '') {
 }
 
 function isRuntimeFile(path) {
+  if (path.startsWith('print/') || path === 'generated/field-guide.html') return false;
   return ['.html', '.css', '.js', '.webmanifest'].includes(extname(path).toLowerCase()) ||
     ['app/', 'assets/', 'public/', 'src/'].some(directory => path.startsWith(directory));
 }
@@ -55,7 +56,10 @@ async function main() {
   if (branch === 'main') throw new Error('create a project branch before opening a pull request');
 
   exec('git', ['fetch', 'origin', 'main']);
-  for (const script of ['check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety']) {
+  for (const script of [
+    'check:repository', 'check:data', 'check:manifest', 'check:provenance', 'check:privacy', 'check:safety',
+    'build:field-guide', 'check:field-guide', 'check:pdf'
+  ]) {
     exec('npm', ['run', script], { inherit: true });
   }
   exec(process.execPath, ['scripts/check-pr-policy.mjs'], {
@@ -67,7 +71,9 @@ async function main() {
   if (!files.length) throw new Error('branch has no changes relative to origin/main');
   const dataChanged = files.some(path => path.startsWith('data/'));
   const runtimeChanged = files.some(isRuntimeFile);
+  const printChanged = files.some(path => path.startsWith('print/') || path.startsWith('generated/') || /field.guide/i.test(path));
   const manifest = JSON.parse(await readFile(resolve(repoRoot, 'data/trip-manifest.json'), 'utf8'));
+  const fieldGuideArtifact = JSON.parse(await readFile(resolve(repoRoot, 'generated/field-guide-artifact.json'), 'utf8'));
   const pending = [];
   const visit = value => {
     if (Array.isArray(value)) value.forEach(visit);
@@ -89,8 +95,17 @@ async function main() {
     '- `npm run check:provenance`',
     '- `npm run check:privacy`',
     '- `npm run check:safety`',
+    '- `npm run build:field-guide`',
+    '- `npm run check:field-guide`',
+    '- `npm run check:pdf`',
     '- `npm run check:policy`', '',
     'Manifest SHA-256: `' + hash + '` (' + (dataChanged ? 'data changed' : 'data unchanged') + ')', '',
+    '## Printable Field Guide', '',
+    'Exact artifact: `' + fieldGuideArtifact.artifact_path + '`.', '',
+    'Page result: ' + fieldGuideArtifact.page_count + ' US Letter portrait pages.', '',
+    'Field Guide PDF SHA-256: `' + fieldGuideArtifact.field_guide_pdf_sha256 + '`.', '',
+    'Canonical data version: `' + fieldGuideArtifact.data_version + '`.', '',
+    'Artifact status: draft, not a field release.', '',
     'Privacy result: pass; no non-allowlisted private value detected.', '',
     'Safety result: pass; no prohibited authorization or false confirmation detected.', '',
     '## Release holds', '',
@@ -98,9 +113,10 @@ async function main() {
     'No new unresolved release blocker or conflicted canonical record was introduced.', '',
     '## Runtime and physical testing', '',
     'Runtime files changed: ' + (runtimeChanged ? 'yes' : 'no') + '.', '',
+    'Printable artifact files changed: ' + (printChanged ? 'yes' : 'no') + '.', '',
     runtimeChanged
       ? 'Physical testing is required before field release; this pull request does not assert physical signoff.'
-      : 'Physical testing is not required for this non-runtime merge; field-release physical signoff remains mandatory.'
+      : 'No browser runtime was introduced. Actual-size print, sleeve/waterproof, daylight, headlamp, glove, wet-hand, and second-person signoff remain mandatory before field release.'
   ].join('\n');
 
   exec('git', ['push', '-u', 'origin', branch], { inherit: true });

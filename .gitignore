@@ -8,6 +8,7 @@ coverage/
 dist/
 build/
 node_modules/
+tmp/pdfs/
 .env
 .env.*
 !.env.example
