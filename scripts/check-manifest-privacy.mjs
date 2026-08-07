@@ -1,22 +1,23 @@
-import { readdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 import { dirname, extname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runValidation } from './validate-manifest.mjs';
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = resolve(dirname(scriptPath), '..');
-const scanExtensions = new Set(['.json', '.md', '.mjs']);
-const excludedDirectories = new Set(['.git', 'node_modules', 'coverage', 'dist', 'build']);
-
-async function filesUnder(directory) {
-  const output = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.isDirectory() && excludedDirectories.has(entry.name)) continue;
-    const path = resolve(directory, entry.name);
-    if (entry.isDirectory()) output.push(...await filesUnder(path));
-    else if (scanExtensions.has(extname(entry.name)) || entry.name === 'README.md' || entry.name === 'AGENTS.md') output.push(path);
-  }
-  return output;
+const scanExtensions = new Set(['.json', '.md', '.mjs', '.html', '.css', '.py', '.txt']);
+function repositoryTextFiles() {
+  return execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  })
+    .split('\0')
+    .filter(Boolean)
+    .filter(path => scanExtensions.has(extname(path)) || path === 'README.md' || path === 'AGENTS.md')
+    .map(path => resolve(repoRoot, path));
 }
 
 function normalizedPhone(value) {
@@ -44,6 +45,18 @@ export async function runPrivacy(options = {}) {
   const errors = [];
   scanStructuredKeys(manifest, '$', errors);
 
+  const allowedProvenanceFingerprints = new Set([
+    createHash('sha256').update(await readFile(resolve(repoRoot, 'data/trip-manifest.json'))).digest('hex'),
+    manifest.metadata.source_commit
+  ]);
+  try {
+    allowedProvenanceFingerprints.add(
+      createHash('sha256').update(await readFile(resolve(repoRoot, 'generated/field-guide.pdf'))).digest('hex')
+    );
+  } catch {
+    // The Phase 1 data-only state has no generated PDF.
+  }
+
   const allowedPhones = new Set(
     manifest.public_emergency_contacts
       .flatMap(contact => contact.phone_numbers)
@@ -55,8 +68,12 @@ export async function runPrivacy(options = {}) {
   const secretAssignmentPattern = /(?:api[_-]?key|access[_-]?token|password)\s*[:=]\s*["'][^"']+["']/gi;
   const absoluteUserPathPattern = /(?:\/Users\/|\/home\/)[A-Za-z0-9._-]+/g;
 
-  for (const path of await filesUnder(repoRoot)) {
+  for (const path of repositoryTextFiles()) {
     const content = await readFile(path, 'utf8');
+    let phoneScanContent = content;
+    for (const fingerprint of allowedProvenanceFingerprints) {
+      phoneScanContent = phoneScanContent.replaceAll(fingerprint, '');
+    }
     const label = relative(repoRoot, path);
     const emails = content.match(emailPattern) || [];
     if (emails.length) errors.push(label + ' contains email address value(s)');
@@ -64,7 +81,7 @@ export async function runPrivacy(options = {}) {
     if (secrets.length) errors.push(label + ' contains credential-like assignment(s)');
     const localPaths = content.match(absoluteUserPathPattern) || [];
     if (localPaths.length) errors.push(label + ' contains local user path value(s)');
-    for (const match of content.match(phonePattern) || []) {
+    for (const match of phoneScanContent.match(phonePattern) || []) {
       const normalized = normalizedPhone(match);
       if (normalized && !allowedPhones.has(normalized)) errors.push(label + ' contains non-allowlisted phone-like value');
     }

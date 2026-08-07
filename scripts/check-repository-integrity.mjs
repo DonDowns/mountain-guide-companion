@@ -28,12 +28,18 @@ function isRuntimeFile(path) {
   return runtimeExtensions.has(extension) || runtimeDirectories.some(directory => path.startsWith(directory));
 }
 
+function isPermittedPrintFile(path) {
+  const extension = extname(path).toLowerCase();
+  return (path.startsWith('print/') && ['.html', '.css'].includes(extension)) || path === 'generated/field-guide.html';
+}
+
 async function main() {
   const files = repositoryFiles();
   const errors = [];
   const packageJson = JSON.parse(await readFile(resolve(repoRoot, 'package.json'), 'utf8'));
   const jsonFiles = files.filter(path => extname(path).toLowerCase() === '.json');
   const moduleFiles = files.filter(path => extname(path).toLowerCase() === '.mjs');
+  const pythonFiles = files.filter(path => extname(path).toLowerCase() === '.py');
 
   for (const path of jsonFiles) {
     try {
@@ -51,8 +57,21 @@ async function main() {
     if (result.status !== 0) errors.push(path + ' has invalid JavaScript syntax: ' + (result.stderr || result.stdout).trim());
   }
 
+  for (const path of pythonFiles) {
+    const result = spawnSync('python3', [
+      '-c',
+      'import pathlib,sys; compile(pathlib.Path(sys.argv[1]).read_text(), sys.argv[1], "exec")',
+      resolve(repoRoot, path)
+    ], {
+      cwd: repoRoot,
+      encoding: 'utf8'
+    });
+    if (result.status !== 0) errors.push(path + ' has invalid Python syntax: ' + (result.stderr || result.stdout).trim());
+  }
+
   if (packageJson.companion_phase?.runtime_allowed === false) {
     for (const path of files.filter(isRuntimeFile)) {
+      if (packageJson.companion_phase.print_artifacts_allowed && isPermittedPrintFile(path)) continue;
       errors.push(path + ' is a runtime file prohibited during ' + packageJson.companion_phase.name);
     }
   }
@@ -71,6 +90,7 @@ async function main() {
   console.log('runtime_allowed=' + packageJson.companion_phase.runtime_allowed);
   console.log('json_files_parsed=' + jsonFiles.length);
   console.log('mjs_files_syntax_checked=' + moduleFiles.length);
+  console.log('python_files_syntax_checked=' + pythonFiles.length);
   console.log('git_whitespace_integrity=pass');
 }
 
