@@ -1,6 +1,6 @@
 # Phase 6 Physical-Test Candidate Checklist
 
-Candidate: `0.6.0-candidate.2`
+Candidate: `0.6.0-candidate.3`
 
 Public URL: `https://companion.vondadowns.com/`
 

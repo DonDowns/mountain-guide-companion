@@ -75,76 +75,66 @@ function setupItem(label, detail, complete) {
   return element('li', { className: complete ? 'complete' : 'pending' }, [mark, copy]);
 }
 
-function formatBytes(value) {
-  if (!Number.isFinite(value)) return 'Not available';
-  if (value < 1024) return `${value} bytes`;
-  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
-  return `${(value / (1024 * 1024)).toFixed(2)} MB`;
-}
-
 export function renderSetupPanel(target, options) {
   const airplaneInstructionsOpen = Boolean(target.querySelector('.airplane-test')?.open);
   const {
-    standalone, ios, promptAvailable, offlineResult, storageInfo, workerState, state
+    standalone, ios, promptAvailable, offlineResult, workerState, state
   } = options;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'INSTALLED COMPANION' : 'INSTALL FOR OFFLINE USE' });
   const heading = element('h2', { text: standalone ? 'Companion installed on this phone' : 'Set up this phone before the trip' });
   const intro = element('p', {
     text: standalone
-      ? 'This standalone copy can verify its complete local field bundle. The physical Airplane Mode test remains a separate release gate.'
-      : 'Install the Companion, open it once while online, and preserve a separate physical backup.'
+      ? 'Run Offline Check, then complete the Airplane Mode test on this phone.'
+      : 'Install the Companion, open it once while online, then run Offline Check.'
   });
   const children = [eyebrow, heading, intro];
 
   if (!standalone && ios) {
     const instructions = [
-      'Open this page in Safari.',
-      'Tap the Share button.',
-      'Choose Add to Home Screen.',
-      'Open the installed Companion once while online.',
+      'Open in Safari.',
+      'Tap Share.',
+      'Add to Home Screen.',
+      'Open Companion once while online.',
       'Run Offline Check.',
-      'Perform the Airplane Mode verification before relying on offline use.'
+      'Test in Airplane Mode.'
     ].map(text => element('li', { text }));
     children.push(element('ol', { 'aria-label': 'iPhone installation steps' }, instructions));
   } else if (!standalone) {
     children.push(element('p', {
       text: promptAvailable
-        ? 'This browser offers an install action. Install, then open the standalone Companion once while online.'
-        : 'Use this browser’s install or Add to Home Screen command when available. iPhone installation must be completed from Safari’s Share menu.'
+        ? 'Install, then open Companion once while online.'
+        : 'On iPhone, open this page in Safari and use Share → Add to Home Screen.'
     }));
   }
 
   const checklist = element('ul', { className: 'setup-checklist', 'aria-label': 'Setup status' }, [
-    setupItem('Installed / standalone detected', standalone ? 'Detected on this launch.' : 'Not detected in this browser tab.', standalone),
-    setupItem('Trip data loaded', 'Canonical public trip data is present in the current shell.', true),
-    setupItem('Emergency data loaded', `${companionData.contacts.length * 2} public contact numbers are present.`, companionData.contacts.length === 3),
-    setupItem('Manifest verified', `Fingerprint ${companionData.identity.manifestShort}… matches runtime identity.`, companionData.identity.manifestSha256 === releaseMetadata.manifest_sha256),
-    setupItem('Production service worker', workerState.controlled ? `Controls this page for ${releaseMetadata.bundle_id}.` : 'Not yet controlling this page.', workerState.controlled),
-    setupItem('Offline resources verified', offlineResult?.complete ? `${offlineResult.entryCount} required resources match the active bundle.` : 'Run Offline Check after installation.', offlineResult?.complete === true),
-    setupItem('Airplane Mode physical test', state.setup.airplaneModeTestCompletedAt ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Physical cold-launch test still required.', Boolean(state.setup.airplaneModeTestCompletedAt))
+    setupItem('Installed on this phone', standalone ? 'Opened from the Home Screen.' : 'Open from the Home Screen after installation.', standalone),
+    setupItem('Trip and emergency information', 'Available in Companion.', true),
+    setupItem('Offline resources', offlineResult?.complete ? 'Verified on this phone.' : 'Run Offline Check after installation.', offlineResult?.complete === true),
+    setupItem('Airplane Mode test', state.setup.airplaneModeTestCompletedAt ? `Marked complete on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Still required on this phone.', Boolean(state.setup.airplaneModeTestCompletedAt))
   ]);
   children.push(checklist);
 
   if (offlineResult?.checking) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
       element('strong', { text: 'CHECKING OFFLINE RESOURCES' }),
-      element('p', { text: 'Verifying the active service worker, release identity, required resource count, and cached SHA-256 values.' })
+      element('p', { text: 'Checking the Companion resources on this phone.' })
     ]));
   } else if (offlineResult) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
       element('strong', { text: offlineResult.complete ? 'OFFLINE RESOURCES VERIFIED' : 'OFFLINE RESOURCES INCOMPLETE' }),
       element('p', { text: offlineResult.complete
-        ? `Active bundle ${offlineResult.bundleId} contains ${offlineResult.entryCount} verified required resources.`
-        : offlineResult.error || 'The active local bundle did not verify.' }),
-      element('p', { text: 'This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.' }),
+        ? 'Required Companion resources are stored on this phone.'
+        : offlineResult.error || 'The offline resources did not verify.' }),
+      element('p', { text: 'This confirms Companion resources on this phone. It does not evaluate weather, access, terrain, or route conditions.' }),
       ...(!offlineResult.complete ? [element('p', { className: 'boundary-note', text: 'Reconnect to the internet and retry Companion update/install.' })] : [])
     ]));
   }
 
   if (workerState.updateAvailable) {
     children.push(element('div', { className: 'update-note', role: 'status' }, [
-      element('strong', { text: 'Update downloaded' }),
-      element('p', { text: 'Restart Companion to use the newer verified release. The installed release remains available until then.' }),
+      element('strong', { text: 'Update ready' }),
+      element('p', { text: 'Restart Companion to use it. This copy stays available until then.' }),
       element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'activate-update' }, text: 'Restart to use update' })
     ]));
   }
@@ -166,12 +156,8 @@ export function renderSetupPanel(target, options) {
     element('summary', { text: 'Airplane Mode test instructions' }),
     element('h3', { text: 'AIRPLANE MODE TEST' }),
     element('ol', {}, airplaneSteps),
-    element('p', { className: 'boundary-note', text: 'Browser automation does not replace this physical-phone test.' })
+    element('p', { className: 'boundary-note', text: 'Each phone must complete its own Offline Check and Airplane Mode test.' })
   ]));
-
-  if (storageInfo) {
-    children.push(element('p', { className: 'storage-note', text: `Browser storage estimate: ${formatBytes(storageInfo.usage)} used of ${formatBytes(storageInfo.quota)}. Persistence ${storageInfo.persisted ? 'is reported by this browser' : 'is not guaranteed by this browser'}.` }));
-  }
 
   const actions = [];
   if (!standalone && promptAvailable) actions.push(element('button', { className: 'install-button', type: 'button', dataset: { action: 'install' }, text: 'Install Companion' }));
@@ -181,8 +167,8 @@ export function renderSetupPanel(target, options) {
   actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
   children.push(element('div', { className: 'setup-actions' }, actions));
   children.push(element('p', { className: 'boundary-note', text: state.setup.offlineVerifiedAt && state.setup.offlineVerifiedBundleId === releaseMetadata.bundle_id
-    ? `Offline bundle verification recorded on this device: ${formatActualStart(state.setup.offlineVerifiedAt)}.`
-    : 'No successful Offline Check is recorded for this bundle on this device.' }));
+    ? `Offline Check completed on this phone: ${formatActualStart(state.setup.offlineVerifiedAt)}.`
+    : 'Offline Check not yet completed on this phone.' }));
 
   clearAndAppend(target, element('section', { className: 'setup-panel', dataset: { mode: standalone ? 'installed' : 'browser' }, 'aria-labelledby': 'setup-heading' }, children));
   target.querySelector('h2').id = 'setup-heading';
@@ -191,14 +177,13 @@ export function renderSetupPanel(target, options) {
 export function renderStaticIdentity() {
   document.querySelector('#trip-name').textContent = companionData.trip.name;
   document.querySelector('#weather-invariant').textContent = companionData.invariants.weather;
-  document.querySelector('#delivery-disclaimer').textContent = companionData.communication.deliveryDisclaimer;
   document.querySelector('#jurisdiction-copy').textContent = `${companionData.invariants.jurisdiction} You do not need to choose a county before calling.`;
   const provenance = document.querySelector('#provenance');
   clearAndAppend(provenance,
-    element('strong', { text: companionData.identity.releaseStatus === 'candidate' ? 'COMPANION CANDIDATE · PHYSICAL TESTING IN PROGRESS' : 'DRAFT COMPANION' }),
+    element('strong', { text: companionData.identity.releaseStatus === 'candidate' ? 'CANDIDATE · PHYSICAL PHONE TESTING REQUIRED' : 'DRAFT COMPANION' }),
     element('span', { text: `Companion ${companionData.identity.companionVersion} · Trip Data v${companionData.identity.dataVersion}` }),
     element('span', { text: `Based on Mountain Guide ${companionData.identity.sourceRelease} · Verified ${formatDate(companionData.identity.verifiedAt)}` }),
-    element('span', { text: `Manifest ${companionData.identity.manifestShort}…` })
+    element('span', { text: `Trip data verified ${formatDate(companionData.identity.verifiedAt)}` })
   );
 }
 
@@ -251,7 +236,7 @@ export function renderTimeline(state, editObjectiveId = '') {
   ]));
   const actual = state.actualStarts[objective.id] || '';
   const actualCard = element('div', { className: 'actual-card' }, [
-    element('span', { text: 'Actual start · local to this device' }),
+    element('span', { text: 'Actual start on this phone' }),
     element('strong', { text: formatActualStart(actual) }),
     element('small', { dataset: { elapsedFor: objective.id }, text: actual ? `Elapsed ${formatElapsed(actual)}` : 'Planned start remains unchanged.' })
   ]);
@@ -291,7 +276,7 @@ export function renderTimeline(state, editObjectiveId = '') {
   const milestones = companionData.communication.milestones.map((label, index) => {
     const key = String(index);
     const checkbox = element('input', { type: 'checkbox', checked: state.checkedMilestones[key] === true, dataset: { milestone: key }, 'aria-label': `Mark ${label} locally` });
-    return element('label', { className: 'milestone' }, [checkbox, element('span', {}, [element('strong', { text: label }), element('small', { text: checkbox.checked ? 'Marked locally only' : 'Not marked on this device' })])]);
+    return element('label', { className: 'milestone' }, [checkbox, element('span', {}, [element('strong', { text: label }), element('small', { text: checkbox.checked ? 'Marked locally' : 'Not marked' })])]);
   });
   clearAndAppend(document.querySelector('#milestone-list'), ...milestones);
   renderLocalOperations(state);
@@ -299,8 +284,8 @@ export function renderTimeline(state, editObjectiveId = '') {
 
 function renderLocalOperations(state) {
   const status = element('section', { className: 'status-note', 'aria-labelledby': 'local-status-title' }, [
-    element('h3', { id: 'local-status-title', text: 'Brief local status note' }),
-    element('p', { className: 'boundary-note', text: 'Stored only in this browser on this device. It is not monitored or shared.' }),
+    element('h3', { id: 'local-status-title', text: 'Brief status note' }),
+    element('p', { className: 'boundary-note', text: 'Stored only on this phone.' }),
     element('label', {}, [element('span', { text: 'Local status' }), element('textarea', { name: 'statusNote', maxlength: '240', dataset: { localField: 'statusNote' }, value: state.statusNote })])
   ]);
   status.querySelector('textarea').value = state.statusNote;
@@ -318,9 +303,9 @@ function renderLocalOperations(state) {
     return element('label', {}, [element('span', { text: label }), input]);
   });
   const privateDetails = element('details', { className: 'private-details' }, [
-    element('summary', { 'aria-expanded': 'false', text: 'Optional private fields on this device' }),
+    element('summary', { 'aria-expanded': 'false', text: 'Optional private fields on this phone' }),
     element('div', { className: 'private-form' }, [
-      element('p', { className: 'boundary-note', text: 'Empty by default. No cloud sync, sharing, logging, or public-manifest storage.' }),
+      element('p', { className: 'boundary-note', text: 'Stored only on this phone.' }),
       ...contactFields,
       element('button', { className: 'danger-button', type: 'button', dataset: { action: 'clear-private' }, text: 'Clear Private Data' })
     ])
@@ -348,22 +333,22 @@ export function renderRoutes() {
   const lily = companionData.lilyLake;
   const withheld = lily.latitude === null && lily.longitude === null && lily.elevationFt === null;
   const note = withheld
-    ? `${lily.name}: Exact canonical coordinate/elevation pending final verification. No emergency location is provided here.`
+    ? `${lily.name}: Exact coordinate/elevation is pending verification and is not shown.`
     : `${lily.name}: canonical location is available in the current data version.`;
-  clearAndAppend(document.querySelector('#lily-status'), element('strong', { text: 'Location hold' }), element('p', { text: note }));
+  clearAndAppend(document.querySelector('#lily-status'), element('strong', { text: 'Lily Lake location' }), element('p', { text: note }));
 }
 
 export function renderEmergency() {
   const cards = companionData.contacts.map(contact => {
-    const phones = contact.phones.map(phone => element('a', { className: 'phone-link', href: phone.tel }, [
+    const county = contact.agency.replace(/ County Sheriff’s Office$/, '');
+    const phones = contact.phones.map(phone => element('a', { className: 'phone-link', href: phone.tel, 'aria-label': `Call ${county} ${phone.kind === 'dispatch' ? 'Dispatch' : 'Sheriff Office'}` }, [
       element('span', {}, [element('small', { text: phone.label }), element('strong', { text: phone.display })]),
-      element('span', { 'aria-hidden': 'true', text: 'Call' })
+      element('span', { 'aria-hidden': 'true', text: `Call ${phone.kind === 'dispatch' ? 'Dispatch' : 'Office'}` })
     ]));
     return element('article', { className: 'contact-card' }, [
       element('h3', { text: contact.agency }),
       element('p', { text: contact.geographicContext }),
-      ...phones,
-      element('p', { className: 'boundary-note', text: 'Opening a phone intent does not prove that a call occurred.' })
+      ...phones
     ]);
   });
   clearAndAppend(document.querySelector('#emergency-contacts'), ...cards);

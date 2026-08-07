@@ -80,6 +80,7 @@ async function main() {
   const prohibited = [
     'all clear', 'safe to proceed', 'route is safe', 'weather permits', 'approved to continue',
     'go/no-go', 'rescue requested', 'rescue activated', 'help is on the way', 'message sent',
+    'phone intent', 'does not prove', 'drafted/copied',
     '37.62361', '-105.47278', '37.623486', '-105.472903', 'current forecast', 'temperature:', 'precipitation:'
   ];
   for (const value of prohibited) rejectText(html, value, 'generated HTML', errors);

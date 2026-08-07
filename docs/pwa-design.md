@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.2` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system without changing canonical data, safety meaning, privacy behavior, or offline architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.3` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, and Phase 6A.1 simplifies field-facing copy without changing canonical data, safety meaning, privacy behavior, or offline architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -51,7 +51,7 @@ Decision Gates renders all five canonical prompts as expandable neutral reassess
 
 Route renders the four canonical profiles as comparison cards with round-trip distance, cumulative gain, class, exposure, route notes, and return/access considerations. It includes no fabricated map or continuous elevation profile. Lily Lake coordinates/elevation remain absent and visibly pending final verification.
 
-Emergency begins with CALL 911 FIRST, reporting prompts, dispatch/jurisdiction language, and all six canonical public numbers as `tel:` links. Opening a phone intent is explicitly not proof that a call occurred.
+Emergency begins with CALL 911 FIRST, reporting prompts, dispatch/jurisdiction language, and all six canonical public numbers as direct, agency-labeled `tel:` links. Tapping a link creates no local completion state or affirmative call claim.
 
 ## Local-state schema version 2
 
@@ -67,7 +67,7 @@ The separate local store contains only:
 
 The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema version 1 preserves operational/private values but does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, URL encoding, or share inclusion. Service workers neither read nor cache the local store.
 
-Milestone checks mean Marked locally only. The canonical delivery disclaimer remains visible.
+Milestone checks use the concise status Marked locally. Tests continue to reject sent, delivered, or confirmed claims.
 
 ## Sharing and URL privacy
 

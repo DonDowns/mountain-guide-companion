@@ -29,7 +29,7 @@ test('repair creates a new complete cache and preserves device-local state', asy
   await page.getByRole('radio', { name: /Select Mount Lindsey/ }).check();
   await page.getByRole('button', { name: /Red/ }).click();
   await page.locator('[data-milestone="0"]').check();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
   await corruptActiveCache(page, 'js/companion-ui.js');
@@ -43,6 +43,6 @@ test('repair creates a new complete cache and preserves device-local state', asy
   await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
   await expect(page.locator('[data-milestone="0"]')).toBeChecked();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
 });

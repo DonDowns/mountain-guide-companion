@@ -22,7 +22,7 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await page.getByRole('button', { name: /Red/ }).click();
   const firstMilestone = page.locator('[data-milestone="0"]');
   await firstMilestone.check();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
 
   await context.setOffline(true);
@@ -39,7 +39,7 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await offlinePage.getByRole('button', { name: 'Open Companion' }).first().click();
   await expect(offlinePage.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
   await expect(offlinePage.locator('[data-milestone="0"]')).toBeChecked();
-  await offlinePage.getByText('Optional private fields on this device').click();
+  await offlinePage.getByText('Optional private fields on this phone').click();
   await expect(offlinePage.locator('[data-private-field="name"]')).toHaveValue('x');
 
   await offlinePage.getByRole('button', { name: /Route/ }).last().click();
@@ -127,11 +127,11 @@ test('keeps the previous complete release active when a new required JavaScript 
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
   await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
+  await expect(page.getByText(/Marked complete on this phone:/)).toBeVisible();
   await page.getByRole('button', { name: 'Open Companion' }).first().click();
   await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
   await expect(page.locator('[data-milestone="0"]')).toBeChecked();
-  await page.getByText('Optional private fields on this device').click();
+  await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).statusNote).toBe('z');
   const cachesAfter = await page.evaluate(() => caches.keys());

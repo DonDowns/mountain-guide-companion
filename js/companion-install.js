@@ -74,10 +74,10 @@ function waitForController(timeoutMs = 8000) {
 }
 
 function sendWorkerMessage(worker, type, timeoutMs = 30000) {
-  if (!worker) return Promise.resolve({ complete: false, error: 'Production service worker does not control this page.' });
+  if (!worker) return Promise.resolve({ complete: false, error: 'Offline setup is not active on this page.' });
   return new Promise(resolve => {
     const channel = new MessageChannel();
-    const timeout = globalThis.setTimeout(() => resolve({ complete: false, error: 'Service-worker verification timed out.' }), timeoutMs);
+    const timeout = globalThis.setTimeout(() => resolve({ complete: false, error: 'Offline Check timed out.' }), timeoutMs);
     channel.port1.onmessage = event => {
       globalThis.clearTimeout(timeout);
       resolve(event.data);
@@ -125,7 +125,7 @@ export async function verifyOfflineResources() {
 
 export async function repairOfflineCopy() {
   const registration = serviceWorkerRegistration || await navigator.serviceWorker?.ready;
-  if (!registration) return { complete: false, error: 'Production service worker is unavailable.' };
+  if (!registration) return { complete: false, error: 'Offline setup is unavailable.' };
   try {
     await registration.update();
   } catch {
