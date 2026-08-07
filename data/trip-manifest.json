@@ -1,0 +1,1340 @@
+{
+  "$schema": "./trip-manifest.schema.json",
+  "schema_version": "1.0.0",
+  "data_version": "1.0.0",
+  "metadata": {
+    "canonical_timezone": "America/Denver",
+    "source_project": "Don Downs Mountain Guide",
+    "source_repository": "https://github.com/DonDowns/mountain-guide",
+    "source_release": "v15.3.10",
+    "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+    "generated_at": "2026-08-07T07:16:31Z",
+    "verified_at": "2026-08-07T07:45:17Z",
+    "verification_scope": "verified_against_upstream",
+    "manifest_purpose": "Canonical public-safe source for the Lake Como, Blanca, Ellingwood, and Mount Lindsey Companion artifacts.",
+    "external_verification_hold": true,
+    "manifest_hash_rule": "SHA-256 is calculated over the exact bytes of data/trip-manifest.json and is recorded outside this file.",
+    "source_record_ids": [
+      "src-trip-seed",
+      "src-timezone"
+    ]
+  },
+  "safety_invariants": {
+    "weather": "Weather is evidence, not permission.",
+    "emergency": "Call 911 first.",
+    "jurisdiction": "Dispatch determines the responding agency from the exact incident location.",
+    "planning": "A user-defined planning target is not automatic route authorization.",
+    "conditions": "Actual conditions govern the decision."
+  },
+  "trip": {
+    "id": "trip-lake-como-2026",
+    "name": "Lake Como / Blanca / Ellingwood / Mount Lindsey 2026",
+    "area": "Lake Como, Blanca Peak, Ellingwood Point, and Mount Lindsey",
+    "start_date": "2026-08-19",
+    "end_date": "2026-08-25",
+    "primary_climb_date": "2026-08-23",
+    "verification_status": "verified_against_upstream",
+    "source_record_ids": [
+      "src-trip-seed",
+      "src-pretrip-calendar"
+    ]
+  },
+  "objectives": [
+    {
+      "id": "objective-lake-como-approach",
+      "name": "Lake Como approach and camp",
+      "role": "approach",
+      "objective_type": "camp_approach",
+      "planned_date": "2026-08-22",
+      "component_waypoint_ids": [
+        "waypoint-lake-como-area"
+      ],
+      "route_segment_ids": [
+        "route-lake-como-approach-8000",
+        "route-lake-como-approach-8800"
+      ],
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-trip-seed",
+        "src-focus-objectives",
+        "src-route-profiles"
+      ]
+    },
+    {
+      "id": "objective-blanca-ellingwood-combination",
+      "name": "Blanca Peak + Ellingwood Point",
+      "role": "primary",
+      "objective_type": "route_combination",
+      "planned_date": "2026-08-23",
+      "component_waypoint_ids": [
+        "waypoint-blanca-peak",
+        "waypoint-ellingwood-point"
+      ],
+      "route_segment_ids": [
+        "route-blanca-ellingwood-combination"
+      ],
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-trip-seed",
+        "src-focus-objectives",
+        "src-route-profiles"
+      ]
+    },
+    {
+      "id": "objective-mount-lindsey",
+      "name": "Mount Lindsey",
+      "role": "separate_planned",
+      "objective_type": "summit",
+      "planned_date": "2026-08-24",
+      "component_waypoint_ids": [
+        "waypoint-mount-lindsey"
+      ],
+      "route_segment_ids": [
+        "route-mount-lindsey-standard"
+      ],
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-trip-seed",
+        "src-focus-objectives",
+        "src-route-profiles"
+      ]
+    }
+  ],
+  "planning_times": [
+    {
+      "id": "planning-lake-como-start",
+      "objective_id": "objective-lake-como-approach",
+      "kind": "planned_start",
+      "local_time": "10:00",
+      "timezone": "America/Denver",
+      "label": "Lake Como approach planned start",
+      "semantics": "planned_start",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "Road clearance, conditions, and driver judgment determine the actual starting point and time.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-focus-objectives"
+      ]
+    },
+    {
+      "id": "planning-lake-como-camp-target",
+      "objective_id": "objective-lake-como-approach",
+      "kind": "turnaround_or_exit_target",
+      "local_time": "15:30",
+      "timezone": "America/Denver",
+      "label": "Lake Como reach-camp planning target",
+      "semantics": "user_defined_planning_target",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "This target preserves recovery margin; it does not determine whether travel is permitted.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-focus-objectives"
+      ]
+    },
+    {
+      "id": "planning-blanca-ellingwood-start",
+      "objective_id": "objective-blanca-ellingwood-combination",
+      "kind": "planned_start",
+      "local_time": "04:15",
+      "timezone": "America/Denver",
+      "label": "Blanca and Ellingwood planned start",
+      "semantics": "planned_start",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "The planned start remains fixed unless the owner creates a new canonical data version.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-trip-seed",
+        "src-focus-objectives",
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "planning-blanca-ellingwood-exit-target",
+      "objective_id": "objective-blanca-ellingwood-combination",
+      "kind": "turnaround_or_exit_target",
+      "local_time": "11:30",
+      "timezone": "America/Denver",
+      "label": "Below-exposed-terrain planning target",
+      "semantics": "user_defined_planning_target",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "This is a user-defined planning target, not a calculated safety cutoff, weather permission, or continuation threshold.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-trip-seed",
+        "src-focus-objectives",
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "planning-mount-lindsey-start",
+      "objective_id": "objective-mount-lindsey",
+      "kind": "planned_start",
+      "local_time": "05:15",
+      "timezone": "America/Denver",
+      "label": "Mount Lindsey planned start",
+      "semantics": "planned_start",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "Current access, route conditions, and group judgment govern the actual climb.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-focus-objectives",
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "planning-mount-lindsey-return-target",
+      "objective_id": "objective-mount-lindsey",
+      "kind": "turnaround_or_exit_target",
+      "local_time": "12:00",
+      "timezone": "America/Denver",
+      "label": "Mount Lindsey return/exit planning target",
+      "semantics": "user_defined_planning_target",
+      "user_defined": true,
+      "automatic_calculation": false,
+      "authorization_effect": "none",
+      "safety_note": "This is a planning target; access, weather, terrain, pace, and group condition govern reassessment.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-focus-objectives",
+        "src-timeline-decisions"
+      ]
+    }
+  ],
+  "camp": {
+    "id": "camp-lake-como",
+    "name": "Lake Como",
+    "waypoint_id": "waypoint-lake-como-area",
+    "location_precision": "area_reference_not_exact_campsite",
+    "notes": "The frozen source identifies Lake Como camp and a Lake Como area weather point; it does not establish that the point coordinates are the exact campsite.",
+    "verification_status": "verified_against_upstream",
+    "source_record_ids": [
+      "src-trip-seed",
+      "src-weather-locations",
+      "src-route-center"
+    ]
+  },
+  "transportation": {
+    "id": "transportation-audi-q5",
+    "description": "Audi Q5",
+    "usage": "Default travel vehicle; actual Lake Como road parking depends on clearance, road condition, weather, and driver judgment.",
+    "private_identifiers_included": false,
+    "verification_status": "verified_against_upstream",
+    "source_record_ids": [
+      "src-trip-seed",
+      "src-focus-objectives",
+      "src-route-profiles"
+    ]
+  },
+  "waypoints": [
+    {
+      "id": "waypoint-lake-como-road-8000",
+      "name": "Lake Como road start near 8,000 ft",
+      "type": "access_start",
+      "latitude": null,
+      "longitude": null,
+      "elevation_ft": 8000,
+      "route_context": "Published lower Lake Como approach start; coordinates are not stored in the frozen source.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles"
+      ]
+    },
+    {
+      "id": "waypoint-lake-como-road-8800",
+      "name": "Lake Como road 4WD pull-offs near 8,800 ft",
+      "type": "access_start",
+      "latitude": null,
+      "longitude": null,
+      "elevation_ft": 8800,
+      "route_context": "Published higher Lake Como approach start; coordinates and an exact parking location are not stored in the frozen source.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles"
+      ]
+    },
+    {
+      "id": "waypoint-lake-como-area",
+      "name": "Lake Como area",
+      "type": "camp_area",
+      "latitude": 37.5696,
+      "longitude": -105.51406,
+      "elevation_ft": 11750,
+      "route_context": "Frozen-source weather/reference point for the Lake Como area; not asserted as an exact campsite coordinate.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-weather-locations",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "waypoint-blanca-peak",
+      "name": "Blanca Peak",
+      "type": "summit",
+      "latitude": 37.57753,
+      "longitude": -105.48569,
+      "elevation_ft": 14350,
+      "route_context": "Frozen-source summit weather/reference point.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-weather-locations",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "waypoint-ellingwood-point",
+      "name": "Ellingwood Point",
+      "type": "summit",
+      "latitude": 37.58257,
+      "longitude": -105.49248,
+      "elevation_ft": 14057,
+      "route_context": "Frozen-source summit weather/reference point.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-weather-locations",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "waypoint-lily-lake-trailhead",
+      "name": "Lily Lake Trailhead",
+      "type": "trailhead",
+      "latitude": null,
+      "longitude": null,
+      "elevation_ft": null,
+      "route_context": "Frozen source names the legal Mount Lindsey access trailhead but stores no coordinate or elevation for it.",
+      "verification_status": "pending_external_verification",
+      "source_record_ids": [
+        "src-route-profiles",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "waypoint-mount-lindsey",
+      "name": "Mount Lindsey",
+      "type": "summit",
+      "latitude": 37.58389,
+      "longitude": -105.4449,
+      "elevation_ft": 14055,
+      "route_context": "Frozen-source summit weather/reference point.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-weather-locations",
+        "src-route-center"
+      ]
+    }
+  ],
+  "route_segments": [
+    {
+      "id": "route-lake-como-approach-8000",
+      "objective_id": "objective-lake-como-approach",
+      "upstream_route_id": "como0",
+      "route_name": "Lake Como Approach from near 8,000 ft",
+      "path_waypoint_ids": [
+        "waypoint-lake-como-road-8000",
+        "waypoint-lake-como-area",
+        "waypoint-lake-como-road-8000"
+      ],
+      "distance_scope": "round_trip",
+      "distance_miles": 11.25,
+      "elevation_gain_ft": 3900,
+      "difficulty": "Class 1",
+      "exposure": "Low",
+      "route_notes": "Published approach profile. Current route-reference evidence explicitly labels 11.25 miles as round-trip. The 3,900 ft figure is retained as upstream cumulative gain and is not replaced by endpoint subtraction.",
+      "return_considerations": "Road clearance determines the actual starting point; do not force the vehicle higher than conditions support.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "route-lake-como-approach-8800",
+      "objective_id": "objective-lake-como-approach",
+      "upstream_route_id": "como0",
+      "route_name": "Lake Como Approach from near 8,800 ft",
+      "path_waypoint_ids": [
+        "waypoint-lake-como-road-8800",
+        "waypoint-lake-como-area",
+        "waypoint-lake-como-road-8800"
+      ],
+      "distance_scope": "round_trip",
+      "distance_miles": 8.5,
+      "elevation_gain_ft": 3100,
+      "difficulty": "Class 1",
+      "exposure": "Low",
+      "route_notes": "Published approach profile. Current route-reference evidence explicitly labels 8.5 miles as round-trip. The 3,100 ft figure is retained as upstream cumulative gain and is not replaced by endpoint subtraction.",
+      "return_considerations": "Road clearance determines the actual starting point; do not force the vehicle higher than conditions support.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "route-blanca-ellingwood-combination",
+      "objective_id": "objective-blanca-ellingwood-combination",
+      "upstream_route_id": "elli3",
+      "route_name": "Combo: Blanca + Ellingwood from Lake Como camp",
+      "path_waypoint_ids": [
+        "waypoint-lake-como-area",
+        "waypoint-blanca-peak",
+        "waypoint-ellingwood-point",
+        "waypoint-lake-como-area"
+      ],
+      "distance_scope": "round_trip",
+      "distance_miles": 7,
+      "elevation_gain_ft": 3000,
+      "difficulty": "Class 3",
+      "exposure": "Considerable",
+      "route_notes": "The connecting ridge has a Class 3 line or a return to the standard trail before reascending; choosing the Class 3 line is a separate decision from choosing the combination.",
+      "return_considerations": "The traverse remains optional. Weather, rock, time, and every climber's comfort decide the sequence.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles",
+        "src-focus-objectives",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "route-mount-lindsey-standard",
+      "objective_id": "objective-mount-lindsey",
+      "upstream_route_id": "lind1",
+      "route_name": "Mount Lindsey — Northwest Gully",
+      "path_waypoint_ids": [
+        "waypoint-lily-lake-trailhead",
+        "waypoint-mount-lindsey",
+        "waypoint-lily-lake-trailhead"
+      ],
+      "distance_scope": "round_trip",
+      "distance_miles": 8.25,
+      "elevation_gain_ft": 3500,
+      "difficulty": "Easy Class 3",
+      "exposure": "Considerable",
+      "route_notes": "Frozen source states that a waiver is required and legal access is from Lily Lake Trailhead via the standard gully or ridge route.",
+      "return_considerations": "The frozen source does not store the trailhead elevation, so no net descent figure is inserted.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-route-profiles",
+        "src-focus-objectives",
+        "src-route-center"
+      ]
+    }
+  ],
+  "decision_points": [
+    {
+      "id": "decision-forecast-versus-actual",
+      "objective_ids": [
+        "objective-lake-como-approach",
+        "objective-blanca-ellingwood-combination",
+        "objective-mount-lindsey"
+      ],
+      "dimension": "weather_evidence",
+      "prompt": "Compare the saved forecast timestamp with actual sky, wind, and cloud growth at departure.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "decision-upper-basin-reassessment",
+      "objective_ids": [
+        "objective-blanca-ellingwood-combination"
+      ],
+      "dimension": "pace_group_weather",
+      "prompt": "At the upper basin, reassess wind, cloud growth, pace, comfort, and group condition.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "decision-blanca-ellingwood-traverse",
+      "objective_ids": [
+        "objective-blanca-ellingwood-combination"
+      ],
+      "dimension": "route_exposure",
+      "prompt": "Before the Blanca–Ellingwood traverse, reassess weather, rock, time, and every climber's comfort; the traverse remains optional.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-focus-objectives",
+        "src-timeline-decisions",
+        "src-route-center"
+      ]
+    },
+    {
+      "id": "decision-turn-or-descend",
+      "objective_ids": [
+        "objective-blanca-ellingwood-combination"
+      ],
+      "dimension": "turnaround_descent",
+      "prompt": "Turn or descend for thunder or rapidly building convection, balance-impairing wind, worsening altitude symptoms, unacceptable rockfall or route conditions, any climber declining the Class 3 traverse, or exposure after the agreed planning target.",
+      "verification_status": "verified_against_upstream",
+      "source_record_ids": [
+        "src-timeline-decisions"
+      ]
+    },
+    {
+      "id": "decision-mount-lindsey-access",
+      "objective_ids": [
+        "objective-mount-lindsey"
+      ],
+      "dimension": "access",
+      "prompt": "Before leaving service, confirm current Mount Lindsey access and waiver requirements; route conditions and group judgment govern.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-focus-objectives",
+        "src-route-profiles"
+      ]
+    }
+  ],
+  "public_emergency_contacts": [
+    {
+      "id": "contact-alamosa-county",
+      "agency": "Alamosa County Sheriff’s Office",
+      "role": "Contextual county dispatch and sheriff reference",
+      "phone_numbers": [
+        {
+          "kind": "dispatch",
+          "label": "County dispatch",
+          "e164": "+17195895807"
+        },
+        {
+          "kind": "office",
+          "label": "Sheriff’s office",
+          "e164": "+17195896608"
+        }
+      ],
+      "geographic_context": "Lake Como and the Alamosa-side approach may involve Alamosa County; summit-area incidents may involve Costilla County.",
+      "activation_notes": "Call 911 first. Dispatch determines the responding agency from the exact incident location.",
+      "verification_status": "externally_verified",
+      "upstream_consistency_status": "verified_against_upstream",
+      "upstream_claimed_verification_date": "2026-08-05",
+      "last_externally_verified": "2026-08-07T07:45:17Z",
+      "source_record_ids": [
+        "src-emergency-areas",
+        "src-focus-objectives",
+        "src-emergency-render"
+      ]
+    },
+    {
+      "id": "contact-huerfano-county",
+      "agency": "Huerfano County Sheriff’s Office",
+      "role": "Contextual county dispatch and sheriff reference",
+      "phone_numbers": [
+        {
+          "kind": "dispatch",
+          "label": "County dispatch",
+          "e164": "+17197381044"
+        },
+        {
+          "kind": "office",
+          "label": "Sheriff’s office",
+          "e164": "+17197381600"
+        }
+      ],
+      "geographic_context": "Lily Lake and trailhead-side incidents may involve Huerfano County; summit-area incidents may involve Costilla County.",
+      "activation_notes": "Call 911 first. Dispatch determines the responding agency from the exact incident location.",
+      "verification_status": "externally_verified",
+      "upstream_consistency_status": "verified_against_upstream",
+      "upstream_claimed_verification_date": "2026-08-05",
+      "last_externally_verified": "2026-08-07T07:45:17Z",
+      "source_record_ids": [
+        "src-emergency-areas",
+        "src-focus-objectives",
+        "src-emergency-render"
+      ]
+    },
+    {
+      "id": "contact-costilla-county",
+      "agency": "Costilla County Sheriff’s Office",
+      "role": "Contextual summit-area dispatch and sheriff reference",
+      "phone_numbers": [
+        {
+          "kind": "dispatch",
+          "label": "County dispatch",
+          "e164": "+17196723302"
+        },
+        {
+          "kind": "office",
+          "label": "Sheriff’s office",
+          "e164": "+17196720673"
+        }
+      ],
+      "geographic_context": "Summit-area incidents on Blanca Peak, Ellingwood Point, or Mount Lindsey may involve Costilla County; exact incident location controls.",
+      "activation_notes": "Call 911 first. Dispatch determines the responding agency from the exact incident location.",
+      "verification_status": "externally_verified",
+      "upstream_consistency_status": "verified_against_upstream",
+      "upstream_claimed_verification_date": "2026-08-05",
+      "last_externally_verified": "2026-08-07T07:45:17Z",
+      "source_record_ids": [
+        "src-emergency-areas",
+        "src-focus-objectives",
+        "src-emergency-render"
+      ]
+    }
+  ],
+  "communications": {
+    "id": "communications-public-protocol",
+    "check_in_protocol": [
+      "Vehicle departure",
+      "Lake Como camp",
+      "Summit start",
+      "Summit or high point",
+      "Below exposed terrain",
+      "Back at camp",
+      "Back at vehicle",
+      "Fort Garland",
+      "Home"
+    ],
+    "emergency_sequence": [
+      "Call 911 first.",
+      "Provide exact location, mountain, route, elevation, and coordinates if available.",
+      "Provide injuries, party size, weather, and current conditions.",
+      "Let dispatch determine the responding agency."
+    ],
+    "draft_behavior": "Text and email actions create drafts for review. A draft or copied update is not evidence of delivery; only external transport confirmation establishes delivery.",
+    "recipient_handling": "No recipient value is canonical. Initial physical values are handwritten outside the repository; any later approved PWA value remains device-local.",
+    "recipient_value_included": false,
+    "delivery_confirmation_required": true,
+    "verification_status": "verified_against_upstream",
+    "source_record_ids": [
+      "src-communications",
+      "src-emergency-render"
+    ]
+  },
+  "weather_reference_locations": [
+    {
+      "id": "weather-lake-como-area",
+      "name": "Lake Como area",
+      "latitude": 37.5696,
+      "longitude": -105.51406,
+      "elevation_ft": 11750,
+      "forecast_context": "Saturday approach reference point; no forecast values are canonical.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-weather-locations"
+      ]
+    },
+    {
+      "id": "weather-blanca-peak",
+      "name": "Blanca Peak",
+      "latitude": 37.57753,
+      "longitude": -105.48569,
+      "elevation_ft": 14350,
+      "forecast_context": "Sunday summit reference point; no forecast values are canonical.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-weather-locations"
+      ]
+    },
+    {
+      "id": "weather-ellingwood-point",
+      "name": "Ellingwood Point",
+      "latitude": 37.58257,
+      "longitude": -105.49248,
+      "elevation_ft": 14057,
+      "forecast_context": "Sunday summit reference point; no forecast values are canonical.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-weather-locations"
+      ]
+    },
+    {
+      "id": "weather-mount-lindsey",
+      "name": "Mount Lindsey",
+      "latitude": 37.58389,
+      "longitude": -105.4449,
+      "elevation_ft": 14055,
+      "forecast_context": "Monday summit reference point; no forecast values are canonical.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-weather-locations"
+      ]
+    },
+    {
+      "id": "weather-great-sand-dunes",
+      "name": "Great Sand Dunes",
+      "latitude": 37.7329,
+      "longitude": -105.5128,
+      "elevation_ft": 8200,
+      "forecast_context": "Friday visit reference point; it is not a climbing objective and no forecast values are canonical.",
+      "verification_status": "externally_verified",
+      "source_record_ids": [
+        "src-weather-locations",
+        "src-trip-seed"
+      ]
+    }
+  ],
+  "source_records": [
+    {
+      "id": "src-trip-seed",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/trips.js",
+      "semantic_locator": "function tripSeedLakeComo() return object",
+      "line_range_optional": "17-41",
+      "locator_probe": "function tripSeedLakeComo()",
+      "fact_category": "trip identity, dates, primary route selection, planning times, camp, transportation, and objective separation",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Private partner text from the upstream record is deliberately excluded."
+    },
+    {
+      "id": "src-timezone",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/core.js",
+      "semantic_locator": "Mountain-time Intl.DateTimeFormat configuration",
+      "line_range_optional": "163-172, 1236-1239",
+      "locator_probe": "timeZone:'America/Denver'",
+      "fact_category": "canonical timezone",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Timezone is also an owner-approved Phase 0 canonical decision."
+    },
+    {
+      "id": "src-weather-locations",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/core.js",
+      "semantic_locator": "WEATHER_LOCATIONS entries",
+      "line_range_optional": "28-35",
+      "locator_probe": "const WEATHER_LOCATIONS=[",
+      "fact_category": "weather reference coordinates, elevations, dates, and contexts",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Reference points are not frozen forecasts and are not automatically exact waypoint positions."
+    },
+    {
+      "id": "src-route-profiles",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/core.js",
+      "semantic_locator": "ROUTE_PROFILES records como0, elli3, and lind1",
+      "line_range_optional": "1996",
+      "locator_probe": "const ROUTE_PROFILES=[",
+      "fact_category": "selected route distances, gains, classifications, risks, start points, and access notes",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Published cumulative gain values are retained separately from endpoint-net schematic changes."
+    },
+    {
+      "id": "src-focus-objectives",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/shared.js",
+      "semantic_locator": "config.focusObjectives entries blanca, lake, and lindsey",
+      "line_range_optional": "106-180",
+      "locator_probe": "focusObjectives:{",
+      "fact_category": "objective identity, dates, planned times, intent, route prompts, and contextual jurisdictions",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Mount Lindsey is preserved as a separate objective from the Blanca and Ellingwood combination."
+    },
+    {
+      "id": "src-emergency-areas",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/shared.js",
+      "semantic_locator": "config.emergencyAreas entries alamosa, huerfano, and costilla",
+      "line_range_optional": "17-32, 90-97",
+      "locator_probe": "emergencyAreas:{",
+      "fact_category": "public county dispatch and sheriff contacts",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Upstream verification dates are recorded as source claims only; independent Phase 1A contact evidence is modeled separately in external_sources."
+    },
+    {
+      "id": "src-timeline-decisions",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "index.html",
+      "semantic_locator": "sections #sat, #sun, #mon, and #emergency planning and turn-or-descend prompts",
+      "line_range_optional": "537-552, 584-595, 1242-1246",
+      "locator_probe": "<h3>Turn or descend</h3>",
+      "fact_category": "planning timeline and decision prompts",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Prompts remain human-reviewed and do not produce an authorization score."
+    },
+    {
+      "id": "src-communications",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "index.html",
+      "semantic_locator": "section #emergency communicationChecksCard and public draft behavior",
+      "line_range_optional": "1240-1277",
+      "locator_probe": "id=\"communicationChecksCard\"",
+      "fact_category": "public-safe check-in sequence and draft semantics",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Private recipient values and the upstream personal-contact label are excluded."
+    },
+    {
+      "id": "src-emergency-render",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "js/v15_3_10.js",
+      "semantic_locator": "renderEmergencySection call-first, jurisdiction, and draft-status behavior",
+      "line_range_optional": "34-70",
+      "locator_probe": "function renderEmergencySection(id)",
+      "fact_category": "911-first hierarchy, jurisdiction semantics, and device-local draft behavior",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "No private local-storage value is copied into the canonical dataset."
+    },
+    {
+      "id": "src-pretrip-calendar",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "docs/pretrip-freeze-and-rollback.md",
+      "semantic_locator": "section 2 Calendar trip-start and freeze-lift milestones",
+      "line_range_optional": "15-23",
+      "locator_probe": "| Trip start | August 19, 2026 |",
+      "fact_category": "trip date boundary corroboration",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "Trip seed remains the primary structured date record."
+    },
+    {
+      "id": "src-route-center",
+      "source_project": "Don Downs Mountain Guide",
+      "source_repository": "https://github.com/DonDowns/mountain-guide",
+      "source_release": "v15.3.10",
+      "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
+      "source_path": "index.html",
+      "semantic_locator": "section #routes schematic profiles and selected route summaries",
+      "line_range_optional": "601-618",
+      "locator_probe": "aria-label=\"Schematic route elevation profiles\"",
+      "fact_category": "route endpoint elevations, net-change semantics, uncertainty, and selected route links",
+      "verification_status": "verified_against_upstream",
+      "verified_at": "2026-08-07T07:16:31Z",
+      "notes": "The Mount Lindsey trailhead elevation is explicitly unavailable; no estimate is inserted."
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "ext-alamosa-sheriff",
+      "authority": "Alamosa County",
+      "title": "Sheriff",
+      "url": "https://www.alamosacounty.org/185/Sheriff",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "Alamosa County Sheriff’s Office lists 719-589-5807 for non-emergency dispatch, 719-589-6608 for the office, and 911 for emergencies.",
+      "canonical_record_ids": [
+        "contact-alamosa-county"
+      ],
+      "notes": "Both upstream public numbers and their roles agree exactly. The source does not convert the county reference into a fixed route-jurisdiction assignment."
+    },
+    {
+      "id": "ext-alamosa-directory",
+      "authority": "Alamosa County",
+      "title": "Sheriff’s Office Directory",
+      "url": "https://www.alamosacounty.org/Directory.aspx?did=55",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The official county directory corroborates the Alamosa County dispatch and sheriff office numbers.",
+      "canonical_record_ids": [
+        "contact-alamosa-county"
+      ],
+      "notes": "Official directory corroboration only; the 911-first and dispatch-controlled response semantics remain unchanged."
+    },
+    {
+      "id": "ext-huerfano-sheriff",
+      "authority": "Huerfano County",
+      "title": "Sheriff’s Office",
+      "url": "https://huerfano.us/sheriff/",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "Huerfano County Sheriff’s Office lists 719-738-1044 for non-emergency dispatch, 719-738-1600 for the office, and 911 for emergencies.",
+      "canonical_record_ids": [
+        "contact-huerfano-county"
+      ],
+      "notes": "Both upstream public numbers and their roles agree exactly. Jurisdiction remains contextual and dispatch-controlled."
+    },
+    {
+      "id": "ext-huerfano-public-safety",
+      "authority": "Huerfano County",
+      "title": "Public Safety",
+      "url": "https://huerfano.us/public-safety/",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The county public-safety page corroborates 719-738-1044 as Huerfano Emergency Dispatch.",
+      "canonical_record_ids": [
+        "contact-huerfano-county"
+      ],
+      "notes": "Used as official corroboration of the dispatch role; no time-sensitive fire-restriction state was copied into the immutable manifest."
+    },
+    {
+      "id": "ext-costilla-sheriff",
+      "authority": "Costilla County",
+      "title": "Sheriff",
+      "url": "https://www.costillacounty.gov/sheriff",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "Costilla County lists 719-672-3302 for dispatch, 719-672-0673 for the sheriff office, and 911 for emergencies.",
+      "canonical_record_ids": [
+        "contact-costilla-county"
+      ],
+      "notes": "Both upstream public numbers and their roles agree exactly. The office page separately directs non-emergency business to the office number."
+    },
+    {
+      "id": "ext-costilla-contact",
+      "authority": "Costilla County",
+      "title": "Contact Us",
+      "url": "https://www.costillacounty.gov/contact-us",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The county contact directory corroborates the Costilla County dispatch and sheriff office numbers.",
+      "canonical_record_ids": [
+        "contact-costilla-county"
+      ],
+      "notes": "Official directory corroboration only; exact incident location still governs the dispatch response."
+    },
+    {
+      "id": "ext-lindsey-waiver",
+      "authority": "Trinchera Blanca Ranch access waiver portal",
+      "title": "Mount Lindsey Waiver",
+      "url": "https://www.mountlindseywaiver.com/",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "An executed landowner waiver is required to enter Trinchera Blanca Ranch property for the designated Mount Lindsey summit access route.",
+      "canonical_record_ids": [
+        "route-mount-lindsey-standard",
+        "decision-mount-lindsey-access"
+      ],
+      "notes": "Scope is hiking access to the summit on the designated route. The portal prohibits route deviation, hunting, camping, overnight use, motorized or wheeled transport, and drones on ranch property; it does not represent the route as maintained or supervised."
+    },
+    {
+      "id": "ext-cfi-lindsey",
+      "authority": "Colorado Fourteeners Initiative",
+      "title": "Mount Lindsey",
+      "url": "https://www.14ers.org/peaks/sangre-de-cristo-range/mount-lindsey/",
+      "source_tier": 2,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "CFI documents the recommended Huerfano River Valley route, Lily Lake-area approach, private-land constraints, and rough final road miles.",
+      "canonical_record_ids": [
+        "waypoint-lily-lake-trailhead",
+        "route-mount-lindsey-standard",
+        "decision-mount-lindsey-access"
+      ],
+      "notes": "The page says not to park or camp at Singing River Ranch, identifies the posted Huerfano River trailhead, and notes the unmarked cutoff from the Lily Lake trail. It does not publish an exact operational trailhead coordinate or elevation."
+    },
+    {
+      "id": "ext-cmc-lindsey-route",
+      "authority": "Colorado Mountain Club",
+      "title": "Mount Lindsey Northwest Ridge",
+      "url": "https://www.cmc.org/education-adventure/trips/routes-places/mount-lindsey-northwest-ridge-14-055-feet",
+      "source_tier": 2,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "CMC documents current designated-route access, the required waiver, an 8.5-mile route profile, 3,500 feet of gain, and a 14,055-foot high point.",
+      "canonical_record_ids": [
+        "route-mount-lindsey-standard",
+        "decision-mount-lindsey-access"
+      ],
+      "notes": "Used for current access and route-profile corroboration. The canonical selected route remains the Northwest Gully, not the ridge variant."
+    },
+    {
+      "id": "ext-cmc-lindsey-trip",
+      "authority": "Colorado Mountain Club",
+      "title": "Summit 2026 — Mt. Lindsey Northwest Gully",
+      "url": "https://www.cmc.org/education-adventure/trips/find-trips/summit-2026-2013-mt-lindsey-northwest-gully",
+      "source_tier": 2,
+      "published_or_updated_at": "2026",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "A current 2026 CMC trip listing treats the Northwest Gully as an active objective and requires the Mount Lindsey access waiver.",
+      "canonical_record_ids": [
+        "route-mount-lindsey-standard",
+        "decision-mount-lindsey-access"
+      ],
+      "notes": "Corroborates current practical use; it does not supersede the landowner’s restrictions or independently establish a trailhead coordinate."
+    },
+    {
+      "id": "ext-usfs-lily-access",
+      "authority": "U.S. Forest Service",
+      "title": "Blanca Peak Roadless Area Profile",
+      "url": "https://www.fs.usda.gov/Internet/FSE_DOCUMENTS/stelprdb5056405.pdf",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The Forest Service identifies NFSR 580 Upper Huerfano Road as public access to NFST 1308 Lily Lake and limits the described trail to foot and horse travel.",
+      "canonical_record_ids": [
+        "waypoint-lily-lake-trailhead",
+        "route-mount-lindsey-standard"
+      ],
+      "notes": "Officially verifies the access corridor and trail identity, but the document does not establish an operational parking-point coordinate or elevation."
+    },
+    {
+      "id": "ext-usfs-trails-catalog",
+      "authority": "U.S. Forest Service",
+      "title": "National Forest System Trails Feature Layer",
+      "url": "https://catalog.data.gov/dataset/national-forest-system-trails-feature-layer-f51e8",
+      "source_tier": 1,
+      "published_or_updated_at": "2026-01-06",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The official national trail dataset catalog was reviewed as the preferred geospatial source class for NFST 1308.",
+      "canonical_record_ids": [
+        "waypoint-lily-lake-trailhead"
+      ],
+      "notes": "The catalog did not yield a single official parking or trailhead point in this pass; it therefore does not close the Lily Lake operational-location blocker."
+    },
+    {
+      "id": "ext-14ers-lily-trailhead",
+      "authority": "14ers.com",
+      "title": "Huerfano/Lily Lake Trailhead",
+      "url": "https://www.14ers.com/php14ers/trailheadsview.php?thparm=sc02",
+      "source_tier": 3,
+      "published_or_updated_at": "2026-07",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The established route reference publishes 37.62361, -105.47278 and 10,700 feet for the Huerfano/Lily Lake trailhead, with rough-road and limited-parking context.",
+      "canonical_record_ids": [
+        "waypoint-lily-lake-trailhead",
+        "route-mount-lindsey-standard"
+      ],
+      "notes": "Secondary operational evidence only. The coordinate and elevation remain null because no authoritative agency point was established."
+    },
+    {
+      "id": "ext-climb13ers-lily-trailhead",
+      "authority": "Climb13ers",
+      "title": "Lily Lake / Huerfano Creek Trailhead",
+      "url": "https://www.climb13ers.com/colorado-13ers/trailhead/lily-lakehuerfano-creek-th",
+      "source_tier": 4,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "A secondary reference publishes approximately 37.623486, -105.472903 and 10,725 feet for a Lily Lake/Huerfano Creek trailhead point.",
+      "canonical_record_ids": [
+        "waypoint-lily-lake-trailhead"
+      ],
+      "notes": "This differs slightly from the 14ers.com point and elevation. Neither value was selected, averaged, or copied into the canonical waypoint."
+    },
+    {
+      "id": "ext-14ers-lindsey-route",
+      "authority": "14ers.com",
+      "title": "Mount Lindsey Northwest Gully",
+      "url": "https://www.14ers.com/route.php?route=lind1",
+      "source_tier": 3,
+      "published_or_updated_at": "2026-07",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current route page labels the Northwest Gully Easy Class 3 with considerable exposure, 8.25 miles round-trip, and 3,500 feet of gain, and links the required waiver.",
+      "canonical_record_ids": [
+        "route-mount-lindsey-standard",
+        "decision-mount-lindsey-access",
+        "waypoint-lily-lake-trailhead"
+      ],
+      "notes": "All four canonical route-profile values agree. Legal access remains limited by the landowner waiver and designated route."
+    },
+    {
+      "id": "ext-usgs-gnis-colorado",
+      "authority": "U.S. Geological Survey and U.S. Board on Geographic Names",
+      "title": "GNIS Domestic Names — Colorado text dataset",
+      "url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/GeographicNames/DomesticNames/DomesticNames_CO_Text.zip",
+      "source_tier": 1,
+      "published_or_updated_at": "2026-07-06",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The July 2026 GNIS extract identifies Lake Como at 37.5695982, -105.5140623; Blanca Peak at 37.5775609, -105.4855987; Ellingwood Point at 37.5824644, -105.4926087; and Mount Lindsey at 37.583803, -105.4446957.",
+      "canonical_record_ids": [
+        "waypoint-lake-como-area",
+        "waypoint-blanca-peak",
+        "waypoint-ellingwood-point",
+        "waypoint-mount-lindsey"
+      ],
+      "notes": "Lake Como rounds to the frozen area-reference coordinate. Summit coordinates differ from the frozen route-reference points by small, non-material field distances; the upstream values were retained and not averaged. The current extract does not publish elevations."
+    },
+    {
+      "id": "ext-usgs-gnis-methodology",
+      "authority": "U.S. Geological Survey",
+      "title": "Geographic Names Information System FAQ",
+      "url": "https://www.usgs.gov/us-board-on-geographic-names/what-geographic-names-information-system-gnis",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "USGS documents that GNIS summit coordinates represent the highest point, are stored in NAD 83, and that GNIS elevations are approximate rather than official values.",
+      "canonical_record_ids": [
+        "waypoint-lake-como-area",
+        "waypoint-blanca-peak",
+        "waypoint-ellingwood-point",
+        "waypoint-mount-lindsey"
+      ],
+      "notes": "Used to interpret coordinate and elevation-method differences; it does not authorize replacing the frozen route-reference points."
+    },
+    {
+      "id": "ext-usgs-summit-elevations",
+      "authority": "U.S. Geological Survey",
+      "title": "Elevations of Named Summits Over 14,000 Feet Above Sea Level",
+      "url": "https://www.usgs.gov/educational-resources/elevations-named-summits-over-14000-feet-above-sea-level",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The USGS named-summit table publishes map-era elevations of 14,345 feet for Blanca and 14,042 feet for both Ellingwood and Lindsey.",
+      "canonical_record_ids": [
+        "waypoint-blanca-peak",
+        "waypoint-ellingwood-point",
+        "waypoint-mount-lindsey",
+        "weather-blanca-peak",
+        "weather-ellingwood-point",
+        "weather-mount-lindsey"
+      ],
+      "notes": "These differ from the frozen modern LiDAR values by 5, 15, and 13 feet. The differences are method-era distinctions and non-material for forecast-reference use; neither representation was silently substituted."
+    },
+    {
+      "id": "ext-14ers-blanca-peak",
+      "authority": "14ers.com",
+      "title": "Blanca Peak",
+      "url": "https://www.14ers.com/peaks/10004/blanca-peak",
+      "source_tier": 3,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current peak page publishes 37.57753, -105.48569 and a 14,350-foot LiDAR elevation, exactly matching the frozen route/weather reference.",
+      "canonical_record_ids": [
+        "waypoint-blanca-peak",
+        "weather-blanca-peak"
+      ],
+      "notes": "Secondary current-method corroboration; the official USGS map/survey representation is separately retained in the evidence record."
+    },
+    {
+      "id": "ext-14ers-ellingwood-peak",
+      "authority": "14ers.com",
+      "title": "Ellingwood Point",
+      "url": "https://www.14ers.com/peaks/10042/ellingwood-point",
+      "source_tier": 3,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current peak page publishes 37.58257, -105.49248 and a 14,057-foot LiDAR elevation, exactly matching the frozen route/weather reference.",
+      "canonical_record_ids": [
+        "waypoint-ellingwood-point",
+        "weather-ellingwood-point"
+      ],
+      "notes": "Secondary current-method corroboration; the official USGS map-era representation is separately retained in the evidence record."
+    },
+    {
+      "id": "ext-14ers-lindsey-peak",
+      "authority": "14ers.com",
+      "title": "Mount Lindsey",
+      "url": "https://www.14ers.com/peaks/10043/mount-lindsey",
+      "source_tier": 3,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current peak page publishes 37.58389, -105.44490 and a 14,055-foot LiDAR elevation, exactly matching the frozen route/weather reference.",
+      "canonical_record_ids": [
+        "waypoint-mount-lindsey",
+        "weather-mount-lindsey"
+      ],
+      "notes": "Secondary current-method corroboration; the official USGS map-era representation is separately retained in the evidence record."
+    },
+    {
+      "id": "ext-topozone-lake-como",
+      "authority": "TopoZone",
+      "title": "Lake Como Topo Map",
+      "url": "https://www.topozone.com/colorado/alamosa-co/lake/lake-como/",
+      "source_tier": 4,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The secondary GNIS/topographic representation gives 37.5695982, -105.5140623 and an approximate elevation of 11,749 feet for Lake Como.",
+      "canonical_record_ids": [
+        "waypoint-lake-como-area",
+        "weather-lake-como-area"
+      ],
+      "notes": "The coordinate rounds to the frozen area point; the one-foot elevation difference is non-material and was not used to replace the 11,750-foot route-reference value."
+    },
+    {
+      "id": "ext-14ers-lake-como-route",
+      "authority": "14ers.com",
+      "title": "Lake Como Approach",
+      "url": "https://www.14ers.com/route.php?route=como0",
+      "source_tier": 3,
+      "published_or_updated_at": "2026-07",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The route page explicitly labels 11.25 miles from near 8,000 feet and 8.5 miles from near 8,800 feet as round-trip, with 3,900 feet and 3,100 feet of gain respectively, Class 1, low exposure, and Lake Como near 11,750 feet.",
+      "canonical_record_ids": [
+        "waypoint-lake-como-road-8000",
+        "waypoint-lake-como-road-8800",
+        "waypoint-lake-como-area",
+        "route-lake-como-approach-8000",
+        "route-lake-como-approach-8800"
+      ],
+      "notes": "This resolves the frozen mileage-scope ambiguity without changing either distance or gain. The page distinguishes lower 2WD access, several 8,800-foot 4WD pull-offs, sparse higher parking, and much harder road above 10,000 feet."
+    },
+    {
+      "id": "ext-14ers-lake-como-trailhead",
+      "authority": "14ers.com",
+      "title": "Lake Como (Blanca Peak) Trailhead",
+      "url": "https://www.14ers.com/php14ers/trailheadsview.php?thparm=sc01",
+      "source_tier": 3,
+      "published_or_updated_at": "2026-07",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current trailhead page identifies approximately 8,000 feet as the lower trailhead and approximately 8,800 feet as several pull-offs just inside the Forest boundary, with increasing 4WD difficulty above.",
+      "canonical_record_ids": [
+        "waypoint-lake-como-road-8000",
+        "waypoint-lake-como-road-8800",
+        "route-lake-como-approach-8000",
+        "route-lake-como-approach-8800"
+      ],
+      "notes": "No vehicle model is certified or authorized. Current, date-specific condition reports were reviewed but not copied into the immutable manifest."
+    },
+    {
+      "id": "ext-14ers-blanca-ellingwood-route",
+      "authority": "14ers.com",
+      "title": "Blanca and Ellingwood Combination Route",
+      "url": "https://www.14ers.com/route.php?route=elli3",
+      "source_tier": 3,
+      "published_or_updated_at": "2026-07",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The current combination profile gives 7 miles round-trip and 3,000 feet of gain from Lake Como, Class 3, and considerable exposure, and distinguishes the Class 3 ridge from descending to the standard trail before reascending.",
+      "canonical_record_ids": [
+        "route-blanca-ellingwood-combination"
+      ],
+      "notes": "All canonical profile values agree and the traverse remains optional. No Little Bear objective or unsourced descent was added."
+    },
+    {
+      "id": "ext-nws-lake-como",
+      "authority": "National Weather Service",
+      "title": "NWS Points API — Lake Como reference",
+      "url": "https://api.weather.gov/points/37.56960,-105.51406",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The exact frozen Lake Como area coordinate resolves to NWS Pueblo grid point PUB 61,36 and a usable forecast endpoint.",
+      "canonical_record_ids": [
+        "weather-lake-como-area"
+      ],
+      "notes": "Only reference-point behavior was verified; no forecast values were stored."
+    },
+    {
+      "id": "ext-nws-blanca",
+      "authority": "National Weather Service",
+      "title": "NWS Points API — Blanca Peak reference",
+      "url": "https://api.weather.gov/points/37.57753,-105.48569",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The exact frozen Blanca coordinate resolves to NWS Pueblo grid point PUB 62,37 and a usable forecast endpoint.",
+      "canonical_record_ids": [
+        "weather-blanca-peak"
+      ],
+      "notes": "Only reference-point behavior was verified; no forecast values were stored."
+    },
+    {
+      "id": "ext-nws-ellingwood",
+      "authority": "National Weather Service",
+      "title": "NWS Points API — Ellingwood Point reference",
+      "url": "https://api.weather.gov/points/37.58257,-105.49248",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The exact frozen Ellingwood coordinate resolves to NWS Pueblo grid point PUB 62,37 and a usable forecast endpoint.",
+      "canonical_record_ids": [
+        "weather-ellingwood-point"
+      ],
+      "notes": "Only reference-point behavior was verified; no forecast values were stored."
+    },
+    {
+      "id": "ext-nws-lindsey",
+      "authority": "National Weather Service",
+      "title": "NWS Points API — Mount Lindsey reference",
+      "url": "https://api.weather.gov/points/37.58389,-105.44490",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The exact frozen Mount Lindsey coordinate resolves to NWS Pueblo grid point PUB 64,37 and a usable forecast endpoint.",
+      "canonical_record_ids": [
+        "weather-mount-lindsey"
+      ],
+      "notes": "Only reference-point behavior was verified; no forecast values were stored."
+    },
+    {
+      "id": "ext-nws-dunes",
+      "authority": "National Weather Service",
+      "title": "NWS Points API — Great Sand Dunes reference",
+      "url": "https://api.weather.gov/points/37.73290,-105.51280",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "The exact frozen Great Sand Dunes coordinate resolves to NWS Pueblo grid point PUB 62,44 and a usable forecast endpoint.",
+      "canonical_record_ids": [
+        "weather-great-sand-dunes"
+      ],
+      "notes": "Only itinerary/weather reference behavior was verified; no forecast values were stored and the Dunes were not made a climbing objective."
+    },
+    {
+      "id": "ext-nps-dunes-weather",
+      "authority": "National Park Service",
+      "title": "Weather — Great Sand Dunes National Park and Preserve",
+      "url": "https://home.nps.gov/grsa/planyourvisit/weather.htm",
+      "source_tier": 1,
+      "published_or_updated_at": "2024-11-13",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "NPS uses an approximately 8,200-foot Visitor Center, campground, and dunefield weather context and links NWS pinpoint forecasts.",
+      "canonical_record_ids": [
+        "weather-great-sand-dunes"
+      ],
+      "notes": "Supports the general visit/weather context rather than a climbing objective or exact surveyed point."
+    },
+    {
+      "id": "ext-nps-dunes-visitor-center",
+      "authority": "National Park Service",
+      "title": "Visitor Center — Great Sand Dunes National Park and Preserve",
+      "url": "https://www.nps.gov/grsa/planyourvisit/visitor-center.htm",
+      "source_tier": 1,
+      "published_or_updated_at": "2026-04-24",
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "NPS confirms the Visitor Center as an operational visitor-context location for the Great Sand Dunes itinerary.",
+      "canonical_record_ids": [
+        "weather-great-sand-dunes"
+      ],
+      "notes": "Context corroboration only; the immutable record remains a general weather reference."
+    },
+    {
+      "id": "ext-nps-dunes-faq",
+      "authority": "National Park Service",
+      "title": "Frequently Asked Questions — Great Sand Dunes National Park and Preserve",
+      "url": "https://www.nps.gov/grsa/faqs.htm",
+      "source_tier": 1,
+      "published_or_updated_at": null,
+      "retrieved_at": "2026-08-07",
+      "fact_verified": "NPS separately gives 8,170 feet for the Visitor Center itself.",
+      "canonical_record_ids": [
+        "weather-great-sand-dunes"
+      ],
+      "notes": "The 30-foot difference reflects the narrower Visitor Center context versus the weather page’s rounded Visitor Center/campground/dunefield context; it is non-material and no value was averaged or replaced."
+    }
+  ]
+}

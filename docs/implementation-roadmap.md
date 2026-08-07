@@ -127,6 +127,14 @@ High: factual verification, schema design, privacy classification, source tracea
 
 ## Phase 2 — Printable three-page Field Guide
 
+### Scoped Lily Lake final-release hold
+
+- Phase 2 and Phase 3 drafting may proceed while the Lily Lake Trailhead latitude, longitude, and elevation remain null and `pending_external_verification`.
+- Prefer omitting those unresolved fields from drafts and release output.
+- No released artifact may print a secondary Lily Lake coordinate/elevation as an authoritative field fact.
+- A secondary point used temporarily for development or visualization must be marked noncanonical, traceable to its secondary source, excluded from release output, and never used for an emergency-location claim.
+- Final field release is blocked only for an artifact that requires the unresolved coordinate/elevation.
+
 ### Goal
 
 Create a deterministic, actual-size, approximately three-page US Letter Field Guide from the canonical public dataset.
