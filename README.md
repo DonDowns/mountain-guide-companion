@@ -9,7 +9,7 @@ The Don Downs Mountain Guide Companion is a separate, trip-scoped field-referenc
 3. What conditions should cause us to reassess or turn around?
 4. What do we do if something goes wrong?
 
-The Companion is not a second full Mountain Guide. It consists of three coordinated artifacts: a printable three-page Field Guide, a pocket-sized Emergency & Communication Card, and an interactive Companion PWA whose field-ready offline lifecycle remains a Phase 5 gate. One canonical public manifest is authoritative for all public trip facts. The artifacts may transform those facts into different formats; they do not need to contain identical JSON bytes.
+The Companion is not a second full Mountain Guide. It consists of three coordinated artifacts: a printable three-page Field Guide, a pocket-sized Emergency & Communication Card, and an interactive Companion PWA with a draft, atomically verified offline runtime. One canonical public manifest is authoritative for all public trip facts. The artifacts may transform those facts into different formats; they do not need to contain identical JSON bytes.
 
 ## Relationship to the Mountain Guide
 
@@ -23,17 +23,17 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 4 adds the draft interactive Companion PWA and friend setup/install experience while preserving the canonical dataset, Field Guide, and Pocket Card. The static shell provides:
+Phase 5 hardens the draft interactive Companion PWA for zero-connectivity operation while preserving the canonical dataset, Field Guide, and Pocket Card. The static shell provides:
 
 1. Timeline — three canonical objectives, six planning values, actual-start/elapsed local state, five decision gates, and nine local-only milestones.
 2. Route — four canonical route comparisons and visibly withheld Lily Lake location values.
 3. Emergency — one-action access to CALL 911 FIRST, reporting prompts, and all six public numbers.
 4. Red — a persistent presentation control with no safety meaning.
-5. Friend setup — browser/iPhone install guidance, standalone detection, bounded setup status, public-link sharing, and an explicitly structural Offline Check.
+5. Friend setup — browser/iPhone install guidance, standalone detection, a hash-verified Offline Check, public-link sharing, repair, and a separately recorded physical Airplane Mode checklist.
 
 `scripts/build-pwa.mjs` deterministically generates immutable `js/companion-data.js` and draft `release.json` from `data/trip-manifest.json`. Hand-maintained runtime files contain no canonical trip literals. The shipped shell is plain HTML/CSS/ES modules with local assets and no runtime external dependency.
 
-All three artifacts remain drafts, not field releases. `service-worker.dev.js` deliberately performs no caching; Phase 5 still owns production precache, atomic updates, cold launch, mixed-version prevention, recovery, and physical Airplane Mode validation. Nothing is deployed or tagged.
+All three artifacts remain drafts, not field releases. `scripts/build-offline.mjs` generates an explicit resource manifest and production `service-worker.js` from actual bytes. Candidate caches are marker-last and SHA-256 verified; field-critical requests resolve only from one complete active release; the last complete release survives failed updates; ordinary repair preserves local state. Chromium proves offline cold launch and interrupted update behavior. Physical primary/backup/friend iPhone Airplane Mode, force-quit, and reboot validation remains open. Nothing is deployed or tagged.
 
 ## Zero-connectivity requirement
 
@@ -137,19 +137,24 @@ The build fails closed on manifest identity, exactly two 252 × 360-point pages,
 
 ## Companion PWA build and browser tests
 
-Install pinned development dependencies, build the generated runtime identity, then run the Phase 4 contracts:
+Install pinned development dependencies, build the generated runtime identity and offline bundle, then run the Phase 5 contracts:
 
 ```sh
 npm ci
 npm run build:pwa
+npm run build:offline
 npm run check:pwa
 npm run check:pwa:privacy
 npm run check:pwa:safety
 npm run check:artifact-parity
+npm run check:offline
+npm run check:service-worker
+npm run test:offline:logic
 npm run test:browser
+npm run test:offline
 ```
 
-Playwright covers Chromium and WebKit at desktop and 390×844 mobile. The matrix tests friend first-open/install behavior, standalone setup, structural Offline Check wording, Timeline/Route/Emergency navigation, Red persistence, actual-start separation, milestone/local/private state, public-only sharing, Lily Lake withholding, `tel:` links, horizontal overflow, critical touch targets, console errors, and WCAG 2.1 AA Axe checks. Temporary screenshots/traces remain ignored.
+Playwright covers normal Chromium and WebKit runtime behavior at desktop and 390×844 mobile. Chromium's offline matrix additionally tests online install, verified Offline Check, zero-request cold launch, persisted-profile close/reopen, Timeline/Route/Emergency, Red, both PDFs, update interruption, previous-to-new activation, corruption, repair, low-storage failure, and local-state survival. Playwright WebKit currently reports an internal engine error on service-worker-controlled offline navigation; that case is documented as infrastructure-limited while normal WebKit coverage remains active. Temporary screenshots/traces remain ignored.
 
 The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/trip-manifest.json`, including whitespace and the final newline. It is deliberately not embedded in the manifest. The aggregate runner computes it twice and requires the results to match.
 
@@ -166,9 +171,10 @@ The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/t
 - docs/repository-automation.md — protected branch, CI, auto-merge, synchronization, release-tagging, and future Pages policy.
 - docs/field-guide-design.md — Phase 2 page architecture, manifest-only fact flow, typography, print geometry, provenance, Lily Lake withholding, grayscale behavior, and release gates.
 - docs/pocket-card-design.md — Phase 3 side architecture, exact dimensions, emergency hierarchy, handwritten fields, provenance, grayscale/low-light behavior, and release gates.
-- docs/pwa-design.md — Phase 4 shell, generated data, friend install/setup, local state, sharing, Red Display, accessibility, and Phase 5 boundary.
+- docs/pwa-design.md — Phase 5 shell, generated data, friend install/setup, local state, sharing, Red Display, accessibility, and remaining physical boundary.
+- docs/offline-architecture.md — explicit bundle, atomic install, coherent fetches, retention, update/repair, storage behavior, automated evidence, and physical-device checklist.
 - docs/crew-distribution-contract.md — stable public URL, draft release metadata, QR/share privacy, and future Mountain Guide Crew integration.
 
 ## Repository status
 
-The public repository is `DonDowns/mountain-guide-companion`. Phases 0–3 and the Phase 4 draft PWA shell are on protected `main` after their respective automated workflows complete. Nothing is deployed. Routine repository development uses required GitHub Actions checks and conservative native auto-merge. Phase 5 offline hardening, field release, tagging, deployment, and physical signoff remain gated.
+The public repository is `DonDowns/mountain-guide-companion`. Phases 0–5 draft work is maintained through protected `main`, required GitHub Actions checks, and conservative native auto-merge. Nothing is deployed or tagged. Field release, custom-domain activation, physical signoff, and the scoped Lily Lake release hold remain gated.

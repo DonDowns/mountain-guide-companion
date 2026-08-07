@@ -75,15 +75,23 @@ function setupItem(label, detail, complete) {
   return element('li', { className: complete ? 'complete' : 'pending' }, [mark, copy]);
 }
 
+function formatBytes(value) {
+  if (!Number.isFinite(value)) return 'Not available';
+  if (value < 1024) return `${value} bytes`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(2)} MB`;
+}
+
 export function renderSetupPanel(target, options) {
+  const airplaneInstructionsOpen = Boolean(target.querySelector('.airplane-test')?.open);
   const {
-    standalone, ios, promptAvailable, offlineResult, state
+    standalone, ios, promptAvailable, offlineResult, storageInfo, workerState, state
   } = options;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'INSTALLED COMPANION' : 'INSTALL FOR OFFLINE USE' });
   const heading = element('h2', { text: standalone ? 'Companion installed on this phone' : 'Set up this phone before the trip' });
   const intro = element('p', {
     text: standalone
-      ? 'This standalone copy exposes its packaged trip identity. Phase 5 is still required before offline field reliance.'
+      ? 'This standalone copy can verify its complete local field bundle. The physical Airplane Mode test remains a separate release gate.'
       : 'Install the Companion, open it once while online, and preserve a separate physical backup.'
   });
   const children = [eyebrow, heading, intro];
@@ -111,24 +119,70 @@ export function renderSetupPanel(target, options) {
     setupItem('Trip data loaded', 'Canonical public trip data is present in the current shell.', true),
     setupItem('Emergency data loaded', `${companionData.contacts.length * 2} public contact numbers are present.`, companionData.contacts.length === 3),
     setupItem('Manifest verified', `Fingerprint ${companionData.identity.manifestShort}… matches runtime identity.`, companionData.identity.manifestSha256 === releaseMetadata.manifest_sha256),
-    setupItem('Offline resources check', 'Phase 5 cache and cold-launch verification is not implemented.', false),
-    setupItem('Airplane Mode physical test', 'Physical relaunch test required before field release.', false)
+    setupItem('Production service worker', workerState.controlled ? `Controls this page for ${releaseMetadata.bundle_id}.` : 'Not yet controlling this page.', workerState.controlled),
+    setupItem('Offline resources verified', offlineResult?.complete ? `${offlineResult.entryCount} required resources match the active bundle.` : 'Run Offline Check after installation.', offlineResult?.complete === true),
+    setupItem('Airplane Mode physical test', state.setup.airplaneModeTestCompletedAt ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Physical cold-launch test still required.', Boolean(state.setup.airplaneModeTestCompletedAt))
   ]);
   children.push(checklist);
 
-  if (offlineResult) {
+  if (offlineResult?.checking) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
-      element('strong', { text: offlineResult.present ? 'Local Companion resources present' : 'Local resource check incomplete' }),
-      element('p', { text: 'Full offline cold-launch verification not yet completed. Phase 5 implementation and an Airplane Mode physical test are required.' })
+      element('strong', { text: 'CHECKING OFFLINE RESOURCES' }),
+      element('p', { text: 'Verifying the active service worker, release identity, required resource count, and cached SHA-256 values.' })
     ]));
+  } else if (offlineResult) {
+    children.push(element('div', { className: 'offline-result', role: 'status' }, [
+      element('strong', { text: offlineResult.complete ? 'OFFLINE RESOURCES VERIFIED' : 'OFFLINE RESOURCES INCOMPLETE' }),
+      element('p', { text: offlineResult.complete
+        ? `Active bundle ${offlineResult.bundleId} contains ${offlineResult.entryCount} verified required resources.`
+        : offlineResult.error || 'The active local bundle did not verify.' }),
+      element('p', { text: 'This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.' }),
+      ...(!offlineResult.complete ? [element('p', { className: 'boundary-note', text: 'Reconnect to the internet and retry Companion update/install.' })] : [])
+    ]));
+  }
+
+  if (workerState.updateAvailable) {
+    children.push(element('div', { className: 'update-note', role: 'status' }, [
+      element('strong', { text: 'Update downloaded' }),
+      element('p', { text: 'Restart Companion to use the newer verified release. The installed release remains available until then.' }),
+      element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'activate-update' }, text: 'Restart to use update' })
+    ]));
+  }
+
+  const airplaneSteps = [
+    'Complete Offline Check while still connected.',
+    'Close the Companion completely.',
+    'Turn on Airplane Mode.',
+    'Confirm Wi-Fi is also off if necessary.',
+    'Reopen the installed Companion from the Home Screen.',
+    'Open Timeline.',
+    'Open Route.',
+    'Open Emergency.',
+    'Confirm the Field Guide opens.',
+    'Confirm the Pocket Card opens.',
+    'Return to the setup screen and record the test.'
+  ].map(text => element('li', { text }));
+  children.push(element('details', { className: 'airplane-test', open: airplaneInstructionsOpen || undefined }, [
+    element('summary', { text: 'Airplane Mode test instructions' }),
+    element('h3', { text: 'AIRPLANE MODE TEST' }),
+    element('ol', {}, airplaneSteps),
+    element('p', { className: 'boundary-note', text: 'Browser automation does not replace this physical-phone test.' })
+  ]));
+
+  if (storageInfo) {
+    children.push(element('p', { className: 'storage-note', text: `Browser storage estimate: ${formatBytes(storageInfo.usage)} used of ${formatBytes(storageInfo.quota)}. Persistence ${storageInfo.persisted ? 'is reported by this browser' : 'is not guaranteed by this browser'}.` }));
   }
 
   const actions = [];
   if (!standalone && promptAvailable) actions.push(element('button', { className: 'install-button', type: 'button', dataset: { action: 'install' }, text: 'Install Companion' }));
   actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Offline Check' }));
+  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'repair-offline' }, text: 'Repair Offline Copy' }));
+  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: state.setup.airplaneModeTestCompletedAt ? 'clear-airplane-test' : 'record-airplane-test' }, text: state.setup.airplaneModeTestCompletedAt ? 'Clear Airplane Mode Record' : 'Record Airplane Mode Test' }));
   actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
   children.push(element('div', { className: 'setup-actions' }, actions));
-  children.push(element('p', { className: 'boundary-note', text: state.setup.structuralCheckCompletedAt ? `Structural check last run on this device: ${formatActualStart(state.setup.structuralCheckCompletedAt)}` : 'No structural check recorded on this device.' }));
+  children.push(element('p', { className: 'boundary-note', text: state.setup.offlineVerifiedAt && state.setup.offlineVerifiedBundleId === releaseMetadata.bundle_id
+    ? `Offline bundle verification recorded on this device: ${formatActualStart(state.setup.offlineVerifiedAt)}.`
+    : 'No successful Offline Check is recorded for this bundle on this device.' }));
 
   clearAndAppend(target, element('section', { className: 'setup-panel', dataset: { mode: standalone ? 'installed' : 'browser' }, 'aria-labelledby': 'setup-heading' }, children));
   target.querySelector('h2').id = 'setup-heading';

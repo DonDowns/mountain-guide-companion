@@ -64,15 +64,19 @@ async function main() {
 
   const sourceFiles = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
     cwd: repoRoot, encoding: 'utf8'
-  }).split('\0').filter(path => path.endsWith('.js') && path !== 'js/companion-data.js');
+  }).split('\0').filter(path => path.endsWith('.js') && ![
+    'js/companion-data.js', 'service-worker.js', 'service-worker.template.js',
+    'tests/fixtures/offline-update/previous/service-worker.js',
+    'tests/fixtures/offline-update/previous/fixture-app.js'
+  ].includes(path));
   const sourceText = (await Promise.all(sourceFiles.map(path => readFile(resolve(repoRoot, path), 'utf8')))).join('\n');
   requireText(sourceText.toLowerCase(), 'install for offline use', 'PWA browser-install UI', errors);
   for (const prohibitedRuntime of ['fetch(', 'XMLHttpRequest', 'WebSocket(', 'EventSource(', 'sendBeacon(', 'https://fonts.', 'https://cdn.']) {
     if (sourceText.includes(prohibitedRuntime)) errors.push(`PWA runtime contains network dependency ${prohibitedRuntime}`);
   }
-  const sw = await readFile(resolve(repoRoot, 'service-worker.dev.js'), 'utf8');
-  for (const phaseFiveOnly of ['caches.open', "addEventListener('fetch'", 'respondWith(']) {
-    if (sw.includes(phaseFiveOnly)) errors.push(`Phase 4 service worker contains Phase 5 behavior ${phaseFiveOnly}`);
+  const sw = await readFile(resolve(repoRoot, 'service-worker.js'), 'utf8');
+  for (const requiredWorkerBehavior of ['caches.open', "addEventListener('fetch'", 'respondWith(', 'VERIFY_OFFLINE_BUNDLE']) {
+    if (!sw.includes(requiredWorkerBehavior)) errors.push(`Phase 5 service worker is missing ${requiredWorkerBehavior}`);
   }
 
   const templateText = [html, css, sourceText].join('\n');

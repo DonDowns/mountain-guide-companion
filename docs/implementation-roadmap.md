@@ -297,16 +297,22 @@ High: accessible field interaction, state clarity, private/local separation, and
 
 Prove that one complete compatible release survives zero connectivity, force quit, reboot, interrupted update, stale cache, storage pressure, and backup-device use.
 
+### Draft status
+
+Implemented technically in Phase 5: a generated explicit resource manifest, deterministic release/cache identity, marker-last hash-verified installation, active-cache-only field fetches, one-prior-release retention, verified Offline Check, neutral update activation, connected repair, state-schema migration, and adversarial Chromium browser/logic tests. Normal WebKit runtime tests remain active; Playwright WebKit's internal failure on service-worker-controlled offline navigation is documented as infrastructure evidence rather than a false pass. Nothing is deployed or tagged.
+
+Primary, backup, and friend iPhone force-quit/reboot/Airplane Mode testing, physical field-use evidence, and owner release approval remain Phase 6/release gates. The in-app physical-test mark is a user attestation and is never set by automation.
+
 ### Deliverables
 
-- Versioned/content-hashed asset strategy.
-- Service worker with atomic shell/data activation.
-- compatibility and release manifests.
-- old-release preservation and rollback behavior.
-- offline cold-launch and update-interruption tests.
-- neutral installed/staleness/update-state surfaces.
-- battery-conservation posture.
-- primary and backup phone provisioning procedure.
+- Generated versioned/content-hashed asset strategy and explicit offline bundle.
+- Production service worker with atomic shell/data/PDF installation and activation.
+- Compatibility, release, and completion-marker metadata.
+- Old-release preservation, bounded retention, and repair behavior.
+- Offline cold-launch, persisted-profile, update-interruption, corruption, and quota-failure tests.
+- Neutral installed/staleness/update-state surfaces and real bundle verification.
+- Storage-estimate/battery-conservation posture without a persistence guarantee.
+- Primary, backup, and friend phone provisioning procedure for the later physical gate.
 
 ### Dependencies
 
@@ -317,7 +323,7 @@ Prove that one complete compatible release survives zero connectivity, force qui
 
 ### Acceptance criteria
 
-- Contract D passes on both phones after force quit and reboot in Airplane Mode.
+- Automated Chromium cold-launch and persisted-profile simulations pass; Contract D still requires both physical phones after force quit and reboot in Airplane Mode.
 - DNS, live weather, GitHub, map tiles, remote fonts, CDNs, analytics, authentication, external APIs, fetch calls, and all other external data transfer are absent from field-critical paths.
 - Interrupted/corrupt update never replaces the last complete release.
 - No mixed shell/data activation.
@@ -325,7 +331,7 @@ Prove that one complete compatible release survives zero connectivity, force qui
 - provenance matches active bytes.
 - update failure never blocks core use or claims currency.
 - emergency remains immediately available with missing private/location data.
-- representative static-use battery observation passes.
+- representative static-use battery observation remains a physical release gate.
 
 ### Complexity
 

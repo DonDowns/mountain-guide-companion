@@ -73,7 +73,7 @@ Never committed, synchronized by default, or embedded in public artifacts:
 - private location history;
 - local acknowledgments or dismissed notices.
 
-Phase 4 permits a bounded optional local contact name, phone, alternate, and brief private note. These fields start empty, use the versioned device-local operational store, never enter canonical data or sharing, and can be cleared with confirmation. Medical information, cloud synchronization, export, and sophisticated private overlays remain deferred. Missing or unreadable local data displays Not available on this device. Sample or placeholder private data is never substituted.
+Phase 5 retains a bounded optional local contact name, phone, alternate, and brief private note. These fields start empty, use the versioned device-local operational store, never enter canonical data, sharing, release metadata, offline manifests, service-worker messages, or caches, and can be cleared with confirmation. Medical information, cloud synchronization, export, and sophisticated private overlays remain deferred. Missing or unreadable local data displays Not available on this device. Sample or placeholder private data is never substituted.
 
 ### C. Handwritten / print-time private data
 
@@ -123,7 +123,13 @@ The local path:
 - fails closed when corrupt or incompatible;
 - requires separate review before any export/backup feature.
 
-Phase 4 local-state schema version 1 fails closed to empty defaults on corrupt or incompatible input and includes migration hooks for future schemas. Share sends only the configured public Companion URL. Checked communication milestones mean only Marked locally, and locally composed status text remains explicitly unsent.
+Phase 5 local-state schema version 2 fails closed to empty defaults on corrupt or incompatible input. Migration from schema version 1 preserves allowlisted operational/private values but does not reinterpret the earlier structural check as a verified offline bundle. Offline verification is bound to the exact bundle ID, and the physical Airplane Mode mark is a local user attestation only. Share sends only the configured public Companion URL. Checked communication milestones mean only Marked locally, and locally composed status text remains explicitly unsent.
+
+### Service-worker/cache path
+
+Public generated application bytes → explicit offline resource manifest → hash-verified versioned cache → active-cache-only field responses.
+
+The service worker has no local-storage access path in the implementation, receives no private values, generates no private document, performs no telemetry, and never adds query strings or fragments to cached URLs. Cache repair and private-data deletion are separate operations. A failed or corrupt candidate cannot replace the prior complete release, and an incomplete local cache is reported as `OFFLINE RESOURCES INCOMPLETE`, never as a mountain-safety state.
 
 ### Private print path
 
@@ -408,7 +414,7 @@ Emergency content remains complete in both modes.
 
 ## Privacy verification requirements
 
-Future automated checks scan:
+Automated checks scan:
 
 - tracked files;
 - Git history before release;

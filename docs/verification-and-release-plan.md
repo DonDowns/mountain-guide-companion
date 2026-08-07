@@ -241,6 +241,12 @@ Browser automation cannot certify outdoor readability, glove operation, waterpro
 | Wrong device clock | Set incorrect time/date where feasible. | Device time is labeled; phase requires confirmation; provenance remains embedded. |
 | Location denied | Deny permission/offline. | Emergency reporting prompts work and no location is invented. |
 
+### Phase 5 automated evidence
+
+`npm run build:offline`, `npm run check:offline`, `npm run check:service-worker`, `npm run test:offline:logic`, and `npm run test:offline` now protect the explicit bundle, marker-last install, exact resource hashes, coherent active release, previous-release survival, interrupted/corrupt/quota failures, repair, local-state preservation, both PDFs, Emergency, Red Display, and zero field-critical requests. Chromium runs the service-worker-controlled cold-launch path at desktop and 390×844 and reopens a persisted browser profile offline.
+
+Playwright WebKit continues to run the normal shell/runtime/accessibility matrix. Its service-worker-controlled offline navigation currently reports an internal engine error on both configured viewports, so that case is documented as infrastructure-limited and is not counted as a pass. Physical Safari/iPhone evidence remains mandatory.
+
 ## Service-worker upgrade tests
 
 The release shell, canonical dataset, and critical assets form one atomic compatibility unit.
@@ -283,7 +289,7 @@ For each canonical fact:
 
 An artifact matrix and generated traceability report are release evidence.
 
-Phase 4 implements `npm run check:artifact-parity` across the generated PWA release/runtime identity, Field Guide artifact record, and Pocket Card artifact record. It compares data version, source release, source commit, and the exact canonical manifest SHA-256.
+Phase 5 retains `npm run check:artifact-parity` across the generated PWA release/runtime identity, Field Guide artifact record, and Pocket Card artifact record. It compares data version, source release, source commit, and the exact canonical manifest SHA-256. The offline integrity contract additionally verifies that those exact artifacts and identities belong to one bundle.
 
 ## Privacy tests
 
@@ -301,7 +307,7 @@ Phase 4 implements `npm run check:artifact-parity` across the generated PWA rele
 - confirm the initial private-print procedure is handwriting/outside-repository only and excluded from release artifacts;
 - reject automated/encrypted private-print handling and sophisticated personal-data overlays until separately approved after the trip.
 
-Phase 4 additionally scans the HTML, CSS, browser modules, web manifest, generated release metadata, configuration, development service worker, and structural browser fixtures for non-allowlisted contact values. Browser tests prove private fields remain device-local, clear only after confirmation, and never enter the shared URL.
+Phase 5 additionally scans the HTML, CSS, browser modules, web manifest, generated release/offline metadata, configuration, production worker/template, and browser fixtures for non-allowlisted contact values. It rejects private fields, local-state APIs, telemetry, and query/fragment state in service-worker/public cache paths. Browser tests prove private fields remain device-local through cache repair and worker update, clear only after confirmation, and never enter the shared URL.
 
 ## Safety-language tests
 
@@ -321,7 +327,7 @@ Manual adversarial review asks:
 
 Any yes/ambiguous answer blocks release.
 
-Phase 4 statically scans the PWA-facing source and generated metadata and exercises rendered browser content. Required principles and emergency hierarchy must appear; affirmative authorization, safety, rescue, delivery, and field-ready offline claims fail validation.
+Phase 5 statically scans the PWA-facing source and generated metadata and exercises rendered browser content. Required principles and emergency hierarchy must appear; affirmative authorization, safety, rescue, delivery, and mountain-readiness claims fail validation. `OFFLINE RESOURCES VERIFIED` is permitted only with the exact local-resource safety boundary.
 
 ## Print validation
 
@@ -358,12 +364,14 @@ The Phase 3 Pocket Card implements `npm run build:pocket-card`, `npm run check:p
 
 ## Physical iPhone validation checklist
 
-Run on both the primary and backup iPhone:
+Run on the primary iPhone, backup iPhone, and at least one friend/second-person iPhone if available:
 
 - exact model, iOS version, browser/PWA engine, storage state, and battery health recorded;
 - install from approved release;
 - launch online once;
+- complete Offline Check while connected;
 - Airplane Mode;
+- confirm Wi-Fi is off;
 - force quit;
 - offline cold launch;
 - device reboot then offline cold launch;
@@ -381,6 +389,7 @@ Run on both the primary and backup iPhone:
 - location permission denied;
 - wrong device time;
 - interrupted update;
+- open and verify the Field Guide and Pocket Card PDFs offline;
 - emergency screen from each location/state;
 - private data absent/present/cleared/corrupt;
 - actual communication path test with explicit draft/handoff/delivery distinctions;

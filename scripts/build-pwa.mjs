@@ -21,6 +21,10 @@ function publicUrl(base, path) {
   return new URL(path, base).href;
 }
 
+function releaseSlug(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 function distanceScopeLabel(scope) {
   if (scope !== 'round_trip') throw new Error(`PWA build requires a reviewed display label for distance scope ${scope}`);
   return 'round trip';
@@ -76,6 +80,7 @@ async function main() {
     }))
   }));
   const objectiveById = new Map(objectives.map(objective => [objective.id, objective]));
+  const bundleId = `${config.cache_namespace}-${releaseSlug(config.companion_version)}-data-${manifestSha256.slice(0, 12)}-b${config.offline_bundle_version}`;
 
   const data = {
     identity: {
@@ -88,6 +93,8 @@ async function main() {
       verifiedAt: manifest.metadata.verified_at,
       manifestSha256,
       manifestShort: manifestSha256.slice(0, 12),
+      bundleId,
+      offlineBundleVersion: config.offline_bundle_version,
       publicBaseUrl: config.public_base_url
     },
     trip: {
@@ -167,6 +174,9 @@ async function main() {
     generated_at: config.generated_at,
     verified_at: manifest.metadata.verified_at,
     release_status: config.release_status,
+    bundle_id: bundleId,
+    offline_bundle_version: config.offline_bundle_version,
+    offline_bundle_url: publicUrl(config.public_base_url, 'offline-bundle.json'),
     pwa_url: config.public_base_url,
     field_guide_url: publicUrl(config.public_base_url, config.field_guide_path),
     pocket_card_url: publicUrl(config.public_base_url, config.pocket_card_path)

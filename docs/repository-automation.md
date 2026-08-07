@@ -13,7 +13,7 @@ After the Phase 1B bootstrap, routine development is repository-local and hands-
 7. GitHub requires both `Validate repository` and `Auto-merge eligibility` on an up-to-date branch.
 8. Run `npm run main:sync -- --pr <number-or-url>` to wait, classify failures, fast-forward local `main`, and revalidate it.
 
-The helper-generated PR body includes purpose, changed files, validation, manifest hash, privacy and safety results, release holds, runtime scope, and physical-test disposition.
+The helper-generated PR body includes purpose, changed files, validation, manifest hash, offline bundle identity/size/checksum, browser/offline results, privacy and safety results, release holds, runtime scope, and physical-test disposition. Phase 5 adds the generated offline build, integrity/worker/transaction contracts, and adversarial browser matrix to both PR opening and post-merge main synchronization.
 
 ## Merge policy and protected holds
 

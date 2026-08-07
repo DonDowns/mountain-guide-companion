@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The future Crew tab in the separate Mountain Guide will distribute, not reimplement, the Companion. The Mountain Guide repository remains untouched in Phase 4. Integration begins only after the Companion has a reviewed public URL and Phase 5 has proven offline behavior.
+The future Crew tab in the separate Mountain Guide will distribute, not reimplement, the Companion. The Mountain Guide repository remains untouched in Phase 5. Integration begins only after the Companion has a reviewed public URL, technical offline evidence, physical-device approval, and a separately approved deployment.
 
 ## Single public URL configuration
 
@@ -48,11 +48,16 @@ Those actions consume the public URL and `release.json`; they must not import Co
 - `generated_at`;
 - `verified_at`;
 - `release_status`;
+- `bundle_id`;
+- `offline_bundle_version`;
+- `offline_bundle_content_sha256`;
+- `offline_bundle_entry_count`;
+- `offline_bundle_url`;
 - `pwa_url`;
 - `field_guide_url`;
 - `pocket_card_url`.
 
-Phase 4 sets `release_status` to `draft`. A future Crew tab must reject missing, incompatible, non-approved, or mixed metadata and must not translate draft into field-ready wording.
+Phase 5 retains `release_status` as `draft`. A future Crew tab must reject missing, incompatible, non-approved, or mixed metadata and must not translate draft into field-ready wording. Bundle metadata identifies a complete cache unit; it is not a mountain-safety or deployment state.
 
 ## Share and privacy contract
 
@@ -62,7 +67,7 @@ PDF links point to the same public-base architecture. They remain draft links un
 
 ## Offline truth boundary
 
-Phase 4 can state only that current local resources are present. The future Crew tab must not display offline-verified, ready, or equivalent completion based on Phase 4 metadata. Phase 5 must add cache-version evidence, cold-launch checks, mixed-version detection, recovery, and physical Airplane Mode results before the Mountain Guide offers an offline-complete workflow.
+The Companion may display `OFFLINE RESOURCES VERIFIED` only after its controlling worker verifies the exact local bundle. A future Crew tab must not infer that state from remote `release.json`, and must not convert it to ready, safe, all clear, or equivalent wording. The physical Airplane Mode mark is a local user attestation on one phone and is not contained in public release metadata.
 
 ## Ownership boundary
 

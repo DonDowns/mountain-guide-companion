@@ -1,10 +1,10 @@
 (function bootstrapDisplayState() {
   const storageKey = 'mgc-companion-local-state';
-  const schemaVersion = 1;
+  const schemaVersion = 2;
   let initialRed = false;
   try {
     const stored = JSON.parse(localStorage.getItem(storageKey) || 'null');
-    initialRed = stored?.schemaVersion === schemaVersion && stored.redDisplay === true;
+    initialRed = [1, schemaVersion].includes(stored?.schemaVersion) && stored.redDisplay === true;
   } catch {
     initialRed = false;
   }

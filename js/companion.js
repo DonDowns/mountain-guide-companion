@@ -1,7 +1,7 @@
 import { clearPrivateFields, createCompanionStore } from './companion-state.js';
 import {
-  installPromptAvailable, isIosBrowser, isStandalone, registerDevelopmentServiceWorker,
-  requestInstall, sharePublicCompanion, watchInstallPrompt
+  activateWaitingUpdate, installPromptAvailable, isIosBrowser, isStandalone, registerProductionServiceWorker,
+  repairOfflineCopy, requestInstall, sharePublicCompanion, storageEstimate, verifyOfflineResources, watchInstallPrompt
 } from './companion-install.js';
 import {
   companionData, navigateTo, releaseMetadata, renderArtifacts, renderEmergency,
@@ -10,7 +10,9 @@ import {
 
 const store = createCompanionStore(companionData.objectives[0].id);
 let editObjectiveId = '';
-let offlineResult = null;
+let offlineResult = { checking: true, complete: false };
+let storageInfo = null;
+let workerState = { supported: 'serviceWorker' in navigator, controlled: Boolean(navigator.serviceWorker?.controller), updateAvailable: false };
 
 function setupOptions(state = store.getState()) {
   return {
@@ -18,6 +20,8 @@ function setupOptions(state = store.getState()) {
     ios: isIosBrowser(),
     promptAvailable: installPromptAvailable(),
     offlineResult,
+    storageInfo,
+    workerState,
     state
   };
 }
@@ -28,19 +32,41 @@ function renderState(state = store.getState()) {
   renderSetupPanel(document.querySelector('#install-panel'), setupOptions(state));
 }
 
-function structuralOfflineCheck() {
-  const checks = [
-    companionData.identity.manifestSha256 === releaseMetadata.manifest_sha256,
-    companionData.objectives.length === 3,
-    companionData.routes.length === 4,
-    companionData.contacts.length === 3,
+async function runOfflineCheck({ record = true } = {}) {
+  offlineResult = { checking: true, complete: false };
+  renderState();
+  const workerResult = await verifyOfflineResources();
+  const runtimeChecks = [
+    workerResult.complete === true,
+    workerResult.bundleId === releaseMetadata.bundle_id,
+    workerResult.identity?.manifestSha256 === companionData.identity.manifestSha256,
+    workerResult.identity?.dataVersion === companionData.identity.dataVersion,
+    workerResult.identity?.sourceRelease === companionData.identity.sourceRelease,
+    workerResult.identity?.sourceCommit === companionData.identity.sourceCommit,
+    Number.isInteger(workerResult.entryCount) && workerResult.entryCount > 0,
+    workerResult.emergencyPhoneCount === 6,
+    workerResult.pdfsPresent === true,
     companionData.contacts.flatMap(contact => contact.phones).length === 6,
-    companionData.communication.milestones.length === 9,
     document.querySelector('#timeline-view')?.textContent.length > 100,
     document.querySelector('#route-view')?.textContent.length > 100,
     document.querySelector('#emergency-view')?.textContent.includes('CALL 911 FIRST')
   ];
-  return checks.every(Boolean);
+  offlineResult = {
+    ...workerResult,
+    complete: runtimeChecks.every(Boolean),
+    error: runtimeChecks.every(Boolean) ? '' : workerResult.error || 'Active release identity or required field resources did not verify.'
+  };
+  if (record) {
+    store.update(state => {
+      state.setup.offlineVerifiedAt = offlineResult.complete ? new Date().toISOString() : '';
+      state.setup.offlineVerifiedBundleId = offlineResult.complete ? releaseMetadata.bundle_id : '';
+    });
+  } else {
+    renderState();
+  }
+  storageInfo = await storageEstimate();
+  renderState();
+  return offlineResult;
 }
 
 function recordActualStart(objectiveId, date = new Date()) {
@@ -78,9 +104,31 @@ async function handleAction(action, button) {
     showToast(result.outcome === 'accepted' ? 'Install accepted. Open the installed Companion once while online.' : 'Install was not completed.');
   }
   if (action === 'offline-check') {
-    offlineResult = { present: structuralOfflineCheck() };
-    store.update(state => { state.setup.structuralCheckCompletedAt = new Date().toISOString(); });
+    await runOfflineCheck();
+  }
+  if (action === 'repair-offline') {
+    offlineResult = { checking: true, complete: false };
     renderState();
+    if (!navigator.onLine) {
+      offlineResult = { complete: false, error: 'Reconnect to the internet and retry Companion update/install.' };
+      renderState();
+      return;
+    }
+    const result = await repairOfflineCopy();
+    offlineResult = result;
+    await runOfflineCheck();
+  }
+  if (action === 'record-airplane-test') {
+    if (!globalThis.confirm('Record that you personally completed every Airplane Mode test step on this phone? This records your statement only and does not verify mountain conditions, access, weather, or route safety.')) return;
+    store.update(state => { state.setup.airplaneModeTestCompletedAt = new Date().toISOString(); });
+  }
+  if (action === 'clear-airplane-test') {
+    if (!globalThis.confirm('Clear the recorded Airplane Mode test from this phone?')) return;
+    store.update(state => { state.setup.airplaneModeTestCompletedAt = ''; });
+  }
+  if (action === 'activate-update') {
+    navigator.serviceWorker?.addEventListener('controllerchange', () => location.reload(), { once: true });
+    await activateWaitingUpdate();
   }
   if (action === 'start-objective') {
     recordActualStart(button.dataset.objectiveId);
@@ -168,7 +216,17 @@ renderEmergency();
 renderState();
 bindEvents();
 watchInstallPrompt(() => renderState());
-registerDevelopmentServiceWorker();
 store.subscribe(renderState);
+
+registerProductionServiceWorker(state => {
+  workerState = state;
+  renderState();
+}).then(async registration => {
+  if (registration) await runOfflineCheck({ record: false });
+  else {
+    offlineResult = { complete: false, error: 'Production service worker is unavailable.' };
+    renderState();
+  }
+});
 
 globalThis.setInterval(() => refreshElapsed(store.getState()), 30000);

@@ -24,7 +24,7 @@ async function main() {
     companionData.invariants.jurisdiction,
     'Planning targets remain planning values.',
     'Opening a phone intent does not prove that a call occurred.',
-    'Full offline cold-launch verification not yet completed.'
+    'This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.'
   ]) {
     if (!runtime.includes(required.toLowerCase())) errors.push(`PWA runtime is missing safety boundary ${JSON.stringify(required)}`);
   }
