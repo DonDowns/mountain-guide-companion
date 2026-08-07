@@ -1,0 +1,26 @@
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.log
+coverage/
+dist/
+build/
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Device-local or print-time private material must never enter Git.
+private/
+local-data/
+print-private/
+*.private.*
+*.local.*
+
+# Local/private overlays remain untracked when implementation begins.
+data/private/
+data/local/
+public/private/
+src/private/
