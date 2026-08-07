@@ -51,6 +51,12 @@ jobs:
       - name: Parse JSON, check JavaScript syntax, and enforce phase scope
         run: npm run check:repository
 
+      - name: Validate repository automation policy
+        run: npm run check:policy -- --repository-only
+
+      - name: Test automation policy fail-closed behavior
+        run: npm run test:automation
+
       - name: Run aggregate data contracts
         env:
           MOUNTAIN_GUIDE_REPO: ${{ github.workspace }}/.upstream/mountain-guide
