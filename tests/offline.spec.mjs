@@ -60,8 +60,8 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await expect(offlinePage.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 
-  await context.setOffline(false);
   expect(await serverRequests(request)).toEqual([]);
+  await context.setOffline(false);
 });
 
 test('keeps the previous complete release active when a new required JavaScript resource fails', async ({ page, context, request }, testInfo) => {
