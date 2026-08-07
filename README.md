@@ -19,23 +19,20 @@ The existing Don Downs Mountain Guide remains a separate, frozen upstream produc
 - Source commit: fb711292b2642c2296eb76c0cfe2531606029609
 - Live site: https://mountainguide.vondadowns.com/
 
-The future Companion dataset will be a public-safe, trip-specific derivative of that pinned source release plus explicitly verified supplemental source records. It will not silently replace the Mountain Guide as the authority for broader planning content.
+The Companion dataset is a public-safe, trip-specific derivative of that pinned source release plus any later, explicitly verified supplemental source records. It does not silently replace the Mountain Guide as the authority for broader planning content.
 
 ## Current phase
 
-Phase 0 is design only. Its architecture is approved with the closeout clarifications integrated into this baseline. This repository contains product definition, architecture, governance, privacy, safety, verification, and implementation-planning documentation.
+Phase 0 architecture is approved and preserved on `main` at commit `ec69e9dd8083411f94e5367a00b4c4e25d768601`. The Phase 1 canonical dataset and controlled Phase 1A external-verification pass are owner-approved on `feature/canonical-trip-data-v1`. Phase 2 has not started.
 
-Phase 0 deliberately contains no:
+The Phase 1 dataset adds only:
 
-- HTML, CSS, or JavaScript;
-- PWA manifest or service worker;
-- application source tree;
-- PDF or print artifact;
-- canonical trip-manifest JSON;
-- production trip data;
-- private personal information.
+- the canonical public trip manifest and its JSON Schema;
+- dependency-free data, provenance, privacy, and safety validators;
+- a source ledger, external-verification evidence, and data-verification report; and
+- repository guidance for the data-only phase.
 
-Phase 1 has not begun. Implementation requires a new, explicitly authorized phase.
+It adds no HTML, CSS, browser JavaScript, PWA manifest, service worker, PDF, image, print artifact, or runtime feature. No fact is approved for field release merely because it passes source-consistency checks. The Lily Lake operational trailhead point remains `pending_external_verification`, but it does not block Phase 2 or Phase 3 drafting. An artifact may omit the unresolved coordinate/elevation; any artifact that requires it remains blocked from final field release until authoritative verification.
 
 ## Zero-connectivity requirement
 
@@ -53,7 +50,7 @@ The physical Field Guide and Emergency Pocket Card are independent fallbacks for
 
 ## Canonical identity and artifact parity
 
-One canonical public manifest is the authority for public trip facts. No hand-copied fact in the Field Guide, Pocket Card, or PWA may become an independent source of truth. Every released artifact must expose or internally record the same:
+One canonical public manifest is the authority for public trip facts. No hand-copied fact in the Field Guide, Pocket Card, or PWA may become an independent source of truth. Every future released artifact must expose or internally record the same:
 
 - `data_version`;
 - `source_release`;
@@ -90,14 +87,28 @@ The first planned Companion is scoped to the Lake Como / Blanca / Ellingwood / M
 - Planned start: 4:15 AM, an explicit planning fact that is never silently recalculated
 - Turnaround / exit target: 11:30 AM, a user-defined planning target that is never silently recalculated
 
-These are design inputs supplied by the owner. Phase 0 introduces no additional route, waypoint, jurisdiction, contact, or weather facts.
+Phase 1 records the source-supported trip facts, qualifications, and unresolved verification states in `data/trip-manifest.json`. It does not add unsourced route, waypoint, jurisdiction, contact, or weather facts.
 
-Any future `actual_start`, elapsed time, or current-phase selection is operational, device-local state rather than a canonical planning fact. Reload or reboot must not overwrite the planned values, and uncertainty in the device clock must be visible rather than hidden. Phase 0 implements no time logic.
+Any future `actual_start`, elapsed time, or current-phase selection is operational, device-local state rather than a canonical planning fact. Reload or reboot must not overwrite the planned values, and uncertainty in the device clock must be visible rather than hidden. Phase 1 implements no runtime time logic.
 
 ## Verification and release conventions
 
 - The minimum automated mobile reference viewport is 390 × 844, inherited from successful Mountain Guide testing. It does not replace testing on the actual primary and backup iPhones, which must be identified and physically tested before field release.
 - Companion releases use ordinary annotated Git tags. Cryptographic tag signing is out of scope unless deliberately approved later.
+
+## Canonical-data validation
+
+The Phase 1 checks use the local Node.js runtime and have no package dependencies:
+
+```sh
+npm run check:data
+npm run check:manifest
+npm run check:provenance
+npm run check:privacy
+npm run check:safety
+```
+
+The canonical manifest hash is lowercase SHA-256 over the exact bytes of `data/trip-manifest.json`, including whitespace and the final newline. It is deliberately not embedded in the manifest. The aggregate runner computes it twice and requires the results to match.
 
 ## Architecture documents
 
@@ -107,7 +118,9 @@ Any future `actual_start`, elapsed time, or current-phase selection is operation
 - docs/privacy-and-safety-model.md — public/private separation, emergency integrity, prohibited claims, and route/weather uncertainty.
 - docs/verification-and-release-plan.md — automated contracts, offline and upgrade testing, physical validation, release, and rollback.
 - docs/implementation-roadmap.md — phased implementation from schema through physical field validation and release.
+- docs/source-ledger.md — fact-group provenance, source locators, verification status, and qualifications.
+- docs/data-verification-report.md — Phase 1 inventory, verification results, exclusions, and owner-review questions.
 
 ## Repository status
 
-This is a local repository with no remote. The first commit on `main` establishes the approved Phase 0 documentation baseline only. Nothing is pushed, published, deployed, or advanced into Phase 1 by this closeout.
+This is a local repository with no remote. The first commit on `main` is the approved Phase 0 baseline. The Phase 1 canonical dataset is owner-approved on `feature/canonical-trip-data-v1`; Phase 2 has not started, and nothing has been pushed, published, or deployed.

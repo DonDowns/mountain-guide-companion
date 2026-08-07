@@ -1,0 +1,13 @@
+{
+  "name": "mountain-guide-companion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:data": "node scripts/run-data-checks.mjs",
+    "check:manifest": "node scripts/validate-manifest.mjs",
+    "check:provenance": "node scripts/check-manifest-provenance.mjs",
+    "check:privacy": "node scripts/check-manifest-privacy.mjs",
+    "check:safety": "node scripts/check-manifest-safety.mjs"
+  }
+}

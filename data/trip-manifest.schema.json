@@ -1,0 +1,1022 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/mountain-guide-companion/trip-manifest.schema.json",
+  "title": "Mountain Guide Companion canonical trip manifest",
+  "description": "Public-safe canonical data contract. Cross-record invariants are enforced by scripts/validate-manifest.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "data_version",
+    "metadata",
+    "safety_invariants",
+    "trip",
+    "objectives",
+    "planning_times",
+    "camp",
+    "transportation",
+    "waypoints",
+    "route_segments",
+    "decision_points",
+    "public_emergency_contacts",
+    "communications",
+    "weather_reference_locations",
+    "source_records",
+    "external_sources"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./trip-manifest.schema.json"
+    },
+    "schema_version": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "data_version": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "safety_invariants": {
+      "$ref": "#/$defs/safetyInvariants"
+    },
+    "trip": {
+      "$ref": "#/$defs/trip"
+    },
+    "objectives": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/objective"
+      }
+    },
+    "planning_times": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/planningTime"
+      }
+    },
+    "camp": {
+      "$ref": "#/$defs/camp"
+    },
+    "transportation": {
+      "$ref": "#/$defs/transportation"
+    },
+    "waypoints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/waypoint"
+      }
+    },
+    "route_segments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/routeSegment"
+      }
+    },
+    "decision_points": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/decisionPoint"
+      }
+    },
+    "public_emergency_contacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/emergencyContact"
+      }
+    },
+    "communications": {
+      "$ref": "#/$defs/communications"
+    },
+    "weather_reference_locations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/weatherLocation"
+      }
+    },
+    "source_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sourceRecord"
+      }
+    },
+    "external_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/externalSource"
+      }
+    }
+  },
+  "$defs": {
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": [
+        "extracted_from_upstream",
+        "verified_against_upstream",
+        "externally_verified",
+        "pending_external_verification",
+        "conflicted",
+        "unknown"
+      ]
+    },
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_timezone",
+        "source_project",
+        "source_repository",
+        "source_release",
+        "source_commit",
+        "generated_at",
+        "verified_at",
+        "verification_scope",
+        "manifest_purpose",
+        "external_verification_hold",
+        "manifest_hash_rule",
+        "source_record_ids"
+      ],
+      "properties": {
+        "canonical_timezone": {
+          "const": "America/Denver"
+        },
+        "source_project": {
+          "const": "Don Downs Mountain Guide"
+        },
+        "source_repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_release": {
+          "const": "v15.3.10"
+        },
+        "source_commit": {
+          "const": "fb711292b2642c2296eb76c0cfe2531606029609"
+        },
+        "generated_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "verified_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "verification_scope": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "manifest_purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "external_verification_hold": {
+          "description": "A scoped final-release hold remains for any artifact that requires the unresolved authoritative Lily Lake Trailhead coordinate/elevation. The hold does not block Phase 2 or Phase 3 drafting when the unresolved value is omitted or visibly withheld.",
+          "const": true
+        },
+        "manifest_hash_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "safetyInvariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weather",
+        "emergency",
+        "jurisdiction",
+        "planning",
+        "conditions"
+      ],
+      "properties": {
+        "weather": {
+          "const": "Weather is evidence, not permission."
+        },
+        "emergency": {
+          "const": "Call 911 first."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "pattern": "^Dispatch determines"
+        },
+        "planning": {
+          "type": "string",
+          "pattern": "planning target is not automatic route authorization"
+        },
+        "conditions": {
+          "const": "Actual conditions govern the decision."
+        }
+      }
+    },
+    "trip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "area",
+        "start_date",
+        "end_date",
+        "primary_climb_date",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "area": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_date": {
+          "$ref": "#/$defs/date"
+        },
+        "end_date": {
+          "$ref": "#/$defs/date"
+        },
+        "primary_climb_date": {
+          "$ref": "#/$defs/date"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "role",
+        "objective_type",
+        "planned_date",
+        "component_waypoint_ids",
+        "route_segment_ids",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": [
+            "primary",
+            "separate_planned",
+            "approach"
+          ]
+        },
+        "objective_type": {
+          "enum": [
+            "route_combination",
+            "summit",
+            "camp_approach"
+          ]
+        },
+        "planned_date": {
+          "$ref": "#/$defs/date"
+        },
+        "component_waypoint_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "route_segment_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "planningTime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "objective_id",
+        "kind",
+        "local_time",
+        "timezone",
+        "label",
+        "semantics",
+        "user_defined",
+        "automatic_calculation",
+        "authorization_effect",
+        "safety_note",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "objective_id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "planned_start",
+            "turnaround_or_exit_target"
+          ]
+        },
+        "local_time": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "timezone": {
+          "const": "America/Denver"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semantics": {
+          "enum": [
+            "planned_start",
+            "user_defined_planning_target"
+          ]
+        },
+        "user_defined": {
+          "const": true
+        },
+        "automatic_calculation": {
+          "const": false
+        },
+        "authorization_effect": {
+          "const": "none"
+        },
+        "safety_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "camp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "waypoint_id",
+        "location_precision",
+        "notes",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "waypoint_id": {
+          "$ref": "#/$defs/id"
+        },
+        "location_precision": {
+          "enum": [
+            "area_reference_not_exact_campsite",
+            "exact"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "transportation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "usage",
+        "private_identifiers_included",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "private_identifiers_included": {
+          "const": false
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "waypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "latitude",
+        "longitude",
+        "elevation_ft",
+        "route_context",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "access_start",
+            "trailhead",
+            "camp_area",
+            "summit",
+            "junction",
+            "landmark"
+          ]
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -180,
+          "maximum": 180
+        },
+        "elevation_ft": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": -1500,
+          "maximum": 30000
+        },
+        "route_context": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "routeSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "objective_id",
+        "upstream_route_id",
+        "route_name",
+        "path_waypoint_ids",
+        "distance_scope",
+        "distance_miles",
+        "elevation_gain_ft",
+        "difficulty",
+        "exposure",
+        "route_notes",
+        "return_considerations",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "objective_id": {
+          "$ref": "#/$defs/id"
+        },
+        "upstream_route_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "route_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path_waypoint_ids": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "distance_scope": {
+          "enum": [
+            "round_trip",
+            "published_profile_scope_unspecified"
+          ]
+        },
+        "distance_miles": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "elevation_gain_ft": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "difficulty": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exposure": {
+          "enum": [
+            "Low",
+            "Moderate",
+            "Considerable",
+            "High",
+            "Extreme"
+          ]
+        },
+        "route_notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "return_considerations": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "decisionPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "objective_ids",
+        "dimension",
+        "prompt",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "objective_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "dimension": {
+          "enum": [
+            "weather_evidence",
+            "pace_group_weather",
+            "route_exposure",
+            "turnaround_descent",
+            "access"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "phone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "label",
+        "e164"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "dispatch",
+            "office"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "e164": {
+          "type": "string",
+          "pattern": "^\\+1[2-9][0-9]{9}$"
+        }
+      }
+    },
+    "emergencyContact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "agency",
+        "role",
+        "phone_numbers",
+        "geographic_context",
+        "activation_notes",
+        "verification_status",
+        "upstream_consistency_status",
+        "upstream_claimed_verification_date",
+        "last_externally_verified",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "agency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phone_numbers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phone"
+          }
+        },
+        "geographic_context": {
+          "type": "string",
+          "minLength": 1
+        },
+        "activation_notes": {
+          "type": "string",
+          "pattern": "^Call 911 first"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "upstream_consistency_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "upstream_claimed_verification_date": {
+          "$ref": "#/$defs/date"
+        },
+        "last_externally_verified": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "communications": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "check_in_protocol",
+        "emergency_sequence",
+        "draft_behavior",
+        "recipient_handling",
+        "recipient_value_included",
+        "delivery_confirmation_required",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "check_in_protocol": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "emergency_sequence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "draft_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient_handling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient_value_included": {
+          "const": false
+        },
+        "delivery_confirmation_required": {
+          "const": true
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "weatherLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "latitude",
+        "longitude",
+        "elevation_ft",
+        "forecast_context",
+        "verification_status",
+        "source_record_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "elevation_ft": {
+          "type": "integer",
+          "minimum": -1500,
+          "maximum": 30000
+        },
+        "forecast_context": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "source_record_ids": {
+          "$ref": "#/$defs/sourceRefs"
+        }
+      }
+    },
+    "sourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_project",
+        "source_repository",
+        "source_release",
+        "source_commit",
+        "source_path",
+        "semantic_locator",
+        "line_range_optional",
+        "locator_probe",
+        "fact_category",
+        "verification_status",
+        "verified_at",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_project": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_release": {
+          "const": "v15.3.10"
+        },
+        "source_commit": {
+          "const": "fb711292b2642c2296eb76c0cfe2531606029609"
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*\\.\\.)[A-Za-z0-9._/-]+$"
+        },
+        "semantic_locator": {
+          "type": "string",
+          "minLength": 3
+        },
+        "line_range_optional": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locator_probe": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fact_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verificationStatus"
+        },
+        "verified_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "externalSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "authority",
+        "title",
+        "url",
+        "source_tier",
+        "published_or_updated_at",
+        "retrieved_at",
+        "fact_verified",
+        "canonical_record_ids",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "published_or_updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$"
+        },
+        "retrieved_at": {
+          "$ref": "#/$defs/date"
+        },
+        "fact_verified": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_record_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

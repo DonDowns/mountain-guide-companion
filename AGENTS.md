@@ -11,6 +11,15 @@ Build and maintain a separate, trip-scoped, zero-connectivity field companion to
 3. Do not create a remote, push, publish, deploy, or open a pull request without explicit owner instruction.
 4. During Phase 0, create documentation and repository-governance files only. Do not create runtime code, manifests, service workers, PDFs, or production data.
 
+## Phase 1 data-only rules
+
+1. Limit Phase 1 to canonical public data, JSON Schema, dependency-free data-validation scripts, provenance records, and verification documentation.
+2. Inspect the pinned historical Mountain Guide tag through read-only Git object commands. Do not checkout the tag, modify the upstream worktree, or source facts from current `main`.
+3. Do not perform external web verification unless the owner separately authorizes that pass. Source consistency and current real-world verification are distinct states.
+4. Do not create HTML, CSS, browser JavaScript, a PWA manifest, a service worker, PDFs, images, print artifacts, generated field artifacts, or runtime features during this phase.
+5. Do not add external package dependencies without explicit approval.
+6. A `pending_external_verification` record blocks final release only when the released artifact requires that unresolved fact. It does not by itself block drafting an artifact that omits or visibly withholds the value. Material conflicts and unresolved required facts still block release.
+
 ## Branch and release governance
 
 1. Once implementation begins, main is production/release-ready only.
@@ -23,7 +32,7 @@ Build and maintain a separate, trip-scoped, zero-connectivity field companion to
 ## Fact and provenance rules
 
 1. Never fabricate route facts, waypoints, contacts, jurisdictions, weather locations, descent options, or alternatives.
-2. Every public fact must derive from the future canonical public manifest and have a traceable source record.
+2. Every public fact must derive from the canonical public manifest and have a traceable source record.
 3. One canonical public manifest is authoritative. Generated artifacts may use different representations, but no hand-copied public fact may become an independent authority.
 4. Every released artifact must expose or internally record the same `data_version`, `source_release`, `source_commit`, canonical manifest SHA-256, and `verified_at`; automated parity tests must prove the hash identity.
 5. Treat upstream facts as pinned to the stated Mountain Guide release; do not silently import facts from a later branch or live site.
