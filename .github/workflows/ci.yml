@@ -17,7 +17,10 @@ jobs:
   validate:
     name: Validate repository
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --user root
     steps:
       - name: Check out Companion
         uses: actions/checkout@v7
@@ -39,9 +42,7 @@ jobs:
           test -z "$(git status --porcelain)"
 
       - name: Install pinned browser-test dependencies
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium webkit
+        run: npm ci
 
       - name: Set up Python for deterministic print tooling
         uses: actions/setup-python@v6
@@ -53,8 +54,8 @@ jobs:
       - name: Install pinned print dependencies and Poppler
         shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes poppler-utils
+          apt-get update
+          apt-get install --yes poppler-utils
           python -m pip install --requirement requirements-print.txt
 
       - name: Check out pinned Mountain Guide source
