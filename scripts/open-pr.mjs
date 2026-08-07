@@ -62,7 +62,7 @@ async function main() {
     'build:field-guide', 'check:field-guide', 'check:pdf',
     'build:pocket-card', 'check:pocket-card', 'check:pocket-card-pdf',
     'build:pwa', 'build:offline', 'check:pwa', 'check:pwa:privacy', 'check:pwa:safety', 'check:artifact-parity',
-    'check:offline', 'check:service-worker', 'test:offline:logic', 'test:browser', 'test:offline'
+    'check:offline', 'check:service-worker', 'build:pages', 'test:offline:logic', 'test:browser', 'test:offline'
   ]) {
     exec('npm', ['run', script], { inherit: true });
   }
@@ -116,6 +116,7 @@ async function main() {
     '- `npm run check:artifact-parity`',
     '- `npm run check:offline`',
     '- `npm run check:service-worker`',
+    '- `npm run build:pages`',
     '- `npm run test:offline:logic`',
     '- `npm run test:browser` (Chromium/WebKit, desktop/390×844, install/setup/share/accessibility)',
     '- `npm run test:offline` (Chromium cold launch/zero-request/update/corruption/repair; WebKit offline navigation limitation documented)',
@@ -135,8 +136,8 @@ async function main() {
     'Lily Lake treatment: no coordinate or elevation is printed; the scoped canonical hold remains unchanged.', '',
     'Artifact status: draft, not a field release.', '',
     '## Interactive Companion PWA', '',
-    'DRAFT Companion version: `' + companionRelease.companion_version + '`.', '',
-    'Designed for future Mountain Guide Crew distribution at the one configured public URL: `' + companionRelease.pwa_url + '`.', '',
+    'Candidate Companion version: `' + companionRelease.companion_version + '`.', '',
+    'Physical-test distribution URL: `' + companionRelease.pwa_url + '`.', '',
     'Browser result: Chromium and WebKit desktop/mobile interaction, friend install, standalone setup, share privacy, responsive, and accessibility checks pass.', '',
     'Offline browser result: Chromium desktop and 390×844 cold launch, zero-request field operation, previous→new update, interruption, corruption, repair, and local-state survival pass. Playwright WebKit offline navigation remains an explicitly documented engine limitation.', '',
     'Privacy result: pass; optional local fields remain device-local and sharing contains only the public Companion URL.', '',
@@ -144,7 +145,7 @@ async function main() {
     'Offline bundle ID: `' + offlineBundle.bundle_id + '`.', '',
     'Offline bundle: ' + offlineBundle.entry_count + ' required resources / ' + offlineBundle.total_bytes + ' bytes; content SHA-256 `' + offlineBundle.bundle_content_sha256 + '`.', '',
     'Offline status: production service worker, atomic hash-verified cache transaction, coherent active-cache fetches, previous-release retention, real Offline Check, and repair are implemented. Physical iPhone Airplane Mode/force-quit/reboot proof remains outstanding.', '',
-    'Deployment status: no deployment and no release tag.', '',
+    'Deployment status: protected-main candidate Pages deployment requested; no field-release tag.', '',
     '## Release holds', '',
     pending.length ? 'Approved scoped holds: ' + pending.map(id => '`' + id + '`').join(', ') + '.' : 'No pending canonical record.', '',
     'Lily Lake hold: canonical coordinate/elevation remain null and pending; no secondary value appears in the PWA or print artifacts.', '',

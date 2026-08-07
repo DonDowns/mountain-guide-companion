@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "bundle_id": "ddmg-companion-0-5-0-draft-1-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-1-data-3cda95d4e6b1-b1",
   "cache_namespace": "ddmg-companion",
-  "companion_version": "0.5.0-draft.1",
+  "companion_version": "0.6.0-candidate.1",
   "data_version": "1.0.0",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "a7fc37c76f1d6b857cf0a65769a11f91c4472d8d8bf36bf4865b48344300a9f1",
-  "generated_at": "2026-08-07T11:10:00Z",
-  "release_status": "draft",
+  "bundle_content_sha256": "27edd06efdaf068e3ac60f3bd97fac8df60d90e280ccb55c7738ce80d09b2cbd",
+  "generated_at": "2026-08-07T15:31:07Z",
+  "release_status": "candidate",
   "entry_count": 15,
-  "total_bytes": 160692,
+  "total_bytes": 160882,
   "pdf_bytes": 18375,
   "retention": {
     "current_complete": 1,
@@ -20,8 +20,8 @@
   "resources": [
     {
       "path": "index.html",
-      "sha256": "39aa7416a3947540433ae9bc9fcbec0440879e07a3cada325b3c2b245e4f619f",
-      "bytes": 6482,
+      "sha256": "e9e868ad416a73076af8461c132950215e906f73c849eb13319bf116e4e9833d",
+      "bytes": 6525,
       "role": "application-shell",
       "required": true
     },
@@ -41,8 +41,8 @@
     },
     {
       "path": "js/companion-data.js",
-      "sha256": "57f17e31b60837a2bb30efe53197c0eab2c87c51b1b45c529c9125697b8fcc63",
-      "bytes": 14819,
+      "sha256": "a92926847d452ddb996ec4a5c17435b59ffae11081f663a8d98fa0a7dd2d2d10",
+      "bytes": 14843,
       "role": "canonical-runtime-data",
       "required": true
     },
@@ -62,8 +62,8 @@
     },
     {
       "path": "js/companion-ui.js",
-      "sha256": "01f65c198eb0e76db09364006ebaadffcb08e222bcef323c85d9ca7dcdbc4651",
-      "bytes": 22874,
+      "sha256": "647512911151bc134f02e636d2542eafc1c7b96d70fd8bfe5a11ae708803d77f",
+      "bytes": 22985,
       "role": "application-ui",
       "required": true
     },
@@ -118,8 +118,8 @@
     },
     {
       "path": "release.json",
-      "sha256": "00e064bbcaafa8ec9a6c49f1829aac59859823cb69f5ee5b3f0be6eb6116b700",
-      "bytes": 900,
+      "sha256": "03c5c106e7b2f82fd72636f4b26e1c8aa79970b6547394c1f1bb520d8077135e",
+      "bytes": 912,
       "role": "release-metadata",
       "required": true
     }

@@ -1,12 +1,12 @@
-# Future Crew Distribution Contract
+# Crew Distribution Contract
 
 ## Purpose
 
-The future Crew tab in the separate Mountain Guide will distribute, not reimplement, the Companion. The Mountain Guide repository remains untouched in Phase 5. Integration begins only after the Companion has a reviewed public URL, technical offline evidence, physical-device approval, and a separately approved deployment.
+The Crew tab in the separate Mountain Guide distributes, rather than reimplements, the Companion. Phase 6 publishes a technical candidate so primary, backup, and friend phones can complete the still-required physical checks. Candidate deployment does not imply physical approval or field-release status.
 
 ## Single public URL configuration
 
-`config/companion.build.json` contains the only configured public base URL. The draft value is the intended future address, `https://companion.vondadowns.com/`, but no domain, CNAME, Pages project, or deployment is created here. Development uses localhost without changing the public sharing identity.
+`config/companion.build.json` contains the only configured public base URL: `https://companion.vondadowns.com/`. Protected-main GitHub Pages automation publishes the candidate. Development uses localhost without changing the public sharing identity.
 
 The public URL is stable and contains no query string, fragment state, local storage, recipient, actual start, milestone, note, medical field, device identifier, or token. It may be encoded directly into a locally generated QR code. No external QR service is permitted.
 
@@ -36,7 +36,7 @@ The Crew tab may expose:
 
 Those actions consume the public URL and `release.json`; they must not import Companion local state or construct a second trip-fact source.
 
-## Draft release metadata
+## Candidate release metadata
 
 `release.json` publishes the integration keys:
 
@@ -57,13 +57,13 @@ Those actions consume the public URL and `release.json`; they must not import Co
 - `field_guide_url`;
 - `pocket_card_url`.
 
-Phase 5 retains `release_status` as `draft`. A future Crew tab must reject missing, incompatible, non-approved, or mixed metadata and must not translate draft into field-ready wording. Bundle metadata identifies a complete cache unit; it is not a mountain-safety or deployment state.
+Phase 6 uses `release_status = candidate`. The Crew tab may render that as Companion candidate or Physical testing in progress. It must tolerate unavailable online metadata, must not translate candidate into field-ready wording, and must not use metadata as field-safety information. Bundle metadata identifies a complete cache unit; it is not a mountain-safety state.
 
 ## Share and privacy contract
 
 The Companion shares exactly the configured `pwa_url` through `navigator.share` or clipboard fallback. Automated tests prove that only title, explanatory text, and public URL enter the share payload. Device-local data is never appended or serialized.
 
-PDF links point to the same public-base architecture. They remain draft links until the release package, caching policy, and deployment are approved.
+PDF links use the same public origin. Their public availability enables physical testing but does not make either artifact a field release.
 
 ## Offline truth boundary
 

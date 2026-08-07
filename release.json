@@ -1,18 +1,18 @@
 {
-  "companion_version": "0.5.0-draft.1",
+  "companion_version": "0.6.0-candidate.1",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
-  "generated_at": "2026-08-07T11:10:00Z",
+  "generated_at": "2026-08-07T15:31:07Z",
   "verified_at": "2026-08-07T07:45:17Z",
-  "release_status": "draft",
-  "bundle_id": "ddmg-companion-0-5-0-draft-1-data-3cda95d4e6b1-b1",
+  "release_status": "candidate",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-1-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",
   "field_guide_url": "https://companion.vondadowns.com/generated/field-guide.pdf",
   "pocket_card_url": "https://companion.vondadowns.com/generated/pocket-card.pdf",
-  "offline_bundle_content_sha256": "a7fc37c76f1d6b857cf0a65769a11f91c4472d8d8bf36bf4865b48344300a9f1",
+  "offline_bundle_content_sha256": "27edd06efdaf068e3ac60f3bd97fac8df60d90e280ccb55c7738ce80d09b2cbd",
   "offline_bundle_entry_count": 15
 }

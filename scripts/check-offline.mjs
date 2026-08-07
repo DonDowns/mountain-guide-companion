@@ -82,7 +82,7 @@ async function main() {
   }
   if (worker.resources.length !== bundle.resources.length) errors.push('service-worker resource count mismatch');
   if (JSON.stringify(worker.resources) !== JSON.stringify(bundle.resources)) errors.push('service-worker resource metadata mismatch');
-  if (bundle.release_status !== 'draft' || release.release_status !== 'draft') errors.push('Phase 5 must remain draft');
+  if (bundle.release_status !== 'candidate' || release.release_status !== 'candidate') errors.push('Phase 6 must remain candidate');
   if (bundle.cache_namespace !== 'ddmg-companion' || worker.cacheNamespace !== 'ddmg-companion') errors.push('Companion cache namespace mismatch');
 
   if (errors.length) throw new Error('Offline bundle verification failed:\n- ' + errors.join('\n- '));

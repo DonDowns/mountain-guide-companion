@@ -1,0 +1,76 @@
+name: Deploy candidate to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: companion-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy validated candidate
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the exact validated main commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
+      - name: Set up Node 24 LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install pinned dependencies
+        run: npm ci
+
+      - name: Rebuild candidate runtime and offline identity
+        run: |
+          npm run build:pwa
+          npm run build:offline
+
+      - name: Recheck deployable contracts
+        run: |
+          npm run check:pwa
+          npm run check:pwa:privacy
+          npm run check:pwa:safety
+          npm run check:artifact-parity
+          npm run check:offline
+          npm run check:service-worker
+          git diff --exit-code -- js/companion-data.js release.json offline-bundle.json service-worker.js
+
+      - name: Build flattened Pages artifact
+        run: npm run build:pages
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload immutable Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: .pages-site
+
+      - name: Deploy GitHub Pages candidate
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Verify deployed HTTPS candidate bytes
+        run: npm run check:live -- "${{ steps.deployment.outputs.page_url }}"

@@ -96,7 +96,7 @@ The PWA adds interaction but not new public facts:
 
 It does not depend on live weather, maps, location, messaging, authentication, or a server for core field operation.
 
-Phase 5 retains the static shell and adds an explicit generated offline bundle, marker-last SHA-256 verification, active-cache-only field resolution, one-prior-release retention, neutral update activation, real Offline Check, repair, local-state migration, and Chromium zero-connectivity/update/corruption evidence. The stable public URL is one architectural build value intended for a future Mountain Guide Crew tab; deployment remains deferred. Physical Airplane Mode, force-quit, reboot, and second-person phone verification remain release gates.
+Phase 5 retains the static shell and adds an explicit generated offline bundle, marker-last SHA-256 verification, active-cache-only field resolution, one-prior-release retention, neutral update activation, real Offline Check, repair, local-state migration, and Chromium zero-connectivity/update/corruption evidence. Phase 6 publishes that exact runtime as a physical-test candidate at the stable public URL for Mountain Guide Crew distribution. Physical Airplane Mode, force-quit, reboot, and second-person phone verification remain release gates; candidate availability is not field-release approval.
 
 ## Information excluded from every Companion artifact
 
