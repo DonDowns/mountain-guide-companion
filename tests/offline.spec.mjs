@@ -7,38 +7,53 @@ test.beforeEach(async ({ request }) => {
   await setServerState(request);
 });
 
+async function openCompanion(page) {
+  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await expect(page.locator('#timeline-view')).toBeVisible();
+}
+
 test('installs, verifies, and cold-launches every field-critical path with zero connectivity', async ({ page, context, request }, testInfo) => {
   test.skip(
     testInfo.project.name.includes('webkit'),
     'Playwright WebKit encounters an internal error on service-worker-controlled offline navigation; normal WebKit runtime coverage remains active'
   );
   const errors = [];
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async value => { globalThis.__offlineCopiedMessage = value; } }
+    });
+  });
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await installCurrent(page, request);
 
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await page.getByRole('radio', { name: /Select Mount Lindsey/ }).check();
+  await openCompanion(page);
+  await page.getByRole('button', { name: /Change objective/ }).click();
+  await page.getByRole('radio', { name: /Choose Mount Lindsey/ }).check();
+  await page.getByRole('button', { name: 'Use objective' }).click();
   await page.getByRole('button', { name: /Red/ }).click();
-  const firstMilestone = page.locator('[data-milestone="0"]');
-  await firstMilestone.check();
+  await page.getByRole('button', { name: /Mark Vehicle departure locally/ }).click();
   await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
 
   await context.setOffline(true);
   await resetServerRequests(request);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Mountain Guide Companion' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
   await page.close();
   const offlinePage = await context.newPage();
   offlinePage.on('pageerror', error => errors.push(error.message));
   offlinePage.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await offlinePage.goto('/');
-  await expect(offlinePage.getByRole('heading', { name: 'Mountain Guide Companion' })).toBeVisible();
+  await expect(offlinePage.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
   await expect(offlinePage.locator('html')).toHaveAttribute('data-display', 'red');
-  await offlinePage.getByRole('button', { name: 'Open Companion' }).first().click();
-  await expect(offlinePage.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
-  await expect(offlinePage.locator('[data-milestone="0"]')).toBeChecked();
+  await openCompanion(offlinePage);
+  await expect(offlinePage.locator('#current-objective-context')).toContainText('Mount Lindsey');
+  await expect(offlinePage.locator('article[data-milestone="0"]')).toContainText(/Marked locally at/);
+  await offlinePage.getByRole('button', { name: 'Copy message for Lake Como camp' }).click();
+  expect(await offlinePage.evaluate(() => globalThis.__offlineCopiedMessage)).toMatch(/^At Lake Como camp at /);
+  await expect(offlinePage.locator('article[data-milestone="1"]')).toContainText('Not marked');
   await offlinePage.getByText('Optional private fields on this phone').click();
   await expect(offlinePage.locator('[data-private-field="name"]')).toHaveValue('x');
 
@@ -145,14 +160,14 @@ test('keeps the previous complete release active when a new required JavaScript 
     });
   });
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Mountain Guide Companion' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
   await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
   await expect(page.getByText(/Marked complete on this phone:/)).toBeVisible();
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
-  await expect(page.locator('[data-milestone="0"]')).toBeChecked();
+  await openCompanion(page);
+  await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
+  await expect(page.locator('article[data-milestone="0"]')).toContainText(/Marked locally/);
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).statusNote).toBe('z');
@@ -181,8 +196,8 @@ test('reloads two previous-release tabs coherently when the verified update acti
   await page.getByRole('button', { name: 'Restart to use update' }).click();
 
   for (const candidatePage of [page, second]) {
-    await expect(candidatePage.getByRole('heading', { name: 'Mountain Guide Companion', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.4/)).toBeVisible();
+    await expect(candidatePage.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.5/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -197,8 +212,8 @@ test('reloads two previous-release tabs coherently when the verified update acti
     return records.sort();
   });
   expect(complete).toEqual([
-    'ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1',
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1$/)
+    'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1',
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-5-data-3cda95d4e6b1-b1$/)
   ]);
 });
 

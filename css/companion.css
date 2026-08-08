@@ -137,6 +137,11 @@ button {
   transform: translateY(0);
 }
 
+body:not(.companion-open) .app-skip-link,
+.companion-open .home-skip-link {
+  display: none;
+}
+
 .app-header {
   position: sticky;
   top: 0;
@@ -540,8 +545,55 @@ h3 {
   display: none;
 }
 
+body:not(.companion-open) main {
+  display: none;
+}
+
 main {
   padding-block: 10px 30px;
+}
+
+.objective-context {
+  position: sticky;
+  top: calc(62px + env(safe-area-inset-top));
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  margin-bottom: 10px;
+  padding: 7px 10px 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.objective-context > span {
+  display: grid;
+  min-width: 0;
+}
+
+.objective-context small,
+.milestone-heading small,
+.message-preparation > small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.objective-context strong {
+  overflow: hidden;
+  font-size: 0.88rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.objective-context .quiet-button {
+  flex: 0 0 auto;
 }
 
 .app-view {
@@ -580,6 +632,14 @@ main {
   display: grid;
   gap: 9px;
   margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-alt);
+}
+
+.objective-selector[hidden] {
+  display: none;
 }
 
 .objective-option {
@@ -675,16 +735,20 @@ main {
   margin-top: 14px;
 }
 
-.edit-start {
+.edit-start,
+.edit-milestone,
+.start-confirmation {
   display: grid;
   gap: 10px;
   margin-top: 13px;
   padding: 13px;
   border: 1px solid var(--border);
   border-radius: 12px;
+  background: var(--surface-alt);
 }
 
 .edit-start label,
+.edit-milestone label,
 .private-form label,
 .status-note label {
   display: grid;
@@ -740,25 +804,51 @@ textarea {
 
 .milestone {
   display: grid;
-  grid-template-columns: 28px 1fr;
-  gap: 10px;
-  align-items: center;
+  gap: 12px;
   min-height: 52px;
-  padding: 8px 11px;
+  padding: 13px;
   border: 1px solid var(--border);
   border-radius: 11px;
   background: var(--surface-alt);
 }
 
-.milestone input {
-  width: 24px;
-  min-height: 24px;
-  accent-color: var(--accent);
+.milestone-heading {
+  display: grid;
+  gap: 3px;
 }
 
-.milestone small {
+.milestone-heading > span:first-child {
+  display: grid;
+}
+
+.milestone-status {
   display: block;
   color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.milestone-state-actions,
+.message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.message-preparation {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.message-preparation .boundary-note {
+  margin: 0;
+}
+
+.view-utility {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
 }
 
 .route-card {
@@ -917,7 +1007,7 @@ textarea {
   left: 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   min-height: calc(var(--nav-height) + env(safe-area-inset-bottom));
   padding: 6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
   border-top: 1px solid var(--border);
@@ -942,9 +1032,16 @@ textarea {
   cursor: pointer;
 }
 
-.primary-nav button span {
+.primary-nav button .nav-icon {
   font-size: 1.25rem;
   line-height: 1;
+}
+
+.primary-nav button .nav-label {
+  min-width: 0;
+  font-size: 0.72rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
 }
 
 .primary-nav button[aria-current="page"],
@@ -1022,11 +1119,16 @@ textarea {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .objective-selector .section-heading,
+  .objective-selector .field-actions {
+    grid-column: 1 / -1;
+  }
+
   .primary-nav {
     right: 20px;
     bottom: 14px;
     left: auto;
-    width: min(430px, calc(100% - 40px));
+    width: min(520px, calc(100% - 40px));
     border: 1px solid var(--border);
     border-radius: 18px;
     box-shadow: var(--shadow);
@@ -1046,6 +1148,40 @@ textarea {
 
   .primary-nav button {
     min-height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .brand {
+    justify-self: start;
+    min-width: 0;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .header-actions .quiet-button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .objective-context {
+    top: env(safe-area-inset-top);
+  }
+
+  .primary-nav button .nav-icon {
+    display: none;
   }
 }
 

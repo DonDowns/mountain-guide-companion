@@ -25,10 +25,12 @@ for (const [label, path, mode] of corruptions) {
 test('repair creates a new complete cache and preserves device-local state', async ({ page, request }, testInfo) => {
   test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Repair transaction runs once in Chromium desktop');
   await installCurrent(page, request);
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await page.getByRole('radio', { name: /Select Mount Lindsey/ }).check();
+  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await page.getByRole('button', { name: /Change objective/ }).click();
+  await page.getByRole('radio', { name: /Choose Mount Lindsey/ }).check();
+  await page.getByRole('button', { name: 'Use objective' }).click();
   await page.getByRole('button', { name: /Red/ }).click();
-  await page.locator('[data-milestone="0"]').check();
+  await page.getByRole('button', { name: /Mark Vehicle departure locally/ }).click();
   await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
@@ -39,9 +41,9 @@ test('repair creates a new complete cache and preserves device-local state', asy
   await setServerState(request);
   await page.getByRole('button', { name: 'Repair Offline Copy' }).click();
   await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
-  await expect(page.locator('[data-milestone="0"]')).toBeChecked();
+  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
+  await expect(page.locator('article[data-milestone="0"]')).toContainText(/Marked locally at/);
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');

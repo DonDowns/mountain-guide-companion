@@ -37,32 +37,60 @@ export async function requestInstall() {
   return { available: true, outcome: choice?.outcome || 'dismissed' };
 }
 
-export async function sharePublicCompanion(publicUrl, title) {
-  const payload = { title, text: 'Open the Mountain Guide Companion for the current trip.', url: publicUrl };
-  if (navigator.share) {
+async function copyText(value, promptMessage) {
+  if (navigator.clipboard?.writeText) {
     try {
-      await navigator.share(payload);
-      return { method: 'share', completed: true };
-    } catch (error) {
-      if (error?.name === 'AbortError') return { method: 'share', completed: false };
+      await navigator.clipboard.writeText(value);
+      return { method: 'copy', completed: true };
+    } catch {
+      // Continue to the packaged, offline-capable copy fallbacks.
     }
   }
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(publicUrl);
-    return { method: 'copy', completed: true };
-  }
   const input = document.createElement('input');
-  input.value = publicUrl;
+  input.value = value;
   input.readOnly = true;
   input.style.position = 'fixed';
   input.style.opacity = '0';
   document.body.append(input);
   input.select();
-  const copied = document.execCommand('copy');
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch {
+    copied = false;
+  }
   input.remove();
   if (copied) return { method: 'copy', completed: true };
-  globalThis.prompt?.('Copy this public Companion link:', publicUrl);
+  globalThis.prompt?.(promptMessage, value);
   return { method: 'manual', completed: false };
+}
+
+async function shareOrCopy(payload, copyValue, promptMessage) {
+  if (navigator.share) {
+    try {
+      await navigator.share(payload);
+      return { method: 'share', completed: true, deliveryConfirmed: false };
+    } catch (error) {
+      if (error?.name === 'AbortError') return { method: 'share', completed: false, cancelled: true };
+    }
+  }
+  return copyText(copyValue, promptMessage);
+}
+
+export async function sharePublicCompanion(publicUrl, title) {
+  return shareOrCopy(
+    { title, text: 'Open the Mountain Guide Companion for the current trip.', url: publicUrl },
+    publicUrl,
+    'Copy this public Companion link:'
+  );
+}
+
+export async function copyPreparedMessage(message) {
+  return copyText(message, 'Copy this prepared message:');
+}
+
+export async function sharePreparedMessage(message, title = 'Mountain Guide Companion update') {
+  return shareOrCopy({ title, text: message }, message, 'Copy this prepared message:');
 }
 
 function waitForController(timeoutMs = 8000) {
