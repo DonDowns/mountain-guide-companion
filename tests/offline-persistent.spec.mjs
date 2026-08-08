@@ -25,9 +25,9 @@ test('persisted Chromium profile cold-launches after a simulated browser close',
     const offline = await chromium.launchPersistentContext(profile, { headless: true, offline: true, viewport: { width: 390, height: 844 } });
     const second = offline.pages()[0] || await offline.newPage();
     await second.goto(baseURL);
-    await expect(second.getByRole('heading', { name: 'Mountain Guide Companion' })).toBeVisible();
+    await expect(second.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
     await expect(second.locator('html')).toHaveAttribute('data-display', 'red');
-    await second.getByRole('button', { name: 'Open Companion' }).first().click();
+    await second.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
     const stored = await second.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
     expect(stored.statusNote).toBe('z');
     await second.getByRole('button', { name: /Emergency/ }).last().click();

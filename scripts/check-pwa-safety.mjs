@@ -16,7 +16,8 @@ async function main() {
   const prohibited = [
     'all clear', 'safe to proceed', 'route is safe', 'weather permits', 'approved to continue',
     'go/no-go', 'rescue requested', 'rescue activated', 'help is on the way', 'message sent',
-    'call completed', 'recipient notified', 'good to go', 'green light', 'cleared to proceed', 'you may proceed'
+    'call completed', 'recipient notified', 'good to go', 'green light', 'cleared to proceed', 'you may proceed',
+    'everything is safe'
   ];
   const found = prohibited.filter(phrase => runtime.includes(phrase));
   const errors = found.map(phrase => `PWA runtime contains prohibited affirmative concept ${JSON.stringify(phrase)}`);

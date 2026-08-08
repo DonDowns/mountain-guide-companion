@@ -60,7 +60,7 @@ async function main() {
     if (!stateSource.includes(defaultValue)) errors.push(`local state lacks empty default ${defaultValue}`);
   }
   const serviceWorker = await readFile(resolve(repoRoot, 'service-worker.js'), 'utf8');
-  for (const prohibited of ['localStorage', 'privateContact', 'statusNote', 'actualStarts', 'checkedMilestones', 'sendBeacon', 'telemetry']) {
+  for (const prohibited of ['localStorage', 'privateContact', 'statusNote', 'actualStarts', 'checkedMilestones', 'milestoneMarks', 'sendBeacon', 'telemetry']) {
     if (serviceWorker.includes(prohibited)) errors.push(`service worker references device-local/private state concept ${prohibited}`);
   }
   for (const resource of offlineBundle.resources) {

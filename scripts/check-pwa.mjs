@@ -61,8 +61,8 @@ async function main() {
   }
 
   for (const required of [
-    'Mountain Guide Companion', 'Open Companion', 'Timeline', 'Route', 'Emergency', 'Red',
-    'CALL 911 FIRST', 'Three Companion Artifacts', 'CANDIDATE', 'not yet a field release'
+    'Mountain Guide Companion', 'Companion Home', 'Open Companion', 'Home', 'Timeline', 'Route', 'Emergency', 'Red',
+    '↑ Top', 'CALL 911 FIRST', 'Three Companion Artifacts', 'CANDIDATE', 'not yet a field release'
   ]) requireText(html.toLowerCase(), required.toLowerCase(), 'index.html', errors);
   for (const required of ['env(safe-area-inset-bottom)', 'min-height: 48px', '[data-display="red"]', 'overflow-x: hidden']) {
     requireText(css, required, 'companion.css', errors);
@@ -77,6 +77,10 @@ async function main() {
   ].includes(path));
   const sourceText = (await Promise.all(sourceFiles.map(path => readFile(resolve(repoRoot, path), 'utf8')))).join('\n');
   requireText(sourceText.toLowerCase(), 'install for offline use', 'PWA browser-install UI', errors);
+  for (const requiredRuntime of [
+    'change objective', 'resume objective', 'replace with current time', 'copy message', 'share message',
+    'marked locally at', 'confirm delivery in the sending app', 'share canceled. milestone unchanged.'
+  ]) requireText(sourceText.toLowerCase(), requiredRuntime, 'PWA field-usability runtime', errors);
   for (const prohibitedRuntime of ['fetch(', 'XMLHttpRequest', 'WebSocket(', 'EventSource(', 'sendBeacon(', 'https://fonts.', 'https://cdn.']) {
     if (sourceText.includes(prohibitedRuntime)) errors.push(`PWA runtime contains network dependency ${prohibitedRuntime}`);
   }

@@ -4,6 +4,7 @@ async function expectBelowHeader(page, heading) {
   const headerBottom = await page.locator('.app-header').evaluate(node => node.getBoundingClientRect().bottom);
   const headingTop = await page.getByRole('heading', { name: heading }).evaluate(node => node.getBoundingClientRect().top);
   expect(headingTop).toBeGreaterThanOrEqual(headerBottom);
+  await page.waitForTimeout(750);
 }
 
 test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }, testInfo) => {

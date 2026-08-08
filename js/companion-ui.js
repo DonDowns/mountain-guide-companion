@@ -36,9 +36,69 @@ function formatActualStart(value) {
   if (!value) return 'Not started on this device';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Not available on this device';
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+    timeZone: companionData.trip.timezone, timeZoneName: 'short'
   }).format(date);
+}
+
+export function formatOperationalTime(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return 'time unavailable';
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric', minute: '2-digit', timeZone: companionData.trip.timezone, timeZoneName: 'short'
+  }).format(date);
+}
+
+function operationalParts(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: companionData.trip.timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+  });
+  return Object.fromEntries(formatter.formatToParts(date).filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+}
+
+export function formatOperationalDateTimeInput(value) {
+  const parts = operationalParts(value);
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+}
+
+function operationalOffsetMilliseconds(date) {
+  const parts = operationalParts(date);
+  const asUtc = Date.UTC(
+    Number(parts.year), Number(parts.month) - 1, Number(parts.day),
+    Number(parts.hour), Number(parts.minute), Number(parts.second)
+  );
+  return asUtc - date.getTime();
+}
+
+export function parseOperationalDateTimeInput(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value || '');
+  if (!match) return null;
+  const wallClock = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), Number(match[4]), Number(match[5]));
+  let result = new Date(wallClock);
+  for (let attempt = 0; attempt < 2; attempt += 1) result = new Date(wallClock - operationalOffsetMilliseconds(result));
+  return Number.isNaN(result.getTime()) ? null : result;
+}
+
+export function createMilestoneMessage(index, objectiveId, value = new Date()) {
+  const objective = companionData.objectives.find(item => item.id === objectiveId) || companionData.objectives[0];
+  const time = formatOperationalTime(value);
+  const templates = [
+    () => `Leaving the vehicle for ${objective.name} at ${time}. I’ll check in again at the next planned milestone.`,
+    () => `At Lake Como camp at ${time}.`,
+    () => `Starting ${objective.name} at ${time}.`,
+    () => `At the summit or high point for ${objective.name} at ${time}. Beginning the return.`,
+    () => `Below exposed high terrain at ${time} and continuing down.`,
+    () => `Back at Lake Como camp at ${time}.`,
+    () => `Back at the vehicle at ${time}.`,
+    () => `Through Fort Garland at ${time} and heading home.`,
+    () => `Home at ${time}.`
+  ];
+  if (!templates[index]) throw new Error('Unknown communication milestone');
+  return templates[index]();
 }
 
 function formatElapsed(value, now = Date.now()) {
@@ -212,21 +272,51 @@ export function renderArtifacts() {
   clearAndAppend(document.querySelector('#artifact-cards'), ...cards);
 }
 
-export function renderTimeline(state, editObjectiveId = '') {
+export function renderObjectiveContext(state) {
+  const objective = companionData.objectives.find(item => item.id === state.selectedObjectiveId) || companionData.objectives[0];
+  clearAndAppend(document.querySelector('#current-objective-context'),
+    element('span', {}, [
+      element('small', { text: 'CURRENT OBJECTIVE' }),
+      element('strong', { text: objective.name })
+    ]),
+    element('button', {
+      className: 'quiet-button', type: 'button', dataset: { action: 'change-objective' },
+      text: 'Change objective', 'aria-label': `Change objective. Current objective: ${objective.name}`
+    })
+  );
+}
+
+export function renderTimeline(state, uiState = {}) {
   const selectedId = companionData.objectives.some(item => item.id === state.selectedObjectiveId)
     ? state.selectedObjectiveId
     : companionData.objectives[0].id;
+  const pendingObjectiveId = companionData.objectives.some(item => item.id === uiState.pendingObjectiveId)
+    ? uiState.pendingObjectiveId
+    : selectedId;
   const options = companionData.objectives.map(objective => {
     const radio = element('input', {
-      type: 'radio', name: 'selected-objective', value: objective.id,
-      checked: objective.id === selectedId, 'aria-label': `Select ${objective.name}`
+      type: 'radio', name: 'pending-objective', value: objective.id,
+      checked: objective.id === pendingObjectiveId, 'aria-label': `Choose ${objective.name}`
     });
     return element('label', { className: 'objective-option' }, [
       radio,
       element('span', {}, [element('strong', { text: objective.name }), element('small', { text: objectiveRole(objective.role) })])
     ]);
   });
-  clearAndAppend(document.querySelector('#objective-selector'), ...options);
+  const selector = document.querySelector('#objective-selector');
+  clearAndAppend(selector,
+    element('div', { className: 'section-heading compact-heading' }, [
+      element('p', { className: 'eyebrow', text: 'CHANGE OBJECTIVE' }),
+      element('h3', { text: 'Choose the current objective' }),
+      element('p', { className: 'boundary-note', text: 'Switching objectives preserves every saved actual start and trip-level communication mark.' })
+    ]),
+    ...options,
+    element('div', { className: 'field-actions' }, [
+      element('button', { className: 'primary-button', type: 'button', dataset: { action: 'confirm-objective' }, text: 'Use objective' }),
+      element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'cancel-objective' }, text: 'Cancel' })
+    ])
+  );
+  selector.hidden = uiState.objectiveSelectorOpen !== true;
 
   const objective = companionData.objectives.find(item => item.id === selectedId);
   const times = objective.planningTimes.map(time => element('div', { className: 'time-card' }, [
@@ -240,12 +330,14 @@ export function renderTimeline(state, editObjectiveId = '') {
     element('strong', { text: formatActualStart(actual) }),
     element('small', { dataset: { elapsedFor: objective.id }, text: actual ? `Elapsed ${formatElapsed(actual)}` : 'Planned start remains unchanged.' })
   ]);
-  const actions = [
-    element('button', { className: 'primary-button', type: 'button', dataset: { action: 'start-objective', objectiveId: objective.id }, text: actual ? 'Record new actual start' : 'Start Objective' })
-  ];
+  const actions = [];
   if (actual) {
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'resume-objective', objectiveId: objective.id }, text: 'Resume Objective' }));
+    actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'replace-start', objectiveId: objective.id }, text: 'Replace with current time' }));
     actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'edit-start', objectiveId: objective.id }, text: 'Edit actual start' }));
     actions.push(element('button', { className: 'danger-button', type: 'button', dataset: { action: 'reset-start', objectiveId: objective.id }, text: 'Reset actual start' }));
+  } else {
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'start-objective', objectiveId: objective.id }, text: 'Start Objective' }));
   }
   const children = [
     element('p', { className: 'eyebrow', text: objectiveRole(objective.role).toUpperCase() }),
@@ -255,10 +347,21 @@ export function renderTimeline(state, editObjectiveId = '') {
     element('div', { className: 'objective-actions' }, actions)
   ];
 
-  if (editObjectiveId === objective.id) {
-    const inputValue = actual ? new Date(new Date(actual).getTime() - new Date(actual).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+  if (uiState.startObjectiveId === objective.id && !actual) {
+    children.push(element('section', { className: 'start-confirmation', tabindex: '-1', 'aria-label': `Start ${objective.name}` }, [
+      element('strong', { text: `Start ${objective.name}?` }),
+      element('p', { text: `Record the current ${companionData.trip.timezone} time as this objective’s actual start.` }),
+      element('div', { className: 'field-actions' }, [
+        element('button', { className: 'primary-button', type: 'button', dataset: { action: 'confirm-start', objectiveId: objective.id }, text: 'Record current time' }),
+        element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'back-from-start' }, text: 'Back' })
+      ])
+    ]));
+  }
+
+  if (uiState.editObjectiveId === objective.id) {
+    const inputValue = actual ? formatOperationalDateTimeInput(actual) : '';
     children.push(element('div', { className: 'edit-start' }, [
-      element('label', {}, [element('span', { text: 'Actual start on this device' }), element('input', { id: 'actual-start-input', type: 'datetime-local', value: inputValue })]),
+      element('label', {}, [element('span', { text: `Actual start (${companionData.trip.timezone})` }), element('input', { id: 'actual-start-input', type: 'datetime-local', value: inputValue })]),
       element('div', { className: 'field-actions' }, [
         element('button', { className: 'primary-button', type: 'button', dataset: { action: 'save-start', objectiveId: objective.id }, text: 'Save actual start' }),
         element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'cancel-edit-start' }, text: 'Cancel' })
@@ -275,8 +378,44 @@ export function renderTimeline(state, editObjectiveId = '') {
 
   const milestones = companionData.communication.milestones.map((label, index) => {
     const key = String(index);
-    const checkbox = element('input', { type: 'checkbox', checked: state.checkedMilestones[key] === true, dataset: { milestone: key }, 'aria-label': `Mark ${label} locally` });
-    return element('label', { className: 'milestone' }, [checkbox, element('span', {}, [element('strong', { text: label }), element('small', { text: checkbox.checked ? 'Marked locally' : 'Not marked' })])]);
+    const marked = state.checkedMilestones[key] === true || Object.hasOwn(state.milestoneMarks, key);
+    const markedAt = state.milestoneMarks[key] || '';
+    const localActions = marked
+      ? [
+          element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'edit-milestone', milestone: key }, text: 'Edit time', 'aria-label': `Edit local mark time for ${label}` }),
+          element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'clear-milestone', milestone: key }, text: 'Undo mark', 'aria-label': `Undo local mark for ${label}` })
+        ]
+      : [element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'mark-milestone', milestone: key }, text: 'Mark locally', 'aria-label': `Mark ${label} locally` })];
+    const children = [
+      element('div', { className: 'milestone-heading' }, [
+        element('span', {}, [element('small', { text: 'LOCAL MILESTONE STATE' }), element('strong', { text: label })]),
+        element('span', { className: 'milestone-status', text: marked
+          ? markedAt ? `Marked locally at ${formatOperationalTime(markedAt)}` : 'Marked locally; time was not recorded by the earlier version.'
+          : 'Not marked' })
+      ]),
+      element('div', { className: 'milestone-state-actions' }, localActions),
+      element('div', { className: 'message-preparation', 'aria-label': `Message preparation for ${label}` }, [
+        element('small', { text: 'MESSAGE PREPARATION' }),
+        element('div', { className: 'message-actions' }, [
+          element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'copy-message', milestone: key }, text: 'Copy Message', 'aria-label': `Copy message for ${label}` }),
+          element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share-message', milestone: key }, text: 'Share Message', 'aria-label': `Share message for ${label}` })
+        ]),
+        element('p', { className: 'boundary-note', text: 'ACTUAL DELIVERY — Confirm in the sending app. Copying or opening Share does not mark this milestone.' })
+      ])
+    ];
+    if (uiState.editMilestoneKey === key) {
+      children.push(element('div', { className: 'edit-milestone' }, [
+        element('label', {}, [
+          element('span', { text: `Local mark time (${companionData.trip.timezone})` }),
+          element('input', { id: `milestone-time-${key}`, type: 'datetime-local', value: formatOperationalDateTimeInput(markedAt || new Date()) })
+        ]),
+        element('div', { className: 'field-actions' }, [
+          element('button', { className: 'primary-button', type: 'button', dataset: { action: 'save-milestone', milestone: key }, text: 'Save time', 'aria-label': `Save local mark time for ${label}` }),
+          element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'cancel-milestone-edit' }, text: 'Cancel' })
+        ])
+      ]));
+    }
+    return element('article', { className: 'milestone', dataset: { milestone: key } }, children);
   });
   clearAndAppend(document.querySelector('#milestone-list'), ...milestones);
   renderLocalOperations(state);
@@ -364,13 +503,29 @@ export function setRedDisplay(enabled) {
 }
 
 export function navigateTo(view) {
+  document.body.classList.add('companion-open');
   for (const section of document.querySelectorAll('[data-view]')) section.hidden = section.dataset.view !== view;
   for (const button of document.querySelectorAll('[data-nav]')) {
     if (button.dataset.nav === view) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
   }
+  document.querySelector('[data-action="home"]')?.removeAttribute('aria-current');
   const target = document.querySelector(`[data-view="${view}"]`);
   globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  target?.focus?.({ preventScroll: true });
+}
+
+export function navigateHome({ focus = true } = {}) {
+  document.body.classList.remove('companion-open');
+  for (const button of document.querySelectorAll('[data-nav]')) button.removeAttribute('aria-current');
+  document.querySelector('[data-action="home"]')?.setAttribute('aria-current', 'page');
+  globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  if (focus) document.querySelector('#companion-home')?.focus?.({ preventScroll: true });
+}
+
+export function scrollCurrentViewToTop() {
+  const target = document.querySelector('[data-view]:not([hidden])');
+  globalThis.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   target?.focus?.({ preventScroll: true });
 }
 

@@ -12,10 +12,11 @@
   <link rel="stylesheet" href="./css/companion.css">
 </head>
 <body>
-  <a class="skip-link" href="#app-main">Skip to Companion</a>
+  <a class="skip-link home-skip-link" href="#companion-home">Skip to Companion Home</a>
+  <a class="skip-link app-skip-link" href="#app-main">Skip to operational Companion</a>
 
   <header class="app-header">
-    <a class="brand" href="#welcome" aria-label="Mountain Guide Companion home">
+    <a class="brand" href="#companion-home" data-action="home" aria-label="Go to Companion Home">
       <img src="./icons/companion-icon.svg" alt="" width="38" height="38">
       <span><strong>Companion</strong><small>CANDIDATE</small></span>
     </a>
@@ -25,10 +26,10 @@
     </div>
   </header>
 
-  <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+  <section class="welcome" id="companion-home" tabindex="-1" aria-labelledby="welcome-title">
     <div class="welcome-copy">
       <p class="eyebrow">CURRENT TRIP</p>
-      <h1 id="welcome-title">Mountain Guide Companion</h1>
+      <h1 id="welcome-title">Companion Home</h1>
       <p class="trip-name" id="trip-name">Loading current trip…</p>
       <p class="welcome-summary">Physical phone testing is still required. This is not yet a field release.</p>
       <div class="welcome-actions">
@@ -55,7 +56,8 @@
   </section>
 
   <main id="app-main" tabindex="-1">
-    <section class="app-view" id="timeline-view" data-view="timeline" aria-labelledby="timeline-title">
+    <div class="objective-context" id="current-objective-context" aria-live="polite"></div>
+    <section class="app-view" id="timeline-view" data-view="timeline" tabindex="-1" aria-labelledby="timeline-title">
       <div class="section-heading">
         <p class="eyebrow">WHERE ARE WE IN THE PLAN?</p>
         <h2 id="timeline-title">Timeline</h2>
@@ -63,7 +65,7 @@
       </div>
       <div id="objective-selector" class="objective-selector" aria-label="Select current objective"></div>
       <div id="selected-objective" class="selected-objective"></div>
-      <section class="decision-section" aria-labelledby="decision-title">
+      <section class="decision-section" tabindex="-1" aria-labelledby="decision-title">
         <div class="section-heading compact-heading">
           <p class="eyebrow">WHAT SHOULD CAUSE US TO REASSESS?</p>
           <h3 id="decision-title">Decision Gates</h3>
@@ -79,9 +81,10 @@
         <div id="milestone-list" class="milestone-list"></div>
         <div id="local-operations" class="local-panel"></div>
       </section>
+      <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
     </section>
 
-    <section class="app-view" id="route-view" data-view="route" aria-labelledby="route-title" hidden>
+    <section class="app-view" id="route-view" data-view="route" tabindex="-1" aria-labelledby="route-title" hidden>
       <div class="section-heading">
         <p class="eyebrow">WHAT MATTERS RIGHT NOW?</p>
         <h2 id="route-title">Route</h2>
@@ -89,9 +92,10 @@
       </div>
       <div id="route-cards" class="route-grid"></div>
       <aside id="lily-status" class="hold-note"></aside>
+      <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
     </section>
 
-    <section class="app-view emergency-view" id="emergency-view" data-view="emergency" aria-labelledby="emergency-title" hidden>
+    <section class="app-view emergency-view" id="emergency-view" data-view="emergency" tabindex="-1" aria-labelledby="emergency-title" hidden>
       <div class="emergency-hero">
         <p class="eyebrow">IF SOMETHING GOES WRONG</p>
         <h2 id="emergency-title">CALL 911 FIRST</h2>
@@ -111,16 +115,18 @@
       </section>
       <p class="jurisdiction" id="jurisdiction-copy"></p>
       <div id="emergency-contacts" class="contact-grid"></div>
+      <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
     </section>
   </main>
 
   <footer class="provenance" id="provenance" aria-label="Companion provenance"></footer>
 
   <nav class="primary-nav" aria-label="Companion sections">
-    <button type="button" data-nav="timeline" aria-current="page"><span aria-hidden="true">◷</span>Timeline</button>
-    <button type="button" data-nav="route"><span aria-hidden="true">△</span>Route</button>
-    <button class="emergency-nav" type="button" data-nav="emergency"><span aria-hidden="true">+</span>Emergency</button>
-    <button type="button" data-action="toggle-red" aria-pressed="false"><span aria-hidden="true">◐</span>Red</button>
+    <button type="button" data-action="home" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Home</span></button>
+    <button type="button" data-nav="timeline"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Time<wbr>line</span></button>
+    <button type="button" data-nav="route"><span class="nav-icon" aria-hidden="true">△</span><span class="nav-label">Route</span></button>
+    <button class="emergency-nav" type="button" data-nav="emergency"><span class="nav-icon" aria-hidden="true">+</span><span class="nav-label">Emer<wbr>gency</span></button>
+    <button type="button" data-action="toggle-red" aria-pressed="false"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Red</span></button>
   </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>

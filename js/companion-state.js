@@ -18,6 +18,7 @@ export function defaultLocalState(defaultObjectiveId = '') {
     actualStarts: {},
     elapsedBasis: {},
     checkedMilestones: {},
+    milestoneMarks: {},
     redDisplay: Boolean(bootstrap.initialRed),
     statusNote: '',
     privateContact: emptyPrivateContact(),
@@ -59,12 +60,19 @@ function sanitizeCurrent(raw, defaultObjectiveId) {
   const fallback = defaultLocalState(defaultObjectiveId);
   const privateContact = raw.privateContact && typeof raw.privateContact === 'object' ? raw.privateContact : {};
   const setup = raw.setup && typeof raw.setup === 'object' ? raw.setup : {};
+  const checkedMilestones = booleanRecord(raw.checkedMilestones);
+  const milestoneMarks = stringRecord(raw.milestoneMarks, 24);
+  for (const [key, checked] of Object.entries(checkedMilestones)) {
+    if (checked && !Object.hasOwn(milestoneMarks, key)) milestoneMarks[key] = '';
+  }
+  for (const key of Object.keys(milestoneMarks)) checkedMilestones[key] = true;
   return {
     schemaVersion: LOCAL_STATE_SCHEMA_VERSION,
     selectedObjectiveId: typeof raw.selectedObjectiveId === 'string' ? raw.selectedObjectiveId : fallback.selectedObjectiveId,
     actualStarts: stringRecord(raw.actualStarts),
     elapsedBasis: elapsedRecord(raw.elapsedBasis),
-    checkedMilestones: booleanRecord(raw.checkedMilestones),
+    checkedMilestones,
+    milestoneMarks,
     redDisplay: raw.redDisplay === true,
     statusNote: typeof raw.statusNote === 'string' ? raw.statusNote.slice(0, 240) : '',
     privateContact: {
@@ -87,7 +95,7 @@ function sanitizeCurrent(raw, defaultObjectiveId) {
 
 export function migrateLocalState(raw, defaultObjectiveId = '') {
   if (!raw || typeof raw !== 'object') return defaultLocalState(defaultObjectiveId);
-  if (raw.schemaVersion === 1 || raw.schemaVersion === 2) return sanitizeCurrent(raw, defaultObjectiveId);
+  if ([1, 2, 3].includes(raw.schemaVersion)) return sanitizeCurrent(raw, defaultObjectiveId);
   return defaultLocalState(defaultObjectiveId);
 }
 

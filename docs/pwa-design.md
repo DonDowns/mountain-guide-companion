@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.4` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, and the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior without changing canonical data, safety meaning, or privacy behavior. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.5` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior, and candidate.5 improves field navigation and local communication preparation without changing canonical data, safety meaning, privacy behavior, or service-worker transaction architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -53,25 +53,27 @@ Route renders the four canonical profiles as comparison cards with round-trip di
 
 Emergency begins with CALL 911 FIRST, reporting prompts, dispatch/jurisdiction language, and all six canonical public numbers as direct, agency-labeled `tel:` links. Tapping a link creates no local completion state or affirmative call claim.
 
-## Local-state schema version 2
+## Local-state schema version 3
 
 The separate local store contains only:
 
 - selected objective;
 - actual-start timestamp and elapsed-time basis by objective;
-- locally marked communication milestones;
+- locally marked communication milestones with optional local timestamps;
 - Red Display state;
 - brief local status note;
 - optional private contact name, phone, alternate, and note;
 - setup/open/check progress, bundle-scoped offline verification, and physical Airplane Mode user attestation.
 
-The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema version 1 preserves operational/private values but does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, URL encoding, or share inclusion. Service workers neither read nor cache the local store.
+The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema versions 1 and 2 preserves operational/private values, leaves the time unavailable for older boolean-only milestone marks, and does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, or URL encoding. Service workers neither read nor cache the local store.
 
-Milestone checks use the concise status Marked locally. Tests continue to reject sent, delivered, or confirmed claims.
+Trip-level communication milestones record an America/Denver local timestamp, support edit and undo, and remain separate from message preparation. Each canonical milestone can generate an approved text-only message from the milestone type, selected canonical objective where applicable, and current operational time. Copy or native Share never marks a milestone and never claims delivery; after native Share returns, the interface says to confirm delivery in the sending app. Tests continue to reject sent, delivered, received, completed, or safety-verdict claims.
 
 ## Sharing and URL privacy
 
-Share uses `navigator.share` when available and otherwise copies the single configured public URL. If neither native sharing nor clipboard/legacy copy is available, a manual-copy prompt exposes that same public URL and nothing else. The payload contains only title, public explanatory text, and that URL. It never includes query parameters, local state, actual start, milestones, status notes, contact fields, or storage content.
+Public Companion Share uses `navigator.share` when available and otherwise copies the single configured public URL. If neither native sharing nor clipboard/legacy copy is available, a manual-copy prompt exposes that same public URL and nothing else. The link payload contains only title, public explanatory text, and that URL. It never includes query parameters, local state, actual start, milestones, status notes, contact fields, or storage content.
+
+Prepared milestone Copy/Share uses a separate text-only payload. Its allowlisted inputs are the canonical milestone type, the currently selected canonical objective name where applicable, and the current America/Denver time. It excludes actual-start history, prior milestone history, private fields, status notes, emergency contacts, coordinates, medical data, URLs, fragments, and query strings. Native Share completion means only that the platform share interaction returned; the Companion instructs the user to confirm delivery in the sending app.
 
 No external QR API is used. The stable public URL is directly QR-encodable without state; QR presentation belongs to the separate Mountain Guide Crew tab.
 

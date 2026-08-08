@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.6.0-candidate.4",
+  "version": "0.6.0-candidate.5",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "pre-crew-audit-remediation-candidate",
+    "name": "candidate-5-field-usability",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },

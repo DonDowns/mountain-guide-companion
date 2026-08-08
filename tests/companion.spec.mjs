@@ -1,5 +1,6 @@
 import { expect, test as base } from '@playwright/test';
 import { companionData, releaseMetadata } from '../js/companion-data.js';
+import { createMilestoneMessage } from '../js/companion-ui.js';
 
 const test = base.extend({
   consoleGate: [async ({ page, baseURL }, use) => {
@@ -18,9 +19,21 @@ const test = base.extend({
   }, { auto: true }]
 });
 
+async function openCompanion(page) {
+  await page.waitForFunction(() => !('serviceWorker' in navigator) || Boolean(navigator.serviceWorker.controller));
+  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await expect(page.locator('#timeline-view')).toBeVisible();
+}
+
+async function chooseObjective(page, objective) {
+  await page.getByRole('button', { name: /Change objective/ }).click();
+  await page.getByRole('radio', { name: `Choose ${objective.name}` }).check();
+  await page.getByRole('button', { name: 'Use objective' }).click();
+}
+
 test('loads canonical identity and friend first-open setup', async ({ page }, testInfo) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Mountain Guide Companion', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
   await expect(page.getByText('CANDIDATE', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
@@ -36,16 +49,19 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
 
 test('navigates Timeline, Route, and one-action Emergency', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   await expect(page.locator('#timeline-view')).toBeVisible();
+  await expect(page.locator('#current-objective-context')).toContainText(companionData.objectives[0].name);
   await expect(page.getByText(companionData.invariants.weather, { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: /Route/ }).last().click();
   await expect(page.locator('#route-view')).toBeVisible();
+  await expect(page.locator('#current-objective-context')).toContainText(companionData.objectives[0].name);
   for (const route of companionData.routes) await expect(page.getByRole('heading', { name: route.name })).toBeVisible();
 
   await page.getByRole('button', { name: /Emergency/ }).last().click();
   await expect(page.locator('#emergency-view')).toBeVisible();
+  await expect(page.locator('#current-objective-context')).toContainText(companionData.objectives[0].name);
   await expect(page.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
   const headerBottom = await page.locator('.app-header').evaluate(node => node.getBoundingClientRect().bottom);
   const emergencyTop = await page.getByRole('heading', { name: 'CALL 911 FIRST' }).evaluate(node => node.getBoundingClientRect().top);
@@ -66,7 +82,7 @@ test('navigates Timeline, Route, and one-action Emergency', async ({ page }) => 
 
 test('uses field-facing copy without implementation disclaimers or false confirmations', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   await page.getByRole('button', { name: /Emergency/ }).last().click();
   const visibleText = await page.locator('body').innerText();
   expect(visibleText).not.toMatch(/phone intent|browser intent|does not prove|drafted\/copied|service worker|cache|sha-256|fingerprint/i);
@@ -82,24 +98,28 @@ test('persists Red Display and objective selection without safety meaning', asyn
   await page.reload();
   await expect(page.getByRole('button', { name: /Red/ })).toHaveAttribute('aria-pressed', 'true');
 
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   const target = companionData.objectives[2];
-  await page.getByRole('radio', { name: `Select ${target.name}` }).check();
+  await chooseObjective(page, target);
   await page.reload();
-  await expect(page.getByRole('radio', { name: `Select ${target.name}` })).toBeChecked();
+  await openCompanion(page);
+  await expect(page.locator('#current-objective-context')).toContainText(target.name);
   await expect(page.locator('body')).not.toContainText(/danger status|safety status/i);
 });
 
 test('keeps actual start separate from canonical planned start and persists elapsed basis', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   const objective = companionData.objectives[1];
-  await page.getByRole('radio', { name: `Select ${objective.name}` }).check();
+  await chooseObjective(page, objective);
   await expect(page.getByText('4:15 AM', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Start Objective' }).click();
+  await expect(page.getByRole('button', { name: 'Record current time' })).toBeVisible();
+  await page.getByRole('button', { name: 'Record current time' }).click();
   await expect(page.getByText('Not started on this device')).toHaveCount(0);
   await expect(page.getByText('4:15 AM', { exact: true })).toBeVisible();
   await page.reload();
+  await openCompanion(page);
   await expect(page.getByText('4:15 AM', { exact: true })).toBeVisible();
   await expect(page.getByText(/^Elapsed /)).toBeVisible();
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
@@ -107,16 +127,196 @@ test('keeps actual start separate from canonical planned start and persists elap
   expect(stored.elapsedBasis[objective.id].startedAt).toBe(stored.actualStarts[objective.id]);
 });
 
-test('persists milestones as local marks only', async ({ page }) => {
+test('makes Companion Home returnable and Start Objective cancellable without state loss', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await expect(page.locator('#app-main')).toBeHidden();
+  await openCompanion(page);
+  const objective = companionData.objectives[0];
+  await page.getByRole('button', { name: 'Start Objective' }).click();
+  await page.getByRole('button', { name: 'Back', exact: true }).click();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objective.id]).toBeUndefined();
+
+  await page.getByRole('button', { name: 'Start Objective' }).click();
+  await page.getByRole('button', { name: 'Record current time' }).click();
+  const recorded = (await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objective.id];
+  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Resume Companion' }).first()).toBeVisible();
+  await expect(page.locator('#app-main')).toBeHidden();
+
+  await openCompanion(page);
+  await expect(page.getByRole('button', { name: 'Resume Objective' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objective.id]).toBe(recorded);
+});
+
+test('protects existing actual starts with edit Cancel and replace/reset confirmation', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
+  await page.getByRole('button', { name: 'Start Objective' }).click();
+  await page.getByRole('button', { name: 'Record current time' }).click();
+  const objectiveId = companionData.objectives[0].id;
+  const original = (await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objectiveId];
+
+  await page.getByRole('button', { name: 'Edit actual start' }).click();
+  await page.locator('#actual-start-input').fill('2026-08-07T10:04');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objectiveId]).toBe(original);
+
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Replace with current time' }).click();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objectiveId]).toBe(original);
+
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Reset actual start' }).click();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objectiveId]).toBe(original);
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Reset actual start' }).click();
+  await expect(page.getByRole('button', { name: 'Start Objective' })).toBeVisible();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objectiveId]).toBeUndefined();
+});
+
+test('switches objectives deliberately and preserves each objective actual start', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
+  const first = companionData.objectives[0];
+  const second = companionData.objectives[1];
+  await page.getByRole('button', { name: 'Start Objective' }).click();
+  await page.getByRole('button', { name: 'Record current time' }).click();
+  const firstStart = (await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[first.id];
+
+  await page.getByRole('button', { name: /Change objective/ }).click();
+  await page.getByRole('radio', { name: `Choose ${second.name}` }).check();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(page.locator('#current-objective-context')).toContainText(first.name);
+
+  await chooseObjective(page, second);
+  await expect(page.locator('#current-objective-context')).toContainText(second.name);
+  await expect(page.getByRole('button', { name: 'Start Objective' })).toBeVisible();
+  await chooseObjective(page, first);
+  await expect(page.getByRole('button', { name: 'Resume Objective' })).toBeVisible();
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[first.id]).toBe(firstStart);
+});
+
+test('returns to the top and reaches Emergency from deep Timeline content', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    scrollTo(0, document.documentElement.scrollHeight);
+  });
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(400);
+  await expect(page.locator('#current-objective-context')).toBeVisible();
+  await page.locator('#timeline-view').getByRole('button', { name: '↑ Top' }).click();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(5);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.getByRole('button', { name: /Emergency/ }).last().click();
+  await expect(page.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
+});
+
+test('timestamps, edits, persists, and undoes a local milestone without delivery claims', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
   const milestone = companionData.communication.milestones[0];
-  const checkbox = page.getByRole('checkbox', { name: `Mark ${milestone} locally` });
-  await checkbox.check();
-  await expect(page.getByText('Marked locally', { exact: true })).toBeVisible();
+  const card = page.locator('article[data-milestone="0"]');
+  await page.getByRole('button', { name: `Mark ${milestone} locally` }).click();
+  await expect(card).toContainText(/Marked locally at .*M[DS]T/);
+  const initialMarkedStatus = await card.locator('.milestone-status').textContent();
+  await page.getByRole('button', { name: `Edit local mark time for ${milestone}` }).click();
+  await page.locator('#milestone-time-0').fill('2026-08-07T10:04');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(card.locator('.milestone-status')).toHaveText(initialMarkedStatus);
+  await page.getByRole('button', { name: `Edit local mark time for ${milestone}` }).click();
+  await page.locator('#milestone-time-0').fill('2026-08-07T10:04');
+  await page.getByRole('button', { name: `Save local mark time for ${milestone}` }).click();
+  await expect(card).toContainText('Marked locally at 10:04 AM MDT');
   await page.reload();
-  await expect(page.getByRole('checkbox', { name: `Mark ${milestone} locally` })).toBeChecked();
-  await expect(page.locator('#milestone-list')).not.toContainText(/sent|delivered|confirmed/i);
+  await openCompanion(page);
+  await expect(page.locator('article[data-milestone="0"]')).toContainText('Marked locally at 10:04 AM MDT');
+  await page.getByRole('button', { name: `Undo local mark for ${milestone}` }).click();
+  await expect(page.locator('article[data-milestone="0"]')).toContainText('Not marked');
+  await expect(page.locator('#milestone-list')).not.toContainText(/sent|delivered|received|completed/i);
+});
+
+test('generates the nine approved milestone message templates from canonical objective and operational time', async () => {
+  const objective = companionData.objectives[1];
+  const time = new Date('2026-08-07T16:04:00.000Z');
+  expect(companionData.communication.milestones.map((_, index) => createMilestoneMessage(index, objective.id, time))).toEqual([
+    `Leaving the vehicle for ${objective.name} at 10:04 AM MDT. I’ll check in again at the next planned milestone.`,
+    'At Lake Como camp at 10:04 AM MDT.',
+    `Starting ${objective.name} at 10:04 AM MDT.`,
+    `At the summit or high point for ${objective.name} at 10:04 AM MDT. Beginning the return.`,
+    'Below exposed high terrain at 10:04 AM MDT and continuing down.',
+    'Back at Lake Como camp at 10:04 AM MDT.',
+    'Back at the vehicle at 10:04 AM MDT.',
+    'Through Fort Garland at 10:04 AM MDT and heading home.',
+    'Home at 10:04 AM MDT.'
+  ]);
+});
+
+test('copies only the prepared public message and never auto-marks the milestone', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async value => { globalThis.__copiedMessage = value; } }
+    });
+  });
+  await page.goto('/');
+  await openCompanion(page);
+  await page.getByText('Optional private fields on this phone').click();
+  await page.locator('[data-private-field="name"]').fill('PRIVATE-NAME-SENTINEL');
+  await page.locator('[data-private-field="note"]').fill('PRIVATE-NOTE-SENTINEL');
+  await page.getByRole('button', { name: 'Copy message for Vehicle departure' }).click();
+  await expect(page.locator('#toast')).toContainText('Message copied.');
+  const copied = await page.evaluate(() => globalThis.__copiedMessage);
+  expect(copied).toContain(`Leaving the vehicle for ${companionData.objectives[0].name}`);
+  expect(copied).toMatch(/at \d{1,2}:\d{2} [AP]M M[DS]T\./);
+  expect(copied).not.toMatch(/PRIVATE|https?:|coordinate|phone/i);
+  await expect(page.locator('article[data-milestone="0"]')).toContainText('Not marked');
+});
+
+test('uses native Share without delivery or local-mark claims', async ({ page }) => {
+  await page.addInitScript(() => {
+    navigator.share = async payload => { globalThis.__sharedMessagePayload = payload; };
+  });
+  await page.goto('/');
+  await openCompanion(page);
+  await page.getByRole('button', { name: 'Share message for Summit start' }).click();
+  await expect(page.locator('#toast')).toContainText('Confirm delivery in the sending app.');
+  const payload = await page.evaluate(() => globalThis.__sharedMessagePayload);
+  expect(Object.keys(payload).sort()).toEqual(['text', 'title']);
+  expect(payload.text).toContain(`Starting ${companionData.objectives[0].name}`);
+  expect(payload).not.toHaveProperty('url');
+  await expect(page.locator('article[data-milestone="2"]')).toContainText('Not marked');
+});
+
+test('treats cancelled Share neutrally and keeps milestone state unchanged', async ({ page }) => {
+  await page.addInitScript(() => {
+    navigator.share = async () => { throw new DOMException('Canceled', 'AbortError'); };
+  });
+  await page.goto('/');
+  await openCompanion(page);
+  await page.getByRole('button', { name: 'Share message for Home' }).click();
+  await expect(page.locator('#toast')).toContainText('Share canceled. Milestone unchanged.');
+  await expect(page.locator('article[data-milestone="8"]')).toContainText('Not marked');
+});
+
+test('falls back from unavailable message Share to offline-capable clipboard copy', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async value => { globalThis.__sharedFallbackCopy = value; } }
+    });
+  });
+  await page.goto('/');
+  await openCompanion(page);
+  await page.getByRole('button', { name: 'Share message for Back at vehicle' }).click();
+  expect(await page.evaluate(() => globalThis.__sharedFallbackCopy)).toMatch(/^Back at the vehicle at /);
+  await expect(page.locator('#toast')).toContainText('Message copied. Share is unavailable on this device.');
+  await expect(page.locator('article[data-milestone="6"]')).toContainText('Not marked');
 });
 
 test('keeps private fields device-local, shares only the public URL, and clears private data', async ({ page }) => {
@@ -124,7 +324,7 @@ test('keeps private fields device-local, shares only the public URL, and clears 
     navigator.share = async payload => { globalThis.__sharedPayload = payload; };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
   await page.locator('[data-private-field="alternate"]').fill('y');
@@ -135,7 +335,7 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   expect(Object.keys(payload).sort()).toEqual(['text', 'title', 'url']);
   expect(page.url()).not.toContain('?');
   await page.reload();
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   page.once('dialog', dialog => dialog.accept());
@@ -205,7 +405,7 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
 });
 
-test('migrates Phase 4 local state to schema version 2 without losing operational or private values', async ({ page }) => {
+test('migrates earlier local state to schema version 3 without inventing a milestone timestamp', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('mgc-companion-local-state', JSON.stringify({
       schemaVersion: 1,
@@ -220,14 +420,15 @@ test('migrates Phase 4 local state to schema version 2 without losing operationa
     }));
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
-  await expect(page.getByRole('radio', { name: /Select Mount Lindsey/ })).toBeChecked();
-  await expect(page.locator('[data-milestone="0"]')).toBeChecked();
+  await openCompanion(page);
+  await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
+  await expect(page.locator('article[data-milestone="0"]')).toContainText('Marked locally; time was not recorded by the earlier version.');
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
-  expect(stored.schemaVersion).toBe(2);
+  expect(stored.schemaVersion).toBe(3);
+  expect(stored.milestoneMarks['0']).toBe('');
   expect(stored.statusNote).toBe('z');
   expect(stored.setup.legacyStructuralCheckCompletedAt).toBe('2026-08-07T10:05:00.000Z');
   expect(stored.setup.offlineVerifiedAt).toBe('');
@@ -262,7 +463,7 @@ test('exposes an install action only after a supported browser prompt', async ({
 
 test('withholds Lily Lake location and prevents horizontal overflow with usable targets', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await openCompanion(page);
   await page.getByRole('button', { name: /Route/ }).last().click();
   await expect(page.locator('#lily-status')).toContainText('Exact coordinate/elevation is pending verification and is not shown.');
   await expect(page.locator('body')).not.toContainText(/37\.62361|-105\.47278|37\.623486|-105\.472903/);
@@ -278,11 +479,14 @@ test('withholds Lily Lake location and prevents horizontal overflow with usable 
 test('provides semantic landmarks, visible focus, and named global controls', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('banner')).toBeVisible();
-  await expect(page.getByRole('main')).toBeVisible();
+  await expect(page.getByRole('main')).toBeHidden();
   await expect(page.getByRole('navigation', { name: 'Companion sections' })).toBeVisible();
   const red = page.getByRole('button', { name: /Red/ });
   await expect(red).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await openCompanion(page);
+  await expect(page.getByRole('main')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Home', exact: true })).toBeVisible();
   await page.keyboard.press('Tab');
   const focused = await page.evaluate(() => ({
     tag: document.activeElement?.tagName,
@@ -290,4 +494,29 @@ test('provides semantic landmarks, visible focus, and named global controls', as
   }));
   expect(focused.tag).not.toBe('BODY');
   expect(focused.outline).not.toBe('none');
+});
+
+test('keeps mobile navigation readable and non-overlapping with increased text', async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.includes('mobile'), 'Increased-text wrapping is verified at the 390×844 mobile viewport');
+  await page.goto('/');
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  await openCompanion(page);
+  const layout = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    pageWidth: document.documentElement.scrollWidth,
+    headerWidth: document.querySelector('.app-header').scrollWidth,
+    headerClientWidth: document.querySelector('.app-header').clientWidth,
+    navButtons: [...document.querySelectorAll('.primary-nav button')].map(node => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, right: box.right, width: box.width, height: box.height, scrollWidth: node.scrollWidth };
+    })
+  }));
+  expect(layout.pageWidth - layout.viewport).toBeLessThanOrEqual(1);
+  expect(layout.headerWidth - layout.headerClientWidth).toBeLessThanOrEqual(1);
+  for (const [index, button] of layout.navButtons.entries()) {
+    expect(button.width).toBeGreaterThanOrEqual(44);
+    expect(button.height).toBeGreaterThanOrEqual(44);
+    expect(button.scrollWidth - button.width).toBeLessThanOrEqual(1);
+    if (index) expect(layout.navButtons[index - 1].right).toBeLessThanOrEqual(button.left + 0.5);
+  }
 });

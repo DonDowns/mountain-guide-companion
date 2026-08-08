@@ -2,7 +2,7 @@
 
 ## Status and boundary
 
-Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets, Phase 6A.1 simplifies field-facing copy, and the pre-Crew audit remediation publishes `0.6.0-candidate.4` with corrected navigation and lifecycle invariants. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
+Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation corrects navigation and lifecycle invariants, and candidate `0.6.0-candidate.5` adds offline field-usability controls without altering the service-worker transaction model. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
 
 The configured origin is `https://companion.vondadowns.com/`. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate `https://mountainguide.vondadowns.com/` origin.
 
@@ -40,7 +40,7 @@ Activation re-verifies the current bundle before claiming clients. Only then doe
 
 The last known-complete release therefore remains operational while a candidate downloads and verifies. A verified update waits for an explicit Restart to use update action. If the candidate fails installation or verification, the previous complete release remains. This retention is recovery protection during an update, not a general offline rollback UI; release-level rollback to a tagged package remains a later gate.
 
-After a verified replacement claims clients, every open Companion window is navigated to its current URL. Each candidate.4 page also reloads once when its controlling worker changes. These bounded behaviors prevent old parsed shells from continuing indefinitely against a new active release; first installation does not trigger the replacement-release navigation path.
+After a verified replacement claims clients, every open Companion window is navigated to its current URL. Each current candidate page also reloads once when its controlling worker changes. These bounded behaviors prevent old parsed shells from continuing indefinitely against a new active release; first installation does not trigger the replacement-release navigation path.
 
 ## Deterministic fetch behavior
 

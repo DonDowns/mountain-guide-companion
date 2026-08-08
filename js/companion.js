@@ -1,15 +1,21 @@
 import { clearPrivateFields, createCompanionStore } from './companion-state.js';
 import {
   activateWaitingUpdate, installPromptAvailable, isIosBrowser, isStandalone, registerProductionServiceWorker,
-  repairOfflineCopy, requestInstall, sharePublicCompanion, storageEstimate, verifyOfflineResources, watchInstallPrompt
+  copyPreparedMessage, repairOfflineCopy, requestInstall, sharePreparedMessage, sharePublicCompanion,
+  storageEstimate, verifyOfflineResources, watchInstallPrompt
 } from './companion-install.js';
 import {
-  companionData, navigateTo, releaseMetadata, renderArtifacts, renderEmergency,
-  refreshElapsed, renderRoutes, renderSetupPanel, renderStaticIdentity, renderTimeline, setRedDisplay, showToast
+  companionData, createMilestoneMessage, navigateHome, navigateTo, parseOperationalDateTimeInput, releaseMetadata,
+  renderArtifacts, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
+  renderStaticIdentity, renderTimeline, scrollCurrentViewToTop, setRedDisplay, showToast
 } from './companion-ui.js';
 
 const store = createCompanionStore(companionData.objectives[0].id);
 let editObjectiveId = '';
+let startObjectiveId = '';
+let objectiveSelectorOpen = false;
+let pendingObjectiveId = '';
+let editMilestoneKey = '';
 let offlineResult = { checking: true, complete: false };
 let storageInfo = null;
 let workerState = { supported: 'serviceWorker' in navigator, controlled: Boolean(navigator.serviceWorker?.controller), updateAvailable: false };
@@ -27,9 +33,13 @@ function setupOptions(state = store.getState()) {
 }
 
 function renderState(state = store.getState()) {
-  renderTimeline(state, editObjectiveId);
+  renderTimeline(state, { editObjectiveId, startObjectiveId, objectiveSelectorOpen, pendingObjectiveId, editMilestoneKey });
+  renderObjectiveContext(state);
   setRedDisplay(state.redDisplay);
   renderSetupPanel(document.querySelector('#install-panel'), setupOptions(state));
+  for (const button of document.querySelectorAll('[data-action="open-companion"]')) {
+    button.textContent = state.setup.companionOpened ? 'Resume Companion' : 'Open Companion';
+  }
 }
 
 async function runOfflineCheck({ record = true } = {}) {
@@ -82,16 +92,23 @@ function recordActualStart(objectiveId, date = new Date()) {
 
 async function handleAction(action, button) {
   if (action === 'open-companion') {
-    document.body.classList.add('companion-open');
     store.update(state => { state.setup.companionOpened = true; });
-    document.body.getBoundingClientRect();
     navigateTo('timeline');
     document.querySelector('#app-main').focus({ preventScroll: true });
   }
+  if (action === 'home') {
+    editObjectiveId = '';
+    startObjectiveId = '';
+    objectiveSelectorOpen = false;
+    pendingObjectiveId = '';
+    editMilestoneKey = '';
+    navigateHome();
+  }
   if (action === 'show-setup') {
-    document.body.classList.remove('companion-open');
+    navigateHome({ focus: false });
     document.querySelector('#install-panel').scrollIntoView({ block: 'start' });
   }
+  if (action === 'top') scrollCurrentViewToTop();
   if (action === 'toggle-red') {
     store.update(state => { state.redDisplay = !state.redDisplay; });
   }
@@ -132,11 +149,34 @@ async function handleAction(action, button) {
     if (!activated) showToast('No downloaded update is waiting.');
   }
   if (action === 'start-objective') {
-    recordActualStart(button.dataset.objectiveId);
+    startObjectiveId = button.dataset.objectiveId;
     editObjectiveId = '';
+    renderState();
+    document.querySelector('.start-confirmation')?.focus?.();
+  }
+  if (action === 'back-from-start') {
+    startObjectiveId = '';
+    renderState();
+    document.querySelector('[data-action="start-objective"]')?.focus();
+  }
+  if (action === 'confirm-start') {
+    startObjectiveId = '';
+    recordActualStart(button.dataset.objectiveId);
+    showToast('Actual start recorded on this phone.');
+  }
+  if (action === 'resume-objective') {
+    const target = document.querySelector('.decision-section');
+    target?.scrollIntoView({ block: 'start' });
+    target?.focus?.({ preventScroll: true });
+  }
+  if (action === 'replace-start') {
+    if (!globalThis.confirm('Replace the existing actual start and elapsed basis with the current time?')) return;
+    recordActualStart(button.dataset.objectiveId);
+    showToast('Actual start replaced with the current time.');
   }
   if (action === 'edit-start') {
     editObjectiveId = button.dataset.objectiveId;
+    startObjectiveId = '';
     renderState();
     document.querySelector('#actual-start-input')?.focus();
   }
@@ -146,21 +186,98 @@ async function handleAction(action, button) {
   }
   if (action === 'save-start') {
     const input = document.querySelector('#actual-start-input');
-    const parsed = input?.value ? new Date(input.value) : null;
+    const parsed = parseOperationalDateTimeInput(input?.value || '');
     if (!parsed || Number.isNaN(parsed.getTime())) {
       showToast('Enter an actual start date and time.');
       return;
     }
-    recordActualStart(button.dataset.objectiveId, parsed);
     editObjectiveId = '';
+    recordActualStart(button.dataset.objectiveId, parsed);
   }
   if (action === 'reset-start') {
-    if (!globalThis.confirm('Clear the actual start and elapsed basis for this objective on this device?')) return;
+    if (!globalThis.confirm('Reset this objective’s actual start and elapsed basis on this phone? This removes the saved start time.')) return;
+    editObjectiveId = '';
     store.update(state => {
       delete state.actualStarts[button.dataset.objectiveId];
       delete state.elapsedBasis[button.dataset.objectiveId];
     });
+  }
+  if (action === 'change-objective') {
+    navigateTo('timeline');
+    objectiveSelectorOpen = true;
+    pendingObjectiveId = store.getState().selectedObjectiveId;
     editObjectiveId = '';
+    startObjectiveId = '';
+    renderState();
+    document.querySelector('[name="pending-objective"]:checked')?.focus();
+  }
+  if (action === 'confirm-objective') {
+    const objective = companionData.objectives.find(item => item.id === pendingObjectiveId);
+    if (!objective) return;
+    objectiveSelectorOpen = false;
+    pendingObjectiveId = '';
+    editObjectiveId = '';
+    startObjectiveId = '';
+    store.update(state => { state.selectedObjectiveId = objective.id; });
+    showToast(`Current objective: ${objective.name}. Saved state was preserved.`);
+  }
+  if (action === 'cancel-objective') {
+    objectiveSelectorOpen = false;
+    pendingObjectiveId = '';
+    renderState();
+    document.querySelector('[data-action="change-objective"]')?.focus();
+  }
+  if (action === 'mark-milestone') {
+    const markedAt = new Date().toISOString();
+    store.update(state => {
+      state.checkedMilestones[button.dataset.milestone] = true;
+      state.milestoneMarks[button.dataset.milestone] = markedAt;
+    });
+  }
+  if (action === 'clear-milestone') {
+    editMilestoneKey = '';
+    store.update(state => {
+      delete state.checkedMilestones[button.dataset.milestone];
+      delete state.milestoneMarks[button.dataset.milestone];
+    });
+    showToast('Local milestone mark removed.');
+  }
+  if (action === 'edit-milestone') {
+    editMilestoneKey = button.dataset.milestone;
+    renderState();
+    document.querySelector(`#milestone-time-${editMilestoneKey}`)?.focus();
+  }
+  if (action === 'cancel-milestone-edit') {
+    editMilestoneKey = '';
+    renderState();
+  }
+  if (action === 'save-milestone') {
+    const key = button.dataset.milestone;
+    const parsed = parseOperationalDateTimeInput(document.querySelector(`#milestone-time-${key}`)?.value || '');
+    if (!parsed) {
+      showToast('Enter a local milestone date and time.');
+      return;
+    }
+    editMilestoneKey = '';
+    store.update(state => {
+      state.checkedMilestones[key] = true;
+      state.milestoneMarks[key] = parsed.toISOString();
+    });
+  }
+  if (action === 'copy-message' || action === 'share-message') {
+    const milestoneIndex = Number(button.dataset.milestone);
+    const state = store.getState();
+    const message = createMilestoneMessage(milestoneIndex, state.selectedObjectiveId, new Date());
+    if (action === 'copy-message') {
+      const result = await copyPreparedMessage(message);
+      showToast(result.completed ? 'Message copied.' : 'Copy the prepared message from the prompt.');
+    } else {
+      const result = await sharePreparedMessage(message);
+      if (result.method === 'share' && result.completed) showToast('Confirm delivery in the sending app.');
+      else if (result.cancelled) showToast('Share canceled. Milestone unchanged.');
+      else if (result.completed) showToast('Message copied. Share is unavailable on this device.');
+      else showToast('Copy the prepared message from the prompt.');
+    }
   }
   if (action === 'clear-private') {
     if (!globalThis.confirm('Clear all optional private contact fields on this device?')) return;
@@ -179,17 +296,14 @@ function bindEvents() {
       return;
     }
     const button = event.target.closest('[data-action]');
-    if (button) handleAction(button.dataset.action, button);
+    if (button) {
+      event.preventDefault();
+      handleAction(button.dataset.action, button);
+    }
   });
 
   document.addEventListener('change', event => {
-    if (event.target.name === 'selected-objective') {
-      store.update(state => { state.selectedObjectiveId = event.target.value; });
-      editObjectiveId = '';
-    }
-    if (event.target.matches('[data-milestone]')) {
-      store.update(state => { state.checkedMilestones[event.target.dataset.milestone] = event.target.checked; });
-    }
+    if (event.target.name === 'pending-objective') pendingObjectiveId = event.target.value;
   });
 
   document.addEventListener('input', event => {

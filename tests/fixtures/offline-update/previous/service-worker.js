@@ -1,4 +1,4 @@
-const PREVIOUS_BUNDLE_ID = 'ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1';
+const PREVIOUS_BUNDLE_ID = 'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1';
 const CACHE_NAME = `ddmg-companion-release-${PREVIOUS_BUNDLE_ID}-previous`;
 const MARKER_URL = new URL('__ddmg_complete__.json', self.registration.scope).href;
 const RESOURCES = ['index.html', 'fixture-app.js'];
@@ -14,13 +14,13 @@ self.addEventListener('install', event => {
     await cache.put(MARKER_URL, new Response(JSON.stringify({
       complete: true,
       bundle_id: PREVIOUS_BUNDLE_ID,
-      bundle_manifest_sha256: 'candidate-3-fixture-manifest-sha256',
-      bundle_content_sha256: 'candidate-3-fixture-content-sha256',
+      bundle_manifest_sha256: 'candidate-4-fixture-manifest-sha256',
+      bundle_content_sha256: 'candidate-4-fixture-content-sha256',
       installed_at: '2026-08-07T00:00:00.000Z',
       offline_bundle: {
         schema_version: 1,
         bundle_id: PREVIOUS_BUNDLE_ID,
-        companion_version: '0.6.0-candidate.3',
+        companion_version: '0.6.0-candidate.4',
         data_version: '1.0.0',
         trip_manifest_sha256: '3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758',
         entry_count: RESOURCES.length,

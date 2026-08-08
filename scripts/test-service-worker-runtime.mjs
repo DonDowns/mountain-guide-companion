@@ -158,12 +158,12 @@ async function createRuntime({ mutateBeforeVerification = false, windowCount = 0
   }
 
   async function seedPreviousRelease() {
-    const name = 'ddmg-companion-release-ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1-previous';
+    const name = 'ddmg-companion-release-ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1-previous';
     const cache = await caches.open(name);
     await cache.put(new URL('index.html', scope).href, new Response('<h1>Previous Companion</h1>', { headers: { 'Content-Type': 'text/html' } }));
     await cache.put(markerUrl, new Response(JSON.stringify({
       complete: true,
-      bundle_id: 'ddmg-companion-0-6-0-candidate-3-data-3cda95d4e6b1-b1',
+      bundle_id: 'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1',
       bundle_manifest_sha256: 'previous-release-manifest-sha256',
       bundle_content_sha256: 'previous-release-content-sha256',
       installed_at: '2026-08-07T00:00:00.000Z',

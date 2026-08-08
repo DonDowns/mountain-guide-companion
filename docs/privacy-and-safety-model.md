@@ -123,7 +123,7 @@ The local path:
 - fails closed when corrupt or incompatible;
 - requires separate review before any export/backup feature.
 
-Phase 5 local-state schema version 2 fails closed to empty defaults on corrupt or incompatible input. Migration from schema version 1 preserves allowlisted operational/private values but does not reinterpret the earlier structural check as a verified offline bundle. Offline verification is bound to the exact bundle ID, and the physical Airplane Mode mark is a local user attestation only. Share sends only the configured public Companion URL. Checked communication milestones mean only Marked locally, and locally composed status text remains explicitly unsent.
+Candidate.5 local-state schema version 3 fails closed to empty defaults on corrupt or incompatible input. Migration from schema versions 1 and 2 preserves allowlisted operational/private values but does not invent timestamps for earlier boolean-only milestone marks or reinterpret the earlier structural check as a verified offline bundle. Offline verification is bound to the exact bundle ID, and the physical Airplane Mode mark is a local user attestation only. Public Companion sharing sends only the configured public Companion URL. Prepared milestone messages contain only approved template wording, the selected canonical objective name where applicable, and the current America/Denver time. Copy or Share never changes the local milestone mark and never claims delivery.
 
 ### Service-worker/cache path
 
