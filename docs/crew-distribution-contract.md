@@ -15,7 +15,7 @@ The public URL is stable and contains no query string, fragment state, local sto
 A friend arriving from QR, link, text, or AirDrop lands at the root Companion URL and sees:
 
 1. Mountain Guide Companion and the current public trip identity.
-2. Open Companion.
+2. Choose Install for Offline Use.
 3. Install for Offline Use.
 4. A short explanation of the field-instrument boundary.
 5. The three coordinated Companion artifacts.
@@ -26,7 +26,7 @@ No GitHub account, authentication, repository knowledge, or Mountain Guide acces
 
 The Crew tab may expose:
 
-- Open Companion;
+- Continue in Browser or open the installed Trip Companion;
 - Set Up a Friend;
 - Show QR Code;
 - Share Companion Link;
@@ -67,7 +67,7 @@ PDF links use the same public origin. Their public availability enables physical
 
 ## Offline truth boundary
 
-The Companion may display `OFFLINE RESOURCES VERIFIED` only after its controlling worker verifies the exact local bundle. A future Crew tab must not infer that state from remote `release.json`, and must not convert it to ready, safe, all clear, or equivalent wording. The physical Airplane Mode mark is a local user attestation on one phone and is not contained in public release metadata.
+The Companion may display `Offline resources verified` only after its controlling worker verifies the exact local bundle. A future Crew tab must not infer that state from remote `release.json`, and must not convert it to ready, safe, all clear, or equivalent wording. The physical Airplane Mode mark is a local user attestation on one phone and is not contained in public release metadata.
 
 ## Ownership boundary
 

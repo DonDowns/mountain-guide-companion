@@ -333,7 +333,7 @@ Manual adversarial review asks:
 
 Any yes/ambiguous answer blocks release.
 
-Phase 5 statically scans the PWA-facing source and generated metadata and exercises rendered browser content. Required principles and emergency hierarchy must appear; affirmative authorization, safety, rescue, delivery, and mountain-readiness claims fail validation. `OFFLINE RESOURCES VERIFIED` is permitted only with the exact local-resource safety boundary.
+Phase 5 statically scans the PWA-facing source and generated metadata and exercises rendered browser content. Required principles and emergency hierarchy must appear; affirmative authorization, safety, rescue, delivery, and mountain-readiness claims fail validation. `Offline resources verified` is permitted only with the exact local-resource safety boundary.
 
 ## Print validation
 

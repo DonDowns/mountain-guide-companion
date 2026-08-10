@@ -26,7 +26,7 @@ async function main() {
     companionData.invariants.emergency,
     companionData.invariants.jurisdiction,
     'Planning targets remain planning values.',
-    'This confirms Companion resources on this phone. It does not evaluate weather, access, terrain, or route conditions.',
+    'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.',
     'Each phone must complete its own Offline Check and Airplane Mode test.'
   ]) {
     if (!runtime.includes(required.toLowerCase())) errors.push(`PWA runtime is missing safety boundary ${JSON.stringify(required)}`);

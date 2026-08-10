@@ -14,7 +14,7 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
 
   await page.goto('/');
   if (desktop) {
-    await page.getByRole('button', { name: 'Open Companion' }).first().click();
+    await page.getByRole('button', { name: 'Continue in Browser' }).click();
     await expectBelowHeader(page, 'Timeline');
     await page.screenshot({ path: 'tmp/visual-audit/14-desktop-timeline.png' });
     await page.getByRole('button', { name: /Route/ }).last().click();
@@ -28,7 +28,7 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   await page.screenshot({ path: 'tmp/visual-audit/02-mobile-artifacts.png' });
   await page.locator('#install-panel').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'tmp/visual-audit/03-mobile-setup.png' });
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await page.getByRole('button', { name: 'Continue in Browser' }).click();
   await expectBelowHeader(page, 'Timeline');
   await page.screenshot({ path: 'tmp/visual-audit/04-mobile-timeline-daylight.png' });
   await page.getByRole('button', { name: /Route/ }).last().click();
@@ -49,12 +49,12 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
 
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
-  await expect(page.getByText('INSTALLED COMPANION', { exact: true })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeAttached();
   await page.getByRole('button', { name: 'Set up this phone' }).click();
-  await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
+  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
   await page.locator('#install-panel').evaluate(node => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
-  await expect(page.getByText('Companion installed on this phone')).toBeVisible();
+  await expect(page.getByText('Companion installed', { exact: true })).toBeVisible();
   await page.screenshot({ path: 'tmp/visual-audit/09-mobile-installed-offline-check.png' });
 
   await page.setViewportSize({ width: 844, height: 390 });

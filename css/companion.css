@@ -74,6 +74,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   min-height: 100%;
   background: var(--bg);
@@ -173,15 +177,17 @@ body:not(.companion-open) .app-skip-link,
 
 .brand span {
   display: grid;
+  min-width: 0;
   line-height: 1.05;
 }
 
 .brand strong {
-  font-size: 1rem;
+  font-size: 0.94rem;
 }
 
 .brand small {
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
   margin-top: 3px;
   padding: 3px 6px;
   border: 1px solid var(--color-status-candidate-border);
@@ -190,8 +196,9 @@ body:not(.companion-open) .app-skip-link,
   color: var(--color-status-candidate-text);
   font-size: 0.69rem;
   font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.16em;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
 }
 
 :root[data-display="red"] .brand small {
@@ -320,6 +327,27 @@ h3 {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 24px;
+}
+
+.welcome-link-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.setup-boundary {
+  margin: 0;
+}
+
+.release-note {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .primary-button,

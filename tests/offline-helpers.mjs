@@ -25,7 +25,7 @@ export async function installCurrent(page, request) {
   await page.goto('/');
   await waitForServiceWorker(page);
   await page.getByRole('button', { name: 'Set up this phone' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
 }
 
 export async function activeCompanionCache(page) {

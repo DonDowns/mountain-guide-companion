@@ -8,7 +8,7 @@ test.beforeEach(async ({ request }) => {
 });
 
 async function openCompanion(page) {
-  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await page.locator('[data-action="open-companion"]').first().click();
   await expect(page.locator('#timeline-view')).toBeVisible();
 }
 
@@ -40,13 +40,13 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await context.setOffline(true);
   await resetServerRequests(request);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
   await page.close();
   const offlinePage = await context.newPage();
   offlinePage.on('pageerror', error => errors.push(error.message));
   offlinePage.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await offlinePage.goto('/');
-  await expect(offlinePage.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
+  await expect(offlinePage.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
   await expect(offlinePage.locator('html')).toHaveAttribute('data-display', 'red');
   await openCompanion(offlinePage);
   await expect(offlinePage.locator('#current-objective-context')).toContainText('Mount Lindsey');
@@ -63,8 +63,8 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await expect(offlinePage.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
   await expect(offlinePage.locator('a.phone-link')).toHaveCount(6);
   await offlinePage.getByRole('button', { name: 'Set up this phone' }).click();
-  await offlinePage.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(offlinePage.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await offlinePage.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
+  await expect(offlinePage.getByText('Offline resources verified', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 
   const observedRequests = await serverRequests(request);
@@ -160,11 +160,11 @@ test('keeps the previous complete release active when a new required JavaScript 
     });
   });
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Companion Home' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Marked complete on this phone:/)).toBeVisible();
+  await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
   await openCompanion(page);
   await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
   await expect(page.locator('article[data-milestone="0"]')).toContainText(/Marked locally/);
@@ -196,8 +196,8 @@ test('reloads two previous-release tabs coherently when the verified update acti
   await page.getByRole('button', { name: 'Restart to use update' }).click();
 
   for (const candidatePage of [page, second]) {
-    await expect(candidatePage.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.5/)).toBeVisible();
+    await expect(candidatePage.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.6/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -213,7 +213,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
   });
   expect(complete).toEqual([
     'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1',
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-5-data-3cda95d4e6b1-b1$/)
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-6-data-3cda95d4e6b1-b1$/)
   ]);
 });
 
@@ -227,7 +227,7 @@ test('Offline Check rejects an active registration when this page has no control
     return { active: Boolean(registration?.active), controlled: Boolean(navigator.serviceWorker.controller) };
   });
   expect(state).toEqual({ active: true, controlled: false });
-  await page.getByRole('button', { name: 'Offline Check' }).click();
+  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
   await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
   await expect(page.getByText(/not controlling this page/i)).toBeVisible();
 });

@@ -18,7 +18,7 @@
   <header class="app-header">
     <a class="brand" href="#companion-home" data-action="home" aria-label="Go to Companion Home">
       <img src="./icons/companion-icon.svg" alt="" width="38" height="38">
-      <span><strong>Companion</strong><small>CANDIDATE</small></span>
+      <span><strong>Mountain Guide Companion</strong><small id="release-badge">Test version</small></span>
     </a>
     <div class="header-actions">
       <button class="quiet-button" type="button" data-action="share">Share</button>
@@ -28,14 +28,19 @@
 
   <section class="welcome" id="companion-home" tabindex="-1" aria-labelledby="welcome-title">
     <div class="welcome-copy">
-      <p class="eyebrow">CURRENT TRIP</p>
-      <h1 id="welcome-title">Companion Home</h1>
+      <p class="eyebrow" id="welcome-eyebrow">MOUNTAIN GUIDE COMPANION</p>
+      <h1 id="welcome-title">Set Up This Phone</h1>
       <p class="trip-name" id="trip-name">Loading current trip…</p>
-      <p class="welcome-summary">Physical phone testing is still required. This is not yet a field release.</p>
+      <p class="welcome-summary" id="welcome-summary">Recommended for trip partners. This keeps the trip plan, emergency information, communication milestones, Field Guide, and Pocket Card available when there is no service.</p>
       <div class="welcome-actions">
-        <button class="primary-button" type="button" data-action="open-companion">Open Companion</button>
-        <button class="secondary-button" type="button" data-action="show-setup">Install for Offline Use</button>
+        <button class="primary-button" id="home-primary-action" type="button" data-action="show-setup">Install for Offline Use</button>
+        <button class="secondary-button" id="home-secondary-action" type="button" data-action="open-companion">Continue in Browser</button>
       </div>
+      <div class="welcome-link-actions">
+        <button class="quiet-button" type="button" data-action="share">Share Companion</button>
+        <a class="quiet-button" id="return-to-mountain-guide" href="https://mountainguide.vondadowns.com/" hidden>Return to Mountain Guide</a>
+      </div>
+      <p class="release-note">Physical phone testing is still required. This is not yet a field release.</p>
     </div>
 
     <aside class="purpose-card" aria-labelledby="purpose-title">

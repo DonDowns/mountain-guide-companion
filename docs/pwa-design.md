@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.5` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior, and candidate.5 improves field navigation and local communication preparation without changing canonical data, safety meaning, privacy behavior, or service-worker transaction architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Protected-main Pages automation publishes `0.6.0-candidate.6` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior, candidate.5 improves field navigation and local communication preparation, and candidate.6 clarifies friend setup and installed navigation without changing canonical data, safety meaning, privacy behavior, or service-worker transaction architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -19,11 +19,11 @@ Hand-maintained HTML, CSS, and JavaScript contain UI structure and safety-bounda
 
 ## Friend first-open flow
 
-The root URL is a friend-facing landing experience suitable for a QR scan, text, AirDrop, or copied link. Above the mobile fold it presents the product name, current trip, Open Companion, Install for Offline Use, and a concise explanation. No repository or developer terminology is exposed.
+The root URL is a friend-facing landing experience suitable for a QR scan, text, AirDrop, or copied link. In a browser it presents Mountain Guide Companion, Set Up This Phone, Install for Offline Use, Continue in Browser, Share Companion, and a plain-language offline recommendation. When launched from the Home Screen it presents Companion Home, Open Trip Companion, Offline Check, the Field Guide, the Pocket Card, and Share Companion. No repository or developer terminology is exposed.
 
-In an ordinary browser the setup panel shows INSTALL FOR OFFLINE USE. iPhone/iOS wording directs the user to Safari, Share, Add to Home Screen, one online installed launch, Offline Check, and a later physical Airplane Mode test. A programmatic Install Companion action appears only when the browser supplies `beforeinstallprompt`.
+In an ordinary browser the setup panel labels offline installation as recommended for trip partners. iPhone/iOS wording directs the user to Safari, Share, Add to Home Screen, one online installed launch, Offline Check, and a later physical Airplane Mode test. A programmatic Install Companion action appears only when the browser supplies `beforeinstallprompt`.
 
-Standalone detection uses the display-mode media query and iOS `navigator.standalone`. The standalone panel is titled INSTALLED COMPANION and exposes Companion version, Trip Data version, source release, verified date, and manifest fingerprint through the persistent provenance and setup checklist.
+Standalone detection uses the display-mode media query and iOS `navigator.standalone`. Once the installed shell and required offline resources are verified, the setup panel says THIS PHONE IS SET UP and shows only the installed, offline-resource, and Airplane Mode states. Companion version, Trip Data version, source release, verified date, and manifest fingerprint remain in persistent provenance.
 
 ## Setup and Offline Check boundary
 
@@ -35,7 +35,9 @@ The setup checklist can truthfully complete packaged-resource checks in Phase 5:
 - every required resource passes byte-size and SHA-256 verification;
 - installed/standalone detection when observed.
 
-Offline Check requires the current page to have a controlling production worker, then verifies that worker's complete active bundle locally: exact cache/bundle identity, completion marker, resource count, every listed asset, canonical/release identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, rendered core sections, and both PDFs. An active registration without a controlling worker fails the check. Its result is `OFFLINE RESOURCES VERIFIED` or `OFFLINE RESOURCES INCOMPLETE`, followed by an explicit statement that software-resource verification does not verify mountain conditions, access, weather, or route safety.
+Offline Check requires the current page to have a controlling production worker, then verifies that worker's complete active bundle locally: exact cache/bundle identity, completion marker, resource count, every listed asset, canonical/release identity, three objectives, four routes, five decision gates, six public numbers, nine milestones, rendered core sections, and both PDFs. An active registration without a controlling worker fails the check. Success appears once as `Offline resources verified` within the concise setup state; failure remains `OFFLINE RESOURCES INCOMPLETE`. The panel always states that software-resource verification does not evaluate weather, access, terrain, or route conditions.
+
+A Return to Mountain Guide link is rendered only when the current document's referrer parses to the exact `https://mountainguide.vondadowns.com` origin. Ordinary friend links, lookalike hosts, installed launches, missing referrers, and unparseable referrers do not expose it. The condition uses no query parameter, fragment, local state, or private value.
 
 `scripts/build-offline.mjs` generates the explicit `offline-bundle.json` and production `service-worker.js` from actual bytes. Installation is marker-last and hash-verified; a failed candidate is deleted without replacing the last complete release. Field-critical fetches resolve only from one verified active cache, preventing network/cache or old/new mixing. See `docs/offline-architecture.md` for lifecycle, retention, repair, storage, and test details.
 
