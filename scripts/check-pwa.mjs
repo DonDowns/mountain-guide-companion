@@ -61,8 +61,8 @@ async function main() {
   }
 
   for (const required of [
-    'Mountain Guide Companion', 'Companion Home', 'Open Companion', 'Home', 'Timeline', 'Route', 'Emergency', 'Red',
-    '↑ Top', 'CALL 911 FIRST', 'Three Companion Artifacts', 'CANDIDATE', 'not yet a field release'
+    'Mountain Guide Companion', 'Set Up This Phone', 'Companion Home', 'Continue in Browser', 'Home', 'Timeline', 'Route', 'Emergency', 'Red',
+    '↑ Top', 'CALL 911 FIRST', 'Three Companion Artifacts', 'Test version', 'not yet a field release'
   ]) requireText(html.toLowerCase(), required.toLowerCase(), 'index.html', errors);
   for (const required of ['env(safe-area-inset-bottom)', 'min-height: 48px', '[data-display="red"]', 'overflow-x: hidden']) {
     requireText(css, required, 'companion.css', errors);

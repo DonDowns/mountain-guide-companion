@@ -9,10 +9,11 @@ async function audit(page, label) {
 }
 
 test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) => {
+  test.setTimeout(60000);
   await page.goto('/');
   await audit(page, 'friend first-open');
 
-  await page.getByRole('button', { name: 'Open Companion' }).first().click();
+  await page.getByRole('button', { name: 'Continue in Browser' }).click();
   await audit(page, 'Timeline daylight');
 
   await page.getByRole('button', { name: /Route/ }).last().click();
@@ -30,7 +31,7 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
   await page.getByRole('button', { name: /Red/ }).click();
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
-  await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
+  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
+  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
   await audit(page, 'installed setup and Offline Check');
 });

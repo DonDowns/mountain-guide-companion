@@ -16,7 +16,7 @@ for (const [label, path, mode] of corruptions) {
     test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Cache-manipulation matrix runs once in Chromium desktop');
     await installCurrent(page, request);
     expect(await corruptActiveCache(page, path, mode)).not.toBe('');
-    await page.getByRole('button', { name: 'Offline Check' }).click();
+    await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
     await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
     await expect(page.getByText('Reconnect to the internet and retry Companion update/install.', { exact: true })).toBeVisible();
   });
@@ -25,7 +25,7 @@ for (const [label, path, mode] of corruptions) {
 test('repair creates a new complete cache and preserves device-local state', async ({ page, request }, testInfo) => {
   test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Repair transaction runs once in Chromium desktop');
   await installCurrent(page, request);
-  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await page.locator('[data-action="open-companion"]').first().click();
   await page.getByRole('button', { name: /Change objective/ }).click();
   await page.getByRole('radio', { name: /Choose Mount Lindsey/ }).check();
   await page.getByRole('button', { name: 'Use objective' }).click();
@@ -35,13 +35,13 @@ test('repair creates a new complete cache and preserves device-local state', asy
   await page.locator('[data-private-field="name"]').fill('x');
   await page.getByRole('button', { name: 'Set up this phone' }).click();
   await corruptActiveCache(page, 'js/companion-ui.js');
-  await page.getByRole('button', { name: 'Offline Check' }).click();
+  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
   await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
 
   await setServerState(request);
   await page.getByRole('button', { name: 'Repair Offline Copy' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES VERIFIED', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: /^(Open|Resume) Companion$/ }).first().click();
+  await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
+  await page.locator('[data-action="open-companion"]').first().click();
   await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
   await expect(page.locator('article[data-milestone="0"]')).toContainText(/Marked locally at/);
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');

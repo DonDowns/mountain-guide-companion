@@ -6,7 +6,7 @@ import {
 } from './companion-install.js';
 import {
   companionData, createMilestoneMessage, navigateHome, navigateTo, parseOperationalDateTimeInput, releaseMetadata,
-  renderArtifacts, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
+  renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
   renderStaticIdentity, renderTimeline, scrollCurrentViewToTop, setRedDisplay, showToast
 } from './companion-ui.js';
 
@@ -37,9 +37,7 @@ function renderState(state = store.getState()) {
   renderObjectiveContext(state);
   setRedDisplay(state.redDisplay);
   renderSetupPanel(document.querySelector('#install-panel'), setupOptions(state));
-  for (const button of document.querySelectorAll('[data-action="open-companion"]')) {
-    button.textContent = state.setup.companionOpened ? 'Resume Companion' : 'Open Companion';
-  }
+  renderCompanionHome(state, isStandalone());
 }
 
 async function runOfflineCheck({ record = true } = {}) {

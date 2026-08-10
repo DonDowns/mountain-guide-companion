@@ -2,7 +2,7 @@
 
 ## Status and boundary
 
-Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation corrects navigation and lifecycle invariants, and candidate `0.6.0-candidate.5` adds offline field-usability controls without altering the service-worker transaction model. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
+Phase 5 implements the Companion's zero-connectivity runtime architecture. Phase 6 publishes that architecture for physical testing; Phase 6A changes presentation assets, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation corrects navigation and lifecycle invariants, candidate `0.6.0-candidate.5` adds offline field-usability controls, and candidate `0.6.0-candidate.6` clarifies those controls without altering the service-worker transaction model. Candidate deployment is not a tag or field release. Automated browser evidence remains technical evidence only; physical iPhone installation, force-quit, reboot, Airplane Mode, PDF, readability, and second-person tests remain release gates.
 
 The configured origin is `https://companion.vondadowns.com/`. The Companion service worker registers at `./service-worker.js` with scope `./`, can control only its own origin and path scope, and cannot control the separate `https://mountainguide.vondadowns.com/` origin.
 
@@ -74,7 +74,7 @@ Offline Check first requires `navigator.serviceWorker.controller`, then sends `V
 - both local PDFs;
 - absence of a mixed release identity.
 
-The application also confirms that Timeline, Route, and Emergency rendered from the packaged data. Success is reported only as `OFFLINE RESOURCES VERIFIED`; any discrepancy is `OFFLINE RESOURCES INCOMPLETE`. Both are followed by the boundary: “This verifies local Companion resources only. It does not verify mountain conditions, access, weather, or route safety.”
+The application also confirms that Timeline, Route, and Emergency rendered from the packaged data. Success appears once as `Offline resources verified` in the concise phone setup state; any discrepancy is `OFFLINE RESOURCES INCOMPLETE`. The panel retains the boundary: “Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.”
 
 Repair Offline Copy is an explicit connected action. It requests an update, builds and verifies a fresh same-bundle cache, changes the selected active cache only after completion, and reruns Offline Check. Repair never clears or migrates device-local operational/private state.
 

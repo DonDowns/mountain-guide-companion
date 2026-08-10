@@ -129,10 +129,44 @@ function decisionLabel(dimension) {
   }[dimension] || 'Reassessment';
 }
 
-function setupItem(label, detail, complete) {
+function setupItem(label, complete, detail = '') {
   const mark = element('span', { className: 'status-mark', 'aria-hidden': 'true', text: complete ? '✓' : '○' });
-  const copy = element('span', {}, [element('strong', { text: label }), element('small', { text: detail })]);
+  const copy = element('span', {}, [element('strong', { text: label }), ...(detail ? [element('small', { text: detail })] : [])]);
   return element('li', { className: complete ? 'complete' : 'pending' }, [mark, copy]);
+}
+
+export function isMountainGuideReferrer(referrer = document.referrer) {
+  try {
+    return new URL(referrer).origin === 'https://mountainguide.vondadowns.com';
+  } catch {
+    return false;
+  }
+}
+
+export function renderCompanionHome(state, standalone) {
+  document.querySelector('#welcome-eyebrow').textContent = standalone ? 'CURRENT TRIP' : 'MOUNTAIN GUIDE COMPANION';
+  document.querySelector('#welcome-title').textContent = standalone ? 'Companion Home' : 'Set Up This Phone';
+  document.querySelector('#welcome-summary').textContent = standalone
+    ? 'Open the trip companion, verify the offline copy, or use the Field Guide and Pocket Card.'
+    : 'Recommended for trip partners. This keeps the trip plan, emergency information, communication milestones, Field Guide, and Pocket Card available when there is no service.';
+
+  const primary = document.querySelector('#home-primary-action');
+  const secondary = document.querySelector('#home-secondary-action');
+  if (standalone) {
+    primary.dataset.action = 'open-companion';
+    primary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+    secondary.dataset.action = 'offline-check';
+    secondary.textContent = 'Offline Check';
+  } else {
+    primary.dataset.action = 'show-setup';
+    primary.textContent = 'Install for Offline Use';
+    secondary.dataset.action = 'open-companion';
+    secondary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Continue in Browser';
+  }
+
+  for (const button of document.querySelectorAll('.artifact-open')) {
+    button.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+  }
 }
 
 export function renderSetupPanel(target, options) {
@@ -140,12 +174,14 @@ export function renderSetupPanel(target, options) {
   const {
     standalone, ios, promptAvailable, offlineResult, workerState, state
   } = options;
-  const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'INSTALLED COMPANION' : 'INSTALL FOR OFFLINE USE' });
-  const heading = element('h2', { text: standalone ? 'Companion installed on this phone' : 'Set up this phone before the trip' });
+  const offlineVerified = offlineResult?.complete === true;
+  const setupComplete = standalone && offlineVerified;
+  const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
+  const heading = element('h2', { text: setupComplete ? 'THIS PHONE IS SET UP' : standalone ? 'FINISH SETTING UP THIS PHONE' : 'SET UP THIS PHONE' });
   const intro = element('p', {
     text: standalone
       ? 'Run Offline Check, then complete the Airplane Mode test on this phone.'
-      : 'Install the Companion, open it once while online, then run Offline Check.'
+      : 'Install for offline use so key trip and emergency information remains available when there is no service.'
   });
   const children = [eyebrow, heading, intro];
 
@@ -168,26 +204,27 @@ export function renderSetupPanel(target, options) {
   }
 
   const checklist = element('ul', { className: 'setup-checklist', 'aria-label': 'Setup status' }, [
-    setupItem('Installed on this phone', standalone ? 'Opened from the Home Screen.' : 'Open from the Home Screen after installation.', standalone),
-    setupItem('Trip and emergency information', 'Available in Companion.', true),
-    setupItem('Offline resources', offlineResult?.complete ? 'Verified on this phone.' : 'Run Offline Check after installation.', offlineResult?.complete === true),
-    setupItem('Airplane Mode test', state.setup.airplaneModeTestCompletedAt ? `Marked complete on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Still required on this phone.', Boolean(state.setup.airplaneModeTestCompletedAt))
+    setupItem('Companion installed', standalone),
+    setupItem('Offline resources verified', offlineVerified),
+    setupItem(
+      state.setup.airplaneModeTestCompletedAt ? 'Airplane Mode test recorded' : 'Airplane Mode test still required',
+      Boolean(state.setup.airplaneModeTestCompletedAt),
+      state.setup.airplaneModeTestCompletedAt ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : ''
+    )
   ]);
   children.push(checklist);
+  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.' }));
 
   if (offlineResult?.checking) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
       element('strong', { text: 'CHECKING OFFLINE RESOURCES' }),
       element('p', { text: 'Checking the Companion resources on this phone.' })
     ]));
-  } else if (offlineResult) {
+  } else if (offlineResult && !offlineVerified) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
-      element('strong', { text: offlineResult.complete ? 'OFFLINE RESOURCES VERIFIED' : 'OFFLINE RESOURCES INCOMPLETE' }),
-      element('p', { text: offlineResult.complete
-        ? 'Required Companion resources are stored on this phone.'
-        : offlineResult.error || 'The offline resources did not verify.' }),
-      element('p', { text: 'This confirms Companion resources on this phone. It does not evaluate weather, access, terrain, or route conditions.' }),
-      ...(!offlineResult.complete ? [element('p', { className: 'boundary-note', text: 'Reconnect to the internet and retry Companion update/install.' })] : [])
+      element('strong', { text: 'OFFLINE RESOURCES INCOMPLETE' }),
+      element('p', { text: offlineResult.error || 'The offline resources did not verify.' }),
+      element('p', { className: 'boundary-note', text: 'Reconnect to the internet and retry Companion update/install.' })
     ]));
   }
 
@@ -226,9 +263,6 @@ export function renderSetupPanel(target, options) {
   actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: state.setup.airplaneModeTestCompletedAt ? 'clear-airplane-test' : 'record-airplane-test' }, text: state.setup.airplaneModeTestCompletedAt ? 'Clear Airplane Mode Record' : 'Record Airplane Mode Test' }));
   actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
   children.push(element('div', { className: 'setup-actions' }, actions));
-  children.push(element('p', { className: 'boundary-note', text: state.setup.offlineVerifiedAt && state.setup.offlineVerifiedBundleId === releaseMetadata.bundle_id
-    ? `Offline Check completed on this phone: ${formatActualStart(state.setup.offlineVerifiedAt)}.`
-    : 'Offline Check not yet completed on this phone.' }));
 
   clearAndAppend(target, element('section', { className: 'setup-panel', dataset: { mode: standalone ? 'installed' : 'browser' }, 'aria-labelledby': 'setup-heading' }, children));
   target.querySelector('h2').id = 'setup-heading';
@@ -236,6 +270,8 @@ export function renderSetupPanel(target, options) {
 
 export function renderStaticIdentity() {
   document.querySelector('#trip-name').textContent = companionData.trip.name;
+  document.querySelector('#release-badge').textContent = `Test version · ${companionData.identity.companionVersion}`;
+  document.querySelector('#return-to-mountain-guide').hidden = !isMountainGuideReferrer();
   document.querySelector('#weather-invariant').textContent = companionData.invariants.weather;
   document.querySelector('#jurisdiction-copy').textContent = `${companionData.invariants.jurisdiction} You do not need to choose a county before calling.`;
   const provenance = document.querySelector('#provenance');
@@ -252,7 +288,7 @@ export function renderArtifacts() {
     {
       title: 'Interactive Companion',
       description: 'Interactive operational reference.',
-      action: element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Companion' })
+      action: element('button', { className: 'quiet-button artifact-open', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Trip Companion' })
     },
     {
       title: '3-Page Field Guide',
