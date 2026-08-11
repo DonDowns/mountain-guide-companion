@@ -85,15 +85,49 @@ export function renderCompanionHelpTopics(query = '') {
   return matches;
 }
 
-export function sharedInformationState({ verifiedAt = companionData.identity.verifiedAt, updateAvailable = false } = {}) {
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+const verificationDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+});
+
+export function sharedInformationState({
+  verifiedAt = companionData.identity.verifiedAt,
+  updateAvailable = false,
+  now = new Date()
+} = {}) {
   const verified = new Date(verifiedAt);
-  if (!verifiedAt || Number.isNaN(verified.getTime())) return { status: 'missing', label: 'Verification date unavailable' };
-  const display = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(verified);
-  if (updateAvailable) return { status: 'stale-package', label: `Newer verified package downloaded · this package verified ${display}` };
-  return { status: 'current-package', label: `Packaged trip data · verified ${display} · recheck changing facts` };
+  if (!verifiedAt || Number.isNaN(verified.getTime())) {
+    return {
+      status: 'missing',
+      label: 'Packaged trip data · verification date unavailable; age cannot be calculated. Recheck changing facts when connectivity is available.'
+    };
+  }
+  const display = verificationDateFormatter.format(verified);
+  const deviceNow = now instanceof Date ? now : new Date(now);
+  const prefix = updateAvailable ? 'Newer verified package downloaded · this package' : 'Packaged trip data ·';
+  const status = updateAvailable ? 'stale-package' : 'current-package';
+  if (Number.isNaN(deviceNow.getTime())) {
+    return {
+      status,
+      label: `${prefix} verified ${display} · age unavailable because this phone’s clock could not be read. Check this phone’s date and time. Recheck changing facts when connectivity is available.`
+    };
+  }
+  const elapsedMilliseconds = deviceNow.getTime() - verified.getTime();
+  if (elapsedMilliseconds < 0) {
+    return {
+      status,
+      label: `${prefix} verified ${display} · verification time is ahead of this phone’s clock. Check this phone’s date and time. Recheck changing facts when connectivity is available.`
+    };
+  }
+  const ageDays = Math.floor(elapsedMilliseconds / DAY_IN_MILLISECONDS);
+  return {
+    status,
+    ageDays,
+    label: `${prefix} verified ${display} · ${ageDays} ${ageDays === 1 ? 'day' : 'days'} old by this phone’s clock. Recheck changing facts when connectivity is available.`
+  };
 }
 
-export function deriveCompanionStatus({ standalone, offlineResult = {}, workerState = {} }) {
+export function deriveCompanionStatus({ standalone, offlineResult = {}, workerState = {}, verifiedAt, now }) {
   const controlled = workerState.controlled === true;
   const offlineReady = controlled && offlineResult.complete === true;
   let setup = 'not-started';
@@ -101,7 +135,7 @@ export function deriveCompanionStatus({ standalone, offlineResult = {}, workerSt
   else if (standalone && offlineReady) setup = 'complete';
   else if (offlineResult.attempted || offlineResult.error || workerState.supported === false || offlineReady || standalone) setup = 'incomplete';
   const update = workerState.updateStatus || (workerState.updateAvailable ? 'available' : 'current');
-  const sharedData = sharedInformationState({ updateAvailable: workerState.updateAvailable === true }).status;
+  const sharedData = sharedInformationState({ verifiedAt, now, updateAvailable: workerState.updateAvailable === true }).status;
   return { setup, offlineReady, installed: Boolean(standalone), controlled, update, sharedData, updateAvailable: workerState.updateAvailable === true };
 }
 
@@ -118,13 +152,13 @@ function updateLabel(status) {
 
 export function buildCompanionDiagnostics(options) {
   const derived = deriveCompanionStatus(options);
-  const shared = sharedInformationState({ updateAvailable: derived.updateAvailable });
+  const shared = sharedInformationState({ verifiedAt: options.verifiedAt, now: options.now, updateAvailable: derived.updateAvailable });
   return [
     'App: Mountain Guide Companion',
     `Companion version: ${companionData.identity.companionVersion}`,
     'Release: Preview candidate — physical phone testing required',
     `Trip Data version: ${companionData.identity.dataVersion}`,
-    `Shared information: ${shared.label} (${shared.status})`,
+    `Shared information: ${shared.label}`,
     `Device/browser category: ${deviceCategory()}`,
     `Display: ${derived.installed ? 'Installed app' : 'Browser'}`,
     `Connection: ${navigator.onLine ? 'Online' : 'Offline'}`,
@@ -145,7 +179,7 @@ export function buildFeatureRequest(fields) {
 
 export function renderCompanionSupportStatus(options) {
   const derived = deriveCompanionStatus(options);
-  const shared = sharedInformationState({ updateAvailable: derived.updateAvailable });
+  const shared = sharedInformationState({ verifiedAt: options.verifiedAt, now: options.now, updateAvailable: derived.updateAvailable });
   const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Offline copy verified', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
   const values = {
     'home-offline-status': setupLabels[derived.setup],

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "bundle_id": "ddmg-companion-0-6-0-candidate-8-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-9-data-3cda95d4e6b1-b1",
   "cache_namespace": "ddmg-companion",
-  "companion_version": "0.6.0-candidate.8",
+  "companion_version": "0.6.0-candidate.9",
   "data_version": "1.0.0",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "87044ba624b83f650503fb5b1d834661537048c257b5f34ed2100160ccb4bf97",
-  "generated_at": "2026-08-11T12:26:47Z",
+  "bundle_content_sha256": "d7b6593fef019cae7bae67c3fd9ee06dd821700446f4b10e3f02e6f13fc9ffe6",
+  "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
   "entry_count": 16,
-  "total_bytes": 218658,
+  "total_bytes": 219939,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -41,7 +41,7 @@
     },
     {
       "path": "js/companion-data.js",
-      "sha256": "1d33746fd931570e6ac0a494d89796e966c25ca101f8619a77b78f0fc07af818",
+      "sha256": "8551aa18c9aa4a34d00d0b35f0b75f345e103539a374294e51acd47668b65e25",
       "bytes": 14652,
       "role": "canonical-runtime-data",
       "required": true
@@ -55,8 +55,8 @@
     },
     {
       "path": "js/companion-help.js",
-      "sha256": "94f7057fde440de90fc1d68faf1bc5e37d9b344cae38b5867ab44f0abe9bf55d",
-      "bytes": 16523,
+      "sha256": "fc92d2efcdd697f47fa579f420cc683cc0c25581d35502fcbd1dd89dfab4c54f",
+      "bytes": 17804,
       "role": "offline-help-and-support",
       "required": true
     },
@@ -125,7 +125,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "28a119ca4b648ee1e206b727d18351000f4da2cef177aa258e5b4cee3bf8f906",
+      "sha256": "3b52f9b5ebc0414bdbdb5c29395055b63d1f2b40e8ba3545fb1d533dcfcf1950",
       "bytes": 912,
       "role": "release-metadata",
       "required": true

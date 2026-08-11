@@ -198,7 +198,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
 
   for (const candidatePage of [page, second]) {
     await expect(candidatePage.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.8/)).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.9/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -214,7 +214,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
   });
   expect(complete).toEqual([
     'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1',
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-8-data-3cda95d4e6b1-b1$/)
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-9-data-3cda95d4e6b1-b1$/)
   ]);
 });
 

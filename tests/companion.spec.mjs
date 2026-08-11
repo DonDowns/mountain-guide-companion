@@ -46,7 +46,7 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Preview build · 0.6.0-candidate.8', { exact: true })).toBeVisible();
+  await expect(page.getByText('Preview build · 0.6.0-candidate.9', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
