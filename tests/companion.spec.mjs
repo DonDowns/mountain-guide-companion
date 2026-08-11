@@ -19,6 +19,17 @@ const test = base.extend({
   }, { auto: true }]
 });
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('mgc-companion-local-state')) {
+      localStorage.setItem('mgc-companion-local-state', JSON.stringify({
+        schemaVersion: 4,
+        setup: { onboarding: { version: 'companion-onboarding-candidate-8-v1', status: 'completed', recordedAt: '2026-08-11T00:00:00.000Z' } }
+      }));
+    }
+  });
+});
+
 async function openCompanion(page) {
   await page.waitForFunction(() => !('serviceWorker' in navigator) || Boolean(navigator.serviceWorker.controller));
   await page.locator('[data-action="open-companion"]').first().click();
@@ -35,7 +46,7 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.6', { exact: true })).toBeVisible();
+  await expect(page.getByText('Preview build · 0.6.0-candidate.8', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -402,6 +413,7 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
   await expect(page.locator('#home-primary-action')).toHaveText('Open Trip Companion');
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await expect(page.getByRole('button', { name: 'Offline Check', exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
   await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
@@ -430,7 +442,7 @@ test('shows Return to Mountain Guide only for the exact trusted referrer origin'
   await lookalike.close();
 });
 
-test('migrates earlier local state to schema version 3 without inventing a milestone timestamp', async ({ page }) => {
+test('migrates earlier local state to schema version 4 without inventing a milestone timestamp', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('mgc-companion-local-state', JSON.stringify({
       schemaVersion: 1,
@@ -445,6 +457,7 @@ test('migrates earlier local state to schema version 3 without inventing a miles
     }));
   });
   await page.goto('/');
+  await page.getByRole('button', { name: 'Skip for now' }).click();
   await openCompanion(page);
   await expect(page.locator('#current-objective-context')).toContainText('Mount Lindsey');
   await expect(page.locator('article[data-milestone="0"]')).toContainText('Marked locally; time was not recorded by the earlier version.');
@@ -452,7 +465,7 @@ test('migrates earlier local state to schema version 3 without inventing a miles
   await page.getByText('Optional private fields on this phone').click();
   await expect(page.locator('[data-private-field="name"]')).toHaveValue('x');
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
-  expect(stored.schemaVersion).toBe(3);
+  expect(stored.schemaVersion).toBe(4);
   expect(stored.milestoneMarks['0']).toBe('');
   expect(stored.statusNote).toBe('z');
   expect(stored.setup.legacyStructuralCheckCompletedAt).toBe('2026-08-07T10:05:00.000Z');
@@ -462,9 +475,11 @@ test('migrates earlier local state to schema version 3 without inventing a miles
 test('records the physical Airplane Mode test only after explicit confirmation', async ({ page }) => {
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
+  await page.getByRole('button', { name: 'Offline Check' }).first().click();
   await page.getByText('Airplane Mode test instructions').click();
   await expect(page.getByRole('heading', { name: 'AIRPLANE MODE TEST' })).toBeVisible();
-  await expect(page.locator('.airplane-test li')).toHaveCount(11);
+  await expect(page.locator('.airplane-test li')).toHaveCount(12);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Record Airplane Mode Test' }).click();
   await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();

@@ -8,16 +8,16 @@ function deepFreeze(value) {
 }
 export const companionData = deepFreeze({
   "identity": {
-    "companionVersion": "0.6.0-candidate.6",
+    "companionVersion": "0.6.0-candidate.8",
     "releaseStatus": "candidate",
     "dataVersion": "1.0.0",
     "sourceRelease": "v15.3.10",
     "sourceCommit": "fb711292b2642c2296eb76c0cfe2531606029609",
-    "generatedAt": "2026-08-10T04:16:32Z",
+    "generatedAt": "2026-08-11T12:26:47Z",
     "verifiedAt": "2026-08-07T07:45:17Z",
     "manifestSha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
     "manifestShort": "3cda95d4e6b1",
-    "bundleId": "ddmg-companion-0-6-0-candidate-6-data-3cda95d4e6b1-b1",
+    "bundleId": "ddmg-companion-0-6-0-candidate-8-data-3cda95d4e6b1-b1",
     "offlineBundleVersion": 1,
     "publicBaseUrl": "https://companion.vondadowns.com/"
   },
@@ -345,15 +345,15 @@ export const companionData = deepFreeze({
   }
 });
 export const releaseMetadata = deepFreeze({
-  "companion_version": "0.6.0-candidate.6",
+  "companion_version": "0.6.0-candidate.8",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
-  "generated_at": "2026-08-10T04:16:32Z",
+  "generated_at": "2026-08-11T12:26:47Z",
   "verified_at": "2026-08-07T07:45:17Z",
   "release_status": "candidate",
-  "bundle_id": "ddmg-companion-0-6-0-candidate-6-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-8-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",

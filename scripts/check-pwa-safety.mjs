@@ -8,7 +8,7 @@ const repoRoot = resolve(dirname(scriptPath), '..');
 async function main() {
   const runtimePaths = [
     'index.html', 'css/companion.css', 'js/companion.js', 'js/companion-ui.js',
-    'js/companion-install.js', 'js/companion-state.js', 'js/companion-data.js', 'js/red-bootstrap.js',
+    'js/companion-install.js', 'js/companion-state.js', 'js/companion-help.js', 'js/companion-data.js', 'js/red-bootstrap.js',
     'service-worker.js', 'manifest.webmanifest', 'release.json'
   ];
   const runtime = (await Promise.all(runtimePaths.map(path => readFile(resolve(repoRoot, path), 'utf8')))).join('\n').toLowerCase();

@@ -12,6 +12,7 @@ const resourceDefinitions = [
   ['js/red-bootstrap.js', 'display-bootstrap'],
   ['js/companion-data.js', 'canonical-runtime-data'],
   ['js/companion-state.js', 'device-local-state'],
+  ['js/companion-help.js', 'offline-help-and-support'],
   ['js/companion-install.js', 'install-and-offline-control'],
   ['js/companion-ui.js', 'application-ui'],
   ['js/companion.js', 'application-controller'],

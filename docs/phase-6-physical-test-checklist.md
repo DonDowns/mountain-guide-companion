@@ -1,6 +1,6 @@
 # Phase 6 Physical-Test Candidate Checklist
 
-Candidate: `0.6.0-candidate.6`
+Candidate: `0.6.0-candidate.8`
 
 Public URL: `https://companion.vondadowns.com/`
 
@@ -14,7 +14,8 @@ Status: physical testing in progress; not a field release. Do not pre-mark any i
 - [ ] Companion opens in Safari and installs with Add to Home Screen.
 - [ ] Installed Companion opens once online and completes Offline Check.
 - [ ] After force quit, Airplane Mode, and Wi-Fi off, Companion cold-opens from the Home Screen.
-- [ ] Timeline, Route, Emergency, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
+- [ ] Onboarding completes or dismisses, stays remembered, and can be replayed from Help.
+- [ ] Timeline, Route, Emergency, Help search, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
 - [ ] Milestone and actual-start state persist.
 - [ ] After device reboot, Companion reopens offline.
 - [ ] Record model, iOS version, storage state, battery state, screenshots, and defects.
@@ -27,7 +28,8 @@ Status: physical testing in progress; not a field release. Do not pre-mark any i
 - [ ] Companion opens in Safari and installs with Add to Home Screen.
 - [ ] Installed Companion opens once online and completes Offline Check.
 - [ ] After force quit, Airplane Mode, and Wi-Fi off, Companion cold-opens from the Home Screen.
-- [ ] Timeline, Route, Emergency, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
+- [ ] Onboarding completes or dismisses, stays remembered, and can be replayed from Help.
+- [ ] Timeline, Route, Emergency, Help search, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
 - [ ] Milestone and actual-start state persist.
 - [ ] After device reboot, Companion reopens offline.
 - [ ] Record model, iOS version, storage state, battery state, screenshots, and defects.
@@ -41,7 +43,8 @@ Status: physical testing in progress; not a field release. Do not pre-mark any i
 - [ ] Companion opens in Safari and installs with Add to Home Screen.
 - [ ] Installed Companion opens once online and completes its own Offline Check.
 - [ ] After force quit, Airplane Mode, and Wi-Fi off, Companion cold-opens from the Home Screen.
-- [ ] Timeline, Route, Emergency, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
+- [ ] The friend completes or dismisses onboarding, replays it from Help, and finds no-signal guidance without coaching.
+- [ ] Timeline, Route, Emergency, Help search, Red Display, Field Guide PDF, and Pocket Card PDF work offline.
 - [ ] Milestone and actual-start state persist.
 - [ ] After device reboot, Companion reopens offline.
 - [ ] Record model, iOS version, storage state, observations, screenshots, and defects.

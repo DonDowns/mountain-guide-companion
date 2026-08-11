@@ -4,7 +4,7 @@
 
 The Phase 6 Companion is a physical-test candidate with the production offline runtime completed in Phase 5. It answers four current-trip questions: where the crew is in the plan, what matters now, what should cause reassessment, and what to do in an emergency. It does not reproduce Road to 50, Mountain Intelligence, planning databases, live weather analysis, archives, a full gear system, or non-current objectives.
 
-Protected-main Pages automation publishes `0.6.0-candidate.6` at the configured Companion origin solely to enable physical tests. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior, candidate.5 improves field navigation and local communication preparation, and candidate.6 clarifies friend setup and installed navigation without changing canonical data, safety meaning, privacy behavior, or service-worker transaction architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
+Candidate `0.6.0-candidate.8` is a local reconstruction for review and physical testing. Phase 6A adds the documented mountain-earth visual system, Phase 6A.1 simplifies field-facing copy, the pre-Crew audit remediation strengthens offline navigation and lifecycle behavior, candidate.5 improves field navigation and local communication preparation, candidate.6 clarifies friend setup and installed navigation, and candidate.8 adds scoped onboarding, offline Help, explicit status, and copy-only support reports without changing canonical data, safety meaning, privacy behavior, or service-worker transaction architecture. No field-release tag exists. Physical Airplane Mode, force-quit, reboot, primary/backup/friend iPhone, and field-use evidence remain release gates.
 
 ## Runtime architecture
 
@@ -23,7 +23,7 @@ The root URL is a friend-facing landing experience suitable for a QR scan, text,
 
 In an ordinary browser the setup panel labels offline installation as recommended for trip partners. iPhone/iOS wording directs the user to Safari, Share, Add to Home Screen, one online installed launch, Offline Check, and a later physical Airplane Mode test. A programmatic Install Companion action appears only when the browser supplies `beforeinstallprompt`.
 
-Standalone detection uses the display-mode media query and iOS `navigator.standalone`. Once the installed shell and required offline resources are verified, the setup panel says THIS PHONE IS SET UP and shows only the installed, offline-resource, and Airplane Mode states. Companion version, Trip Data version, source release, verified date, and manifest fingerprint remain in persistent provenance.
+Standalone detection uses the display-mode media query and iOS `navigator.standalone`. Setup completes only when standalone display, current-page service-worker control, and required offline-resource verification all succeed. The setup panel then becomes quiet and remains available through Help & Diagnostics recovery actions rather than persisting as a misleading header action. Companion version, Trip Data version, source release, verified date, and manifest fingerprint remain in persistent provenance.
 
 ## Setup and Offline Check boundary
 
@@ -41,11 +41,11 @@ A Return to Mountain Guide link is rendered only when the current document's ref
 
 `scripts/build-offline.mjs` generates the explicit `offline-bundle.json` and production `service-worker.js` from actual bytes. Installation is marker-last and hash-verified; a failed candidate is deleted without replacing the last complete release. Field-critical fetches resolve only from one verified active cache, preventing network/cache or old/new mixing. See `docs/offline-architecture.md` for lifecycle, retention, repair, storage, and test details.
 
-The physical Airplane Mode checklist remains pending until a user displays the eleven instructions and records completion on that phone. Automation never sets this mark.
+The physical Airplane Mode checklist remains pending until a user displays the twelve instructions—including offline Help—and records completion on that phone. Automation never sets this mark.
 
 ## Navigation and field hierarchy
 
-Persistent navigation provides Timeline, Route, Emergency, and Red. Emergency is a primary control from every normal screen. The sticky header and safe-area-aware bottom navigation use at least 44×44 CSS-pixel critical targets, and section scroll offsets prevent the header from hiding emergency content.
+Persistent navigation provides Timeline, Route, Emergency, Help, and Red. Emergency is a primary control from every normal screen. The sticky header and safe-area-aware bottom navigation use at least 44×44 CSS-pixel critical targets, and section scroll offsets prevent the header from hiding emergency content.
 
 Timeline renders all three canonical objectives and six planning values. Planned Start and Planning Target remain visible when an actual start is locally recorded. Actual start and elapsed basis never rewrite canonical times.
 
@@ -55,7 +55,7 @@ Route renders the four canonical profiles as comparison cards with round-trip di
 
 Emergency begins with CALL 911 FIRST, reporting prompts, dispatch/jurisdiction language, and all six canonical public numbers as direct, agency-labeled `tel:` links. Tapping a link creates no local completion state or affirmative call claim.
 
-## Local-state schema version 3
+## Local-state schema version 4
 
 The separate local store contains only:
 
@@ -65,9 +65,9 @@ The separate local store contains only:
 - Red Display state;
 - brief local status note;
 - optional private contact name, phone, alternate, and note;
-- setup/open/check progress, bundle-scoped offline verification, and physical Airplane Mode user attestation.
+- setup/open/check progress, bundle-scoped offline verification, physical Airplane Mode user attestation, and the local onboarding version/status record.
 
-The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema versions 1 and 2 preserves operational/private values, leaves the time unavailable for older boolean-only milestone marks, and does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, or URL encoding. Service workers neither read nor cache the local store.
+The state loader is allowlist-based, length-bounded, versioned, and fail-closed on unknown/corrupt versions. Migration from schema versions 1 through 3 preserves operational/private values, adds only an empty onboarding record, leaves the time unavailable for older boolean-only milestone marks, and does not promote the old structural check into an offline verification. Defaults are empty, and Clear Private Data removes all optional private contact fields after confirmation. There is no cloud synchronization, export, logging, telemetry, or URL encoding. Service workers neither read nor cache the local store.
 
 Trip-level communication milestones record an America/Denver local timestamp, support edit and undo, and remain separate from message preparation. Each canonical milestone can generate an approved text-only message from the milestone type, selected canonical objective where applicable, and current operational time. Copy or native Share never marks a milestone and never claims delivery; after native Share returns, the interface says to confirm delivery in the sending app. Tests continue to reject sent, delivered, received, completed, or safety-verdict claims.
 
@@ -83,7 +83,7 @@ No external QR API is used. The stable public URL is directly QR-encodable witho
 
 Red is a persistent presentation control with `aria-pressed`; it changes no content or safety state. Its active styling uses dedicated display-mode tokens rather than Emergency semantic tokens. A synchronous local bootstrap applies Red before the main module renders to reduce daylight flashing on reload. Daylight and Red both use explicit text, borders, and icons rather than color-only meaning.
 
-The shell uses semantic header/main/nav/footer landmarks, native controls, visible focus, labeled fields, native details disclosure, heading hierarchy, reduced-motion handling, safe-area insets, and responsive portrait/landscape layouts. Playwright runs Chromium and WebKit at desktop and 390×844 mobile. Axe checks the first-open, Timeline, Route, Emergency, and Red states against WCAG 2.1 AA rules. Physical VoiceOver, increased-text, sunlight, headlamp, glove, wet-finger, and actual iPhone testing remain release gates.
+The shell uses semantic header/main/nav/footer landmarks, native controls, visible focus, labeled fields, native details disclosure, heading hierarchy, reduced-motion handling, safe-area insets, and responsive portrait/landscape layouts. The onboarding dialog traps focus, supports Escape, makes the background inert, and restores focus. Playwright runs Chromium and WebKit at desktop and 390×844 mobile, with an additional 375×667 Help/onboarding fit check. Axe checks onboarding, first-open, Timeline, Route, Emergency, Help/feedback, installed setup, and Red states against WCAG 2.1 AA rules. Physical VoiceOver, increased-text, sunlight, headlamp, glove, wet-finger, and actual iPhone testing remain release gates.
 
 ## Physical artifacts
 

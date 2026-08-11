@@ -2,7 +2,7 @@
 
 ## Scope
 
-Phase 6A gives Companion one restrained visual language across the PWA, three-page Field Guide, and two-sided Pocket Card. Phase 6A.1 carries that approved system forward while simplifying field-facing copy. The dedicated Red Display pressed-state token keeps the presentation control separate from Emergency semantics. Candidates `0.6.0-candidate.5` and `0.6.0-candidate.6` reuse the same teal, gold, stone, Emergency, and Red Display meanings for Home, setup, Back, Top, objective, milestone, Copy, and Share controls. Canonical facts, planning values, emergency instructions, decision prompts, privacy boundaries, and the Lily Lake release hold are unchanged.
+Phase 6A gives Companion one restrained visual language across the PWA, three-page Field Guide, and two-sided Pocket Card. Phase 6A.1 carries that approved system forward while simplifying field-facing copy. The dedicated Red Display pressed-state token keeps the presentation control separate from Emergency semantics. Candidates `0.6.0-candidate.5`, `0.6.0-candidate.6`, and reconstructed `0.6.0-candidate.8` reuse the same teal, gold, stone, Emergency, and Red Display meanings for Home, setup, Help, onboarding, Back, Top, objective, milestone, Copy, and Share controls. Canonical facts, planning values, emergency instructions, decision prompts, privacy boundaries, and the Lily Lake release hold are unchanged.
 
 The existing teal mountain mark remains the identity seed. Its recognizable silhouette and application/maskable icon geometry remain unchanged because the audit found no usability, legibility, or platform-mask defect that justified redesign.
 

@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.6.0-candidate.6",
+  "version": "0.6.0-candidate.8",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "candidate-6-friend-setup-ux",
+    "name": "candidate-8-onboarding-help-companion-setup",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },

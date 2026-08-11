@@ -11,6 +11,9 @@ async function audit(page, label) {
 test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) => {
   test.setTimeout(60000);
   await page.goto('/');
+  await expect(page.getByRole('dialog', { name: 'What was shared' })).toBeVisible();
+  await audit(page, 'first-use onboarding');
+  await page.getByRole('button', { name: 'Skip for now' }).click();
   await audit(page, 'friend first-open');
 
   await page.getByRole('button', { name: 'Continue in Browser' }).click();
@@ -22,6 +25,9 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
   await page.getByRole('button', { name: /Emergency/ }).last().click();
   await audit(page, 'Emergency daylight');
 
+  await page.getByRole('button', { name: /Help/ }).last().click();
+  await audit(page, 'Help and feedback daylight');
+
   await page.getByRole('button', { name: /Red/ }).click();
   await audit(page, 'Emergency Red Display');
 
@@ -31,7 +37,7 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
   await page.getByRole('button', { name: /Red/ }).click();
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
-  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
+  await page.getByRole('button', { name: 'Offline Check' }).first().click();
   await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
   await audit(page, 'installed setup and Offline Check');
 });
