@@ -75,6 +75,9 @@ jobs:
       - name: Test automation policy fail-closed behavior
         run: npm run test:automation
 
+      - name: Test live-site verifier fail-closed behavior
+        run: npm run test:live-verifier
+
       - name: Run aggregate data contracts
         env:
           MOUNTAIN_GUIDE_REPO: ${{ github.workspace }}/.upstream/mountain-guide

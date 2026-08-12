@@ -42,6 +42,16 @@ jobs:
       - name: Install pinned dependencies
         run: npm ci
 
+      - name: Verify pinned Playwright and install matching Chromium
+        shell: bash
+        run: |
+          expected_version="$(node -p "require('./package.json').devDependencies['@playwright/test']")"
+          installed_version="$(node -p "require('./node_modules/@playwright/test/package.json').version")"
+          cli_version="$(npx --no-install playwright --version)"
+          test "$installed_version" = "$expected_version"
+          test "$cli_version" = "Version $expected_version"
+          npx --no-install playwright install --with-deps chromium
+
       - name: Rebuild candidate runtime and offline identity
         run: |
           npm run build:pwa

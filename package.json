@@ -35,6 +35,7 @@
     "check:service-worker": "node scripts/check-service-worker.mjs",
     "test:service-worker:runtime": "node scripts/test-service-worker-runtime.mjs",
     "check:live": "node scripts/check-live-site.mjs",
+    "test:live-verifier": "node --test scripts/test-live-site-verifier.mjs",
     "test:offline:logic": "node scripts/test-offline-transaction.mjs",
     "serve:pwa": "node scripts/serve-pwa.mjs",
     "test:browser": "playwright test",
