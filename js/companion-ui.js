@@ -265,7 +265,7 @@ export function renderSetupPanel(target, options) {
 
 export function renderStaticIdentity() {
   document.querySelector('#trip-name').textContent = companionData.trip.name;
-  document.querySelector('#release-badge').textContent = `Preview build · ${companionData.identity.companionVersion}`;
+  document.querySelector('#release-badge').textContent = `Test version · ${companionData.identity.companionVersion}`;
   document.querySelector('#return-to-mountain-guide').hidden = !isMountainGuideReferrer();
   document.querySelector('#weather-invariant').textContent = companionData.invariants.weather;
   document.querySelector('#jurisdiction-copy').textContent = `${companionData.invariants.jurisdiction} You do not need to choose a county before calling.`;
