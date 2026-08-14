@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "bundle_id": "ddmg-companion-0-6-0-candidate-6-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-9-data-3cda95d4e6b1-b1",
   "cache_namespace": "ddmg-companion",
-  "companion_version": "0.6.0-candidate.6",
+  "companion_version": "0.6.0-candidate.9",
   "data_version": "1.0.0",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "b422246f9bf455df77a32b530b3d55d22862599615788fc6a7548001d9892fff",
-  "generated_at": "2026-08-10T04:16:32Z",
+  "bundle_content_sha256": "27d33b3a7cadfd1c18e10be626ae9dfc4d38501099f92bd968b1e70119b3f67d",
+  "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
-  "entry_count": 15,
-  "total_bytes": 183818,
+  "entry_count": 16,
+  "total_bytes": 219937,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -20,57 +20,64 @@
   "resources": [
     {
       "path": "index.html",
-      "sha256": "bc125227b20fcdc6a97f349d0241d74b6664c5e6437f2ec93aed2df8856474fa",
-      "bytes": 7888,
+      "sha256": "85123ae9226a498636baf8bc2407defb4f019925a1d00c117e8e48a9a9a4b7d2",
+      "bytes": 15253,
       "role": "application-shell",
       "required": true
     },
     {
       "path": "css/companion.css",
-      "sha256": "b253e30e0caea771dd11b0dd3f79c25b353b4ff1f9828ab626c7901c77431d48",
-      "bytes": 22705,
+      "sha256": "9df6e00a490b33ff204afe7c2fb2b89c539d10a9710060aac964ff1691020091",
+      "bytes": 25973,
       "role": "application-style",
       "required": true
     },
     {
       "path": "js/red-bootstrap.js",
-      "sha256": "7df598afb31e3d2162b25cadba74a4ff6aac22eb0956b9af3d9beb096c8173ff",
-      "bytes": 656,
+      "sha256": "30ff676ecdb95d595f308eadf055d20fdd9b8c83489c79213382192f1850913c",
+      "bytes": 659,
       "role": "display-bootstrap",
       "required": true
     },
     {
       "path": "js/companion-data.js",
-      "sha256": "2edb1f59728e687deb65ac93148c2e16f02b5846e456bd3b4722aa7e1ae2b8fb",
+      "sha256": "8551aa18c9aa4a34d00d0b35f0b75f345e103539a374294e51acd47668b65e25",
       "bytes": 14652,
       "role": "canonical-runtime-data",
       "required": true
     },
     {
       "path": "js/companion-state.js",
-      "sha256": "0b745fb6e69e4434eeb4c682027dbce2ca3175290a5eff2f4ad168ee9cf9f669",
-      "bytes": 5903,
+      "sha256": "723e586f87c8771517b576a14fdf3103e1e94a1116c286ab86aa1d888412d2b9",
+      "bytes": 6400,
       "role": "device-local-state",
       "required": true
     },
     {
+      "path": "js/companion-help.js",
+      "sha256": "fc92d2efcdd697f47fa579f420cc683cc0c25581d35502fcbd1dd89dfab4c54f",
+      "bytes": 17804,
+      "role": "offline-help-and-support",
+      "required": true
+    },
+    {
       "path": "js/companion-install.js",
-      "sha256": "b8e061beea9bd3b0f4dd29630ae484fe94be3f270060ae0bdc39b9b9cc15330f",
-      "bytes": 7163,
+      "sha256": "b0fd5ba54bb1d23d5e82172f518a6021b456123b4e6ea434c69fead4b1dc96f5",
+      "bytes": 8618,
       "role": "install-and-offline-control",
       "required": true
     },
     {
       "path": "js/companion-ui.js",
-      "sha256": "ab6dc6f6e548509450507e5ce6ced8795a08746a27ec160ad64f89a8c59c3ae0",
-      "bytes": 31622,
+      "sha256": "1ed7c2d74e4ff42a3681d731f9f1edd630be7e9b649a1b0157f3efc563602fb2",
+      "bytes": 31359,
       "role": "application-ui",
       "required": true
     },
     {
       "path": "js/companion.js",
-      "sha256": "fb9f98eb387b47dbb69eecdfda9557341d29cde0be1cb3b035ff1ed58f78b3d2",
-      "bytes": 13525,
+      "sha256": "7c0461c4103ba5dc30553dd8f2c3b93eb90f0efe1d7d0ad65d6e57e3425da130",
+      "bytes": 19515,
       "role": "application-controller",
       "required": true
     },
@@ -118,7 +125,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "f45bb7b79f13608b139c216e9b3dfbcc74f5c96036de9608e3d3a99da8a3de87",
+      "sha256": "1882be679bacf06cbed618ac259ea5d30f3645ee399ff69b7a40c0f93cb8e41a",
       "bytes": 912,
       "role": "release-metadata",
       "required": true

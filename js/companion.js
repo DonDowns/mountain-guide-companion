@@ -1,9 +1,14 @@
 import { clearPrivateFields, createCompanionStore } from './companion-state.js';
 import {
-  activateWaitingUpdate, installPromptAvailable, isIosBrowser, isStandalone, registerProductionServiceWorker,
+  activateWaitingUpdate, checkForCompanionUpdate, installPromptAvailable, isIosBrowser, isStandalone, registerProductionServiceWorker,
   copyPreparedMessage, repairOfflineCopy, requestInstall, sharePreparedMessage, sharePublicCompanion,
   storageEstimate, verifyOfflineResources, watchInstallPrompt
 } from './companion-install.js';
+import {
+  buildCompanionDiagnostics, buildFeatureRequest, buildProblemReport, companionOnboardingStepCount,
+  COMPANION_ONBOARDING_VERSION, deriveCompanionStatus, renderCompanionHelpTopics, renderCompanionOnboarding,
+  renderCompanionSupportStatus
+} from './companion-help.js';
 import {
   companionData, createMilestoneMessage, navigateHome, navigateTo, parseOperationalDateTimeInput, releaseMetadata,
   renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
@@ -16,9 +21,12 @@ let startObjectiveId = '';
 let objectiveSelectorOpen = false;
 let pendingObjectiveId = '';
 let editMilestoneKey = '';
-let offlineResult = { checking: true, complete: false };
+let offlineResult = { checking: true, complete: false, attempted: false };
 let storageInfo = null;
-let workerState = { supported: 'serviceWorker' in navigator, controlled: Boolean(navigator.serviceWorker?.controller), updateAvailable: false };
+let workerState = { supported: 'serviceWorker' in navigator, controlled: Boolean(navigator.serviceWorker?.controller), updateAvailable: false, updateStatus: 'current' };
+let setupPanelRequested = false;
+let onboardingStep = 0;
+let onboardingReturnFocus = null;
 
 function setupOptions(state = store.getState()) {
   return {
@@ -37,11 +45,63 @@ function renderState(state = store.getState()) {
   renderObjectiveContext(state);
   setRedDisplay(state.redDisplay);
   renderSetupPanel(document.querySelector('#install-panel'), setupOptions(state));
+  const derived = renderCompanionSupportStatus(setupOptions(state));
+  document.querySelector('#install-panel').hidden = derived.setup === 'complete' && !setupPanelRequested;
   renderCompanionHome(state, isStandalone());
 }
 
+function setOnboardingBackgroundInert(inert) {
+  for (const child of document.body.children) {
+    if (child.id === 'companion-onboarding' || child.tagName === 'SCRIPT') continue;
+    if (inert && !child.inert) {
+      child.inert = true;
+      child.dataset.onboardingInert = 'true';
+    } else if (!inert && child.dataset.onboardingInert === 'true') {
+      child.inert = false;
+      delete child.dataset.onboardingInert;
+    }
+  }
+}
+
+function openOnboarding(trigger = null) {
+  const overlay = document.querySelector('#companion-onboarding');
+  if (!overlay) return;
+  const active = trigger || document.activeElement;
+  onboardingReturnFocus = active && active !== document.body ? active : document.querySelector('#home-primary-action');
+  onboardingStep = 0;
+  renderCompanionOnboarding(onboardingStep);
+  overlay.hidden = false;
+  setOnboardingBackgroundInert(true);
+  document.body.style.overflow = 'hidden';
+  globalThis.setTimeout(() => document.querySelector('#companion-onboarding-next')?.focus(), 0);
+}
+
+function closeOnboarding(status) {
+  const overlay = document.querySelector('#companion-onboarding');
+  if (!overlay || overlay.hidden) return;
+  overlay.hidden = true;
+  setOnboardingBackgroundInert(false);
+  document.body.style.overflow = '';
+  store.update(state => {
+    state.setup.onboarding = { version: COMPANION_ONBOARDING_VERSION, status, recordedAt: new Date().toISOString() };
+  });
+  const target = onboardingReturnFocus?.isConnected ? onboardingReturnFocus : document.querySelector('#home-primary-action');
+  target?.focus?.({ preventScroll: true });
+}
+
+async function copySupportText(text, previewSelector, statusSelector) {
+  const result = await copyPreparedMessage(text);
+  const preview = document.querySelector(previewSelector);
+  preview.textContent = text;
+  preview.hidden = false;
+  document.querySelector(statusSelector).textContent = result.completed
+    ? 'Structured text copied. Paste it into the support channel you choose.'
+    : 'Automatic copy was unavailable. Select and copy the preview below.';
+  return result;
+}
+
 async function runOfflineCheck({ record = true } = {}) {
-  offlineResult = { checking: true, complete: false };
+  offlineResult = { checking: true, complete: false, attempted: true };
   renderState();
   const workerResult = await verifyOfflineResources();
   const runtimeChecks = [
@@ -61,6 +121,7 @@ async function runOfflineCheck({ record = true } = {}) {
   ];
   offlineResult = {
     ...workerResult,
+    attempted: true,
     complete: runtimeChecks.every(Boolean),
     error: runtimeChecks.every(Boolean) ? '' : workerResult.error || 'Required Companion resources did not verify.'
   };
@@ -103,7 +164,9 @@ async function handleAction(action, button) {
     navigateHome();
   }
   if (action === 'show-setup') {
+    setupPanelRequested = true;
     navigateHome({ focus: false });
+    renderState();
     document.querySelector('#install-panel').scrollIntoView({ block: 'start' });
   }
   if (action === 'top') scrollCurrentViewToTop();
@@ -120,13 +183,14 @@ async function handleAction(action, button) {
     showToast(result.outcome === 'accepted' ? 'Install accepted. Open the installed Companion once while online.' : 'Install was not completed.');
   }
   if (action === 'offline-check') {
+    setupPanelRequested = true;
     await runOfflineCheck();
   }
   if (action === 'repair-offline') {
-    offlineResult = { checking: true, complete: false };
+    offlineResult = { checking: true, complete: false, attempted: true };
     renderState();
     if (!navigator.onLine) {
-      offlineResult = { complete: false, error: 'Reconnect to the internet and retry Companion update/install.' };
+      offlineResult = { complete: false, attempted: true, error: 'Reconnect to the internet and retry Companion update/install.' };
       renderState();
       return;
     }
@@ -145,6 +209,42 @@ async function handleAction(action, button) {
   if (action === 'activate-update') {
     const activated = await activateWaitingUpdate();
     if (!activated) showToast('No downloaded update is waiting.');
+  }
+  if (action === 'check-shared-update') {
+    const result = await checkForCompanionUpdate();
+    if (result.status === 'current') showToast('No newer verified package is downloaded. Recheck changing facts before departure.');
+    if (result.status === 'offline') showToast('Update check unavailable offline. The last complete package remains available.');
+    if (result.status === 'failed') showToast('Update check failed. The last complete package remains available.');
+  }
+  if (action === 'replay-tutorial') openOnboarding(button);
+  if (action === 'tutorial-back') {
+    onboardingStep = Math.max(0, onboardingStep - 1);
+    renderCompanionOnboarding(onboardingStep);
+  }
+  if (action === 'tutorial-next') {
+    if (onboardingStep < companionOnboardingStepCount - 1) {
+      onboardingStep += 1;
+      renderCompanionOnboarding(onboardingStep);
+    } else closeOnboarding('completed');
+  }
+  if (action === 'dismiss-tutorial') closeOnboarding('dismissed');
+  if (action === 'copy-problem-report') {
+    const report = buildProblemReport({
+      section: document.querySelector('#problem-section').value,
+      description: document.querySelector('#problem-description').value,
+      steps: document.querySelector('#problem-steps').value
+    }, buildCompanionDiagnostics(setupOptions()));
+    await copySupportText(report, '#problem-report-preview', '#problem-report-status');
+  }
+  if (action === 'copy-feature-request') {
+    const report = buildFeatureRequest({
+      problem: document.querySelector('#feature-problem').value,
+      who: document.querySelector('#feature-who').value,
+      when: document.querySelector('#feature-when').value,
+      frequency: document.querySelector('#feature-frequency').value,
+      behavior: document.querySelector('#feature-behavior').value
+    });
+    await copySupportText(report, '#feature-request-preview', '#feature-request-status');
   }
   if (action === 'start-objective') {
     startObjectiveId = button.dataset.objectiveId;
@@ -305,6 +405,7 @@ function bindEvents() {
   });
 
   document.addEventListener('input', event => {
+    if (event.target.id === 'companion-help-search') renderCompanionHelpTopics(event.target.value);
     if (event.target.matches('[data-local-field="statusNote"]')) {
       const value = event.target.value;
       store.update(state => { state.statusNote = value; }, { notify: false });
@@ -321,16 +422,48 @@ function bindEvents() {
       event.target.querySelector(':scope > summary')?.setAttribute('aria-expanded', String(event.target.open));
     }
   }, true);
+
+  document.addEventListener('keydown', event => {
+    const overlay = document.querySelector('#companion-onboarding');
+    if (!overlay || overlay.hidden) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeOnboarding('dismissed');
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const controls = [...overlay.querySelectorAll('button:not([hidden]):not([disabled])')];
+    const first = controls[0];
+    const last = controls.at(-1);
+    if (!controls.includes(document.activeElement)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first)?.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 }
 
 renderStaticIdentity();
 renderArtifacts();
 renderRoutes();
 renderEmergency();
+renderCompanionHelpTopics();
 renderState();
 bindEvents();
 watchInstallPrompt(() => renderState());
 store.subscribe(renderState);
+
+if (store.getState().setup.onboarding.version !== COMPANION_ONBOARDING_VERSION) {
+  globalThis.setTimeout(() => openOnboarding(), 0);
+}
+
+globalThis.addEventListener('online', () => renderState());
+globalThis.addEventListener('offline', () => renderState());
 
 registerProductionServiceWorker(state => {
   workerState = state;
@@ -338,7 +471,7 @@ registerProductionServiceWorker(state => {
 }).then(async registration => {
   if (registration) await runOfflineCheck({ record: false });
   else {
-    offlineResult = { complete: false, error: 'Offline setup is unavailable.' };
+    offlineResult = { complete: false, attempted: true, error: 'Offline setup is unavailable.' };
     renderState();
   }
 });

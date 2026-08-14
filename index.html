@@ -27,6 +27,10 @@
   </header>
 
   <section class="welcome" id="companion-home" tabindex="-1" aria-labelledby="welcome-title">
+    <aside class="update-banner" id="companion-update-banner" aria-live="polite" hidden>
+      <div><strong>Companion update downloaded</strong><p>Restart to use the atomically verified app and trip-data package.</p></div>
+      <button class="secondary-button" type="button" data-action="activate-update">Restart to Use Update</button>
+    </aside>
     <div class="welcome-copy">
       <p class="eyebrow" id="welcome-eyebrow">MOUNTAIN GUIDE COMPANION</p>
       <h1 id="welcome-title">Set Up This Phone</h1>
@@ -48,6 +52,19 @@
       <h2 id="purpose-title">The field instrument, not the full Mountain Guide</h2>
       <p>Use it to orient the crew, compare the plan with actual conditions, and reach emergency information quickly.</p>
     </aside>
+
+    <section class="home-status" aria-labelledby="home-status-title">
+      <div class="section-heading compact-heading">
+        <p class="eyebrow">THIS PHONE AND PACKAGE</p>
+        <h2 id="home-status-title">Companion status</h2>
+      </div>
+      <dl>
+        <div><dt>Phone setup</dt><dd id="home-offline-status">Checking…</dd></div>
+        <div><dt>Shared trip data</dt><dd id="home-shared-status">Loading package identity…</dd></div>
+        <div><dt>App update</dt><dd id="home-update-status">Checking…</dd></div>
+      </dl>
+      <p class="boundary-note">A verified package does not confirm current weather, access, route, or group conditions.</p>
+    </section>
 
     <div id="install-panel" class="setup-host" aria-live="polite"></div>
 
@@ -122,6 +139,63 @@
       <div id="emergency-contacts" class="contact-grid"></div>
       <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
     </section>
+
+    <section class="app-view help-view" id="help-view" data-view="help" tabindex="-1" aria-labelledby="help-title" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">COMPANION-ONLY GUIDANCE</p>
+        <h2 id="help-title">Help &amp; Diagnostics</h2>
+        <p>Searchable instructions and recovery steps are packaged for offline use.</p>
+      </div>
+      <label class="help-search" for="companion-help-search"><span>Search Help</span><input id="companion-help-search" type="search" autocomplete="off" placeholder="Try offline, no signal, update, install, weather, or emergency"></label>
+      <p id="companion-help-status" class="boundary-note" role="status" aria-live="polite"></p>
+      <div id="companion-help-results" class="help-results"></div>
+
+      <section class="support-panel" aria-labelledby="diagnostic-title">
+        <div class="section-heading compact-heading"><p class="eyebrow">THIS DEVICE</p><h3 id="diagnostic-title">Diagnostics</h3></div>
+        <dl class="diagnostic-list">
+          <div><dt>App</dt><dd id="diagnostic-app-type">Companion App</dd></div>
+          <div><dt>Version</dt><dd id="diagnostic-version">Loading…</dd></div>
+          <div><dt>Release</dt><dd id="diagnostic-release">Preview candidate</dd></div>
+          <div><dt>Display</dt><dd id="diagnostic-display">Checking…</dd></div>
+          <div><dt>Connection</dt><dd id="diagnostic-network">Checking…</dd></div>
+          <div><dt>Service worker</dt><dd id="diagnostic-worker">Checking…</dd></div>
+          <div><dt>Offline package</dt><dd id="diagnostic-offline">Checking…</dd></div>
+          <div><dt>Shared information</dt><dd id="diagnostic-shared">Loading…</dd></div>
+          <div><dt>App update</dt><dd id="diagnostic-update">Checking…</dd></div>
+        </dl>
+        <div class="setup-actions">
+          <button class="secondary-button" type="button" data-action="check-shared-update">Check for New Shared Information</button>
+          <button class="secondary-button" type="button" data-action="repair-offline">Repair Offline Copy</button>
+          <button class="secondary-button" type="button" data-action="replay-tutorial">Replay Tutorial</button>
+        </div>
+      </section>
+
+      <section class="support-panel" aria-labelledby="problem-title">
+        <div class="section-heading compact-heading"><p class="eyebrow">FEEDBACK</p><h3 id="problem-title">Report a Problem</h3></div>
+        <p class="boundary-note">Creates text to copy. Nothing is sent automatically, and private trip fields are excluded.</p>
+        <label><span>Section</span><select id="problem-section"><option value="">Choose a section</option><option>Home / Setup</option><option>Timeline</option><option>Route</option><option>Emergency</option><option>Help</option><option>Offline / Update</option></select></label>
+        <label><span>What happened?</span><textarea id="problem-description" maxlength="1200"></textarea></label>
+        <label><span>Steps to reproduce</span><textarea id="problem-steps" maxlength="1200"></textarea></label>
+        <button class="primary-button" type="button" data-action="copy-problem-report">Copy Problem Report</button>
+        <p id="problem-report-status" role="status" aria-live="polite"></p>
+        <pre id="problem-report-preview" class="report-preview" tabindex="0" hidden></pre>
+      </section>
+
+      <section class="support-panel" aria-labelledby="feature-title">
+        <div class="section-heading compact-heading"><p class="eyebrow">IDEA</p><h3 id="feature-title">Request a Feature</h3></div>
+        <p class="boundary-note">Describe a need separately from a defect. Nothing is sent automatically.</p>
+        <label><span>Problem to solve</span><textarea id="feature-problem" maxlength="1200"></textarea></label>
+        <label><span>Who would use it?</span><input id="feature-who" maxlength="240"></label>
+        <label><span>When is it needed?</span><select id="feature-when"><option value="">Choose timing</option><option>Before the trip</option><option>At the trailhead</option><option>During the objective</option><option>After the trip</option></select></label>
+        <label><span>How often?</span><select id="feature-frequency"><option value="">Choose frequency</option><option>Once per trip</option><option>Several times per trip</option><option>Every field day</option><option>Occasionally</option></select></label>
+        <label><span>Requested behavior</span><textarea id="feature-behavior" maxlength="1200"></textarea></label>
+        <button class="primary-button" type="button" data-action="copy-feature-request">Copy Feature Request</button>
+        <p id="feature-request-status" role="status" aria-live="polite"></p>
+        <pre id="feature-request-preview" class="report-preview" tabindex="0" hidden></pre>
+      </section>
+      <aside class="hold-note"><strong>Safety boundary</strong><p>Companion is decision support, not permission. It does not provide live weather, rescue guidance, medical clearance, route authorization, or confirmation that a message was delivered.</p></aside>
+      <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
+    </section>
   </main>
 
   <footer class="provenance" id="provenance" aria-label="Companion provenance"></footer>
@@ -131,8 +205,23 @@
     <button type="button" data-nav="timeline"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Time<wbr>line</span></button>
     <button type="button" data-nav="route"><span class="nav-icon" aria-hidden="true">△</span><span class="nav-label">Route</span></button>
     <button class="emergency-nav" type="button" data-nav="emergency"><span class="nav-icon" aria-hidden="true">+</span><span class="nav-label">Emer<wbr>gency</span></button>
+    <button type="button" data-nav="help"><span class="nav-icon" aria-hidden="true">?</span><span class="nav-label">Help</span></button>
     <button type="button" data-action="toggle-red" aria-pressed="false"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Red</span></button>
   </nav>
+
+  <div class="onboarding-overlay" id="companion-onboarding" hidden>
+    <section class="onboarding-sheet" role="dialog" aria-modal="true" aria-labelledby="companion-onboarding-title" aria-describedby="companion-onboarding-body">
+      <button class="onboarding-close" type="button" data-action="dismiss-tutorial" aria-label="Dismiss tutorial">×</button>
+      <p class="eyebrow" id="companion-onboarding-kicker">Step 1 of 4</p>
+      <h2 id="companion-onboarding-title">What was shared</h2>
+      <p id="companion-onboarding-body"></p>
+      <div class="onboarding-actions">
+        <button class="secondary-button" id="companion-onboarding-back" type="button" data-action="tutorial-back">Back</button>
+        <button class="quiet-button" type="button" data-action="dismiss-tutorial">Skip for now</button>
+        <button class="primary-button" id="companion-onboarding-next" type="button" data-action="tutorial-next">Next</button>
+      </div>
+    </section>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
   <noscript><p class="noscript">JavaScript is required to render the packaged trip data. Use the printed Field Guide or Pocket Card if unavailable.</p></noscript>

@@ -175,7 +175,8 @@ export function renderSetupPanel(target, options) {
     standalone, ios, promptAvailable, offlineResult, workerState, state
   } = options;
   const offlineVerified = offlineResult?.complete === true;
-  const setupComplete = standalone && offlineVerified;
+  const controlled = workerState.controlled === true;
+  const setupComplete = standalone && controlled && offlineVerified;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
   const heading = element('h2', { text: setupComplete ? 'THIS PHONE IS SET UP' : standalone ? 'FINISH SETTING UP THIS PHONE' : 'SET UP THIS PHONE' });
   const intro = element('p', {
@@ -205,6 +206,7 @@ export function renderSetupPanel(target, options) {
 
   const checklist = element('ul', { className: 'setup-checklist', 'aria-label': 'Setup status' }, [
     setupItem('Companion installed', standalone),
+    setupItem('Offline control active', controlled),
     setupItem('Offline resources verified', offlineVerified),
     setupItem(
       state.setup.airplaneModeTestCompletedAt ? 'Airplane Mode test recorded' : 'Airplane Mode test still required',
@@ -228,14 +230,6 @@ export function renderSetupPanel(target, options) {
     ]));
   }
 
-  if (workerState.updateAvailable) {
-    children.push(element('div', { className: 'update-note', role: 'status' }, [
-      element('strong', { text: 'Update downloaded' }),
-      element('p', { text: 'Restart Companion to use it. This copy stays available until then.' }),
-      element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'activate-update' }, text: 'Restart to use update' })
-    ]));
-  }
-
   const airplaneSteps = [
     'Complete Offline Check while still connected.',
     'Close the Companion completely.',
@@ -245,6 +239,7 @@ export function renderSetupPanel(target, options) {
     'Open Timeline.',
     'Open Route.',
     'Open Emergency.',
+    'Open Help and search for offline recovery.',
     'Confirm the Field Guide opens.',
     'Confirm the Pocket Card opens.',
     'Return to the setup screen and record the test.'

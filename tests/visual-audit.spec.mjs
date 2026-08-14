@@ -14,6 +14,7 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
 
   await page.goto('/');
   if (desktop) {
+    await page.getByRole('button', { name: 'Skip for now' }).click();
     await page.getByRole('button', { name: 'Continue in Browser' }).click();
     await expectBelowHeader(page, 'Timeline');
     await page.screenshot({ path: 'tmp/visual-audit/14-desktop-timeline.png' });
@@ -24,6 +25,7 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   }
 
   await page.screenshot({ path: 'tmp/visual-audit/01-mobile-first-open.png' });
+  await page.getByRole('button', { name: 'Skip for now' }).click();
   await page.locator('#artifact-cards').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'tmp/visual-audit/02-mobile-artifacts.png' });
   await page.locator('#install-panel').scrollIntoViewIfNeeded();
@@ -37,6 +39,10 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   await page.getByRole('button', { name: /Emergency/ }).last().click();
   await expectBelowHeader(page, 'CALL 911 FIRST');
   await page.screenshot({ path: 'tmp/visual-audit/06-mobile-emergency-daylight.png' });
+  await page.getByRole('button', { name: /Help/ }).last().click();
+  await page.locator('#companion-help-search').fill('no signal');
+  await expectBelowHeader(page, 'Help & Diagnostics');
+  await page.screenshot({ path: 'tmp/visual-audit/06a-mobile-help-search.png' });
   await page.getByRole('button', { name: /Timeline/ }).last().click();
   await expectBelowHeader(page, 'Timeline');
   await page.getByRole('button', { name: /Red/ }).click();
@@ -50,8 +56,8 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeAttached();
-  await page.getByRole('button', { name: 'Set up this phone' }).click();
-  await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
+  await page.getByRole('button', { name: 'Offline Check' }).first().click();
   await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
   await page.locator('#install-panel').evaluate(node => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
   await expect(page.getByText('Companion installed', { exact: true })).toBeVisible();
