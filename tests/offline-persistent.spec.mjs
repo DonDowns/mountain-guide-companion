@@ -2,7 +2,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { chromium, expect, test } from '@playwright/test';
-import { resetServerRequests, serverRequests, setServerState, waitForServiceWorker } from './offline-helpers.mjs';
+import { resetServerRequests, seedCompletedOnboarding, serverRequests, setServerState, waitForServiceWorker } from './offline-helpers.mjs';
 
 test('persisted Chromium profile cold-launches after a simulated browser close', async ({ request, baseURL }, testInfo) => {
   test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Persistent-profile simulation runs once in Chromium desktop');
@@ -11,6 +11,7 @@ test('persisted Chromium profile cold-launches after a simulated browser close',
   try {
     const online = await chromium.launchPersistentContext(profile, { headless: true, viewport: { width: 390, height: 844 } });
     const first = online.pages()[0] || await online.newPage();
+    await seedCompletedOnboarding(first);
     await first.goto(baseURL);
     await waitForServiceWorker(first);
     await first.getByRole('button', { name: /Red/ }).click();

@@ -27,7 +27,8 @@ export function defaultLocalState(defaultObjectiveId = '') {
       offlineVerifiedAt: '',
       offlineVerifiedBundleId: '',
       airplaneModeTestCompletedAt: '',
-      legacyStructuralCheckCompletedAt: ''
+      legacyStructuralCheckCompletedAt: '',
+      onboarding: { version: '', status: '', recordedAt: '' }
     }
   };
 }
@@ -60,6 +61,7 @@ function sanitizeCurrent(raw, defaultObjectiveId) {
   const fallback = defaultLocalState(defaultObjectiveId);
   const privateContact = raw.privateContact && typeof raw.privateContact === 'object' ? raw.privateContact : {};
   const setup = raw.setup && typeof raw.setup === 'object' ? raw.setup : {};
+  const onboarding = setup.onboarding && typeof setup.onboarding === 'object' ? setup.onboarding : {};
   const checkedMilestones = booleanRecord(raw.checkedMilestones);
   const milestoneMarks = stringRecord(raw.milestoneMarks, 24);
   for (const [key, checked] of Object.entries(checkedMilestones)) {
@@ -88,14 +90,19 @@ function sanitizeCurrent(raw, defaultObjectiveId) {
       airplaneModeTestCompletedAt: typeof setup.airplaneModeTestCompletedAt === 'string' ? setup.airplaneModeTestCompletedAt.slice(0, 160) : '',
       legacyStructuralCheckCompletedAt: typeof setup.legacyStructuralCheckCompletedAt === 'string'
         ? setup.legacyStructuralCheckCompletedAt.slice(0, 160)
-        : typeof setup.structuralCheckCompletedAt === 'string' ? setup.structuralCheckCompletedAt.slice(0, 160) : ''
+        : typeof setup.structuralCheckCompletedAt === 'string' ? setup.structuralCheckCompletedAt.slice(0, 160) : '',
+      onboarding: {
+        version: typeof onboarding.version === 'string' ? onboarding.version.slice(0, 120) : '',
+        status: ['completed', 'dismissed'].includes(onboarding.status) ? onboarding.status : '',
+        recordedAt: typeof onboarding.recordedAt === 'string' ? onboarding.recordedAt.slice(0, 160) : ''
+      }
     }
   };
 }
 
 export function migrateLocalState(raw, defaultObjectiveId = '') {
   if (!raw || typeof raw !== 'object') return defaultLocalState(defaultObjectiveId);
-  if ([1, 2, 3].includes(raw.schemaVersion)) return sanitizeCurrent(raw, defaultObjectiveId);
+  if ([1, 2, 3, 4].includes(raw.schemaVersion)) return sanitizeCurrent(raw, defaultObjectiveId);
   return defaultLocalState(defaultObjectiveId);
 }
 

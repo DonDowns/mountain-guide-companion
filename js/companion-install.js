@@ -1,6 +1,19 @@
 let deferredInstallPrompt = null;
 let serviceWorkerRegistration = null;
 let controllerReloadStarted = false;
+let workerStatePublisher = null;
+let updateStatus = 'current';
+
+function publishWorkerState(overrides = {}) {
+  workerStatePublisher?.({
+    supported: 'serviceWorker' in navigator,
+    controlled: Boolean(navigator.serviceWorker?.controller),
+    updateAvailable: Boolean(serviceWorkerRegistration?.waiting),
+    updateStatus: serviceWorkerRegistration?.waiting ? 'available' : updateStatus,
+    registration: serviceWorkerRegistration,
+    ...overrides
+  });
+}
 
 export function isStandalone() {
   if (globalThis.__COMPANION_TEST_STANDALONE__ === true) return true;
@@ -118,8 +131,9 @@ function sendWorkerMessage(worker, type, timeoutMs = 30000) {
 }
 
 export async function registerProductionServiceWorker(onChange) {
+  workerStatePublisher = onChange;
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) {
-    onChange?.({ supported: false, controlled: false, updateAvailable: false });
+    publishWorkerState({ supported: false, controlled: false, updateAvailable: false, updateStatus: 'failed' });
     return null;
   }
   try {
@@ -128,15 +142,16 @@ export async function registerProductionServiceWorker(onChange) {
       scope: './',
       updateViaCache: 'none'
     });
-    const publish = () => onChange?.({
-      supported: true,
-      controlled: Boolean(navigator.serviceWorker.controller),
-      updateAvailable: Boolean(serviceWorkerRegistration.waiting),
-      registration: serviceWorkerRegistration
-    });
+    const publish = () => publishWorkerState();
     serviceWorkerRegistration.addEventListener('updatefound', () => {
       const installing = serviceWorkerRegistration.installing;
-      installing?.addEventListener('statechange', publish);
+      updateStatus = 'downloading';
+      publish();
+      installing?.addEventListener('statechange', () => {
+        if (installing.state === 'installed') updateStatus = serviceWorkerRegistration.waiting ? 'available' : 'current';
+        if (installing.state === 'redundant') updateStatus = 'failed';
+        publish();
+      });
     });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       const nextController = navigator.serviceWorker.controller;
@@ -153,9 +168,34 @@ export async function registerProductionServiceWorker(onChange) {
     publish();
     return serviceWorkerRegistration;
   } catch {
-    onChange?.({ supported: true, controlled: false, updateAvailable: false });
+    updateStatus = navigator.onLine ? 'failed' : 'offline';
+    publishWorkerState({ supported: true, controlled: false, updateAvailable: false });
     return null;
   }
+}
+
+export async function checkForCompanionUpdate() {
+  const registration = serviceWorkerRegistration || await navigator.serviceWorker?.ready;
+  if (!registration) {
+    updateStatus = 'failed';
+    publishWorkerState();
+    return { available: false, status: updateStatus };
+  }
+  if (!navigator.onLine) {
+    updateStatus = 'offline';
+    publishWorkerState();
+    return { available: false, status: updateStatus };
+  }
+  updateStatus = 'checking';
+  publishWorkerState();
+  try {
+    await registration.update();
+    updateStatus = registration.waiting ? 'available' : 'current';
+  } catch {
+    updateStatus = 'failed';
+  }
+  publishWorkerState();
+  return { available: Boolean(registration.waiting), status: updateStatus };
 }
 
 export async function verifyOfflineResources() {
@@ -181,6 +221,8 @@ export async function repairOfflineCopy() {
 export async function activateWaitingUpdate() {
   const registration = serviceWorkerRegistration || await navigator.serviceWorker?.ready;
   if (!registration?.waiting) return false;
+  updateStatus = 'applying';
+  publishWorkerState();
   registration.waiting.postMessage({ type: 'ACTIVATE_VERIFIED_UPDATE' });
   return true;
 }

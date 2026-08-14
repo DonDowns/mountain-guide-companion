@@ -20,10 +20,10 @@ async function main() {
   ]);
   const paths = [
     'index.html', 'css/companion.css', 'js/red-bootstrap.js', 'js/companion.js', 'js/companion-ui.js',
-    'js/companion-install.js', 'js/companion-state.js', 'js/companion-data.js', 'manifest.webmanifest',
+    'js/companion-install.js', 'js/companion-state.js', 'js/companion-help.js', 'js/companion-data.js', 'manifest.webmanifest',
     'release.json', 'config/companion.build.json', 'playwright.config.mjs',
     'offline-bundle.json', 'service-worker.js', 'service-worker.template.js', 'playwright.offline.config.mjs',
-    'tests/companion.spec.mjs', 'tests/visual-audit.spec.mjs', 'tests/accessibility.spec.mjs',
+    'tests/companion.spec.mjs', 'tests/help-onboarding.spec.mjs', 'tests/visual-audit.spec.mjs', 'tests/accessibility.spec.mjs',
     'tests/offline.spec.mjs', 'tests/offline-corruption.spec.mjs', 'tests/offline-interruption.spec.mjs',
     'tests/offline-persistent.spec.mjs', 'tests/offline-helpers.mjs',
     'tests/fixtures/offline-update/previous/index.html',

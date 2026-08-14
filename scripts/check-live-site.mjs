@@ -2359,7 +2359,7 @@ export async function checkOnce(options = {}) {
     ? async (path, loadOptions) => ({ bytes: await fetchBytesImpl(path, loadOptions), finalUrl: new URL(path, canonicalBase(liveBaseUrl)).href })
     : (path, loadOptions) => fetchDeploymentResource(path, { liveBaseUrl, allowedPaths: approvedPaths, fetchImpl, signal: loadOptions.signal }));
   const errors = [];
-  if (release.companion_version !== '0.6.0-candidate.6') errors.push('candidate version mismatch');
+  if (release.companion_version !== '0.6.0-candidate.9') errors.push('candidate version mismatch');
   if (release.release_status !== 'candidate') errors.push('release status mismatch');
   if (release.pwa_url !== expectedPublicBase) errors.push('public URL contract mismatch');
   if (release.manifest_sha256 !== sha256(localManifestBytes)) errors.push('canonical manifest fingerprint mismatch');

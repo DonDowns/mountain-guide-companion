@@ -23,7 +23,7 @@ The Companion dataset is a public-safe, trip-specific derivative of that pinned 
 
 ## Current phase
 
-Phase 6 publishes Companion through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 6A applies a restrained mountain-earth visual system, Phase 6A.1 cleans up field-facing copy, and the pre-Crew audit remediation adds verified PDF navigation, stronger offline transactions, and clearer CI evidence. Candidate `0.6.0-candidate.5` adds a returnable Companion Home, safer objective/start controls, reversible timestamped local milestones, and offline prepared-message Copy/Share actions. Candidate `0.6.0-candidate.6` clarifies friend setup, installed Home, concise offline status, and the privacy-clean conditional return to Mountain Guide. None changes the canonical dataset. The static shell provides:
+Phase 6 publishes Companion through validated GitHub Pages automation so it can be installed on real phones for physical testing. Phase 6A applies a restrained mountain-earth visual system, Phase 6A.1 cleans up field-facing copy, and the pre-Crew audit remediation adds verified PDF navigation, stronger offline transactions, and clearer CI evidence. Candidate `0.6.0-candidate.5` adds a returnable Companion Home, safer objective/start controls, reversible timestamped local milestones, and offline prepared-message Copy/Share actions. Candidate `0.6.0-candidate.6` clarifies friend setup, installed Home, concise offline status, and the privacy-clean conditional return to Mountain Guide. Candidate `0.6.0-candidate.8` independently reconstructs companion-scoped onboarding, token-aware searchable offline Help, separate setup/package/update status, recovery guidance, diagnostics, and copy-only problem and feature reports. Candidate `0.6.0-candidate.9` restores neutral device-clock verification age on Home and in safe problem-report diagnostics without making age an update or package-expiry signal. None changes the canonical dataset. The static shell provides:
 
 `package.json`, the build configuration, generated release metadata, offline bundle, and service worker all use the exact candidate version. The PWA contract rejects version drift so package metadata cannot become a second release authority.
 
@@ -32,6 +32,7 @@ Phase 6 publishes Companion through validated GitHub Pages automation so it can 
 3. Emergency — one-action access to CALL 911 FIRST, reporting prompts, and all six public numbers.
 4. Red — a persistent presentation control with no safety meaning.
 5. Friend setup — browser/iPhone install guidance, standalone detection, a hash-verified Offline Check, public-link sharing, repair, and a separately recorded physical Airplane Mode checklist.
+6. Help & Diagnostics — first-use tutorial and replay, morphology/alias-aware offline search, setup and update recovery, exact package verification context without an invented expiry window, and privacy-limited copy-only feedback reports.
 
 `scripts/build-pwa.mjs` deterministically generates immutable `js/companion-data.js` and candidate `release.json` from `data/trip-manifest.json`. Hand-maintained runtime files contain no canonical trip literals. The shipped shell is plain HTML/CSS/ES modules with local assets and no runtime external dependency.
 

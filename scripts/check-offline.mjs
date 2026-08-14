@@ -29,7 +29,7 @@ async function main() {
   const errors = [];
   const requiredPaths = new Set([
     'index.html', 'css/companion.css', 'js/red-bootstrap.js', 'js/companion-data.js',
-    'js/companion-state.js', 'js/companion-install.js', 'js/companion-ui.js', 'js/companion.js',
+    'js/companion-state.js', 'js/companion-help.js', 'js/companion-install.js', 'js/companion-ui.js', 'js/companion.js',
     'manifest.webmanifest', 'icons/companion-icon.svg', 'icons/companion-maskable.svg',
     'data/trip-manifest.json', 'generated/field-guide.pdf', 'generated/pocket-card.pdf', 'release.json'
   ]);
