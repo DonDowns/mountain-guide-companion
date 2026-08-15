@@ -180,7 +180,7 @@ export function buildFeatureRequest(fields) {
 export function renderCompanionSupportStatus(options) {
   const derived = deriveCompanionStatus(options);
   const shared = sharedInformationState({ verifiedAt: options.verifiedAt, now: options.now, updateAvailable: derived.updateAvailable });
-  const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Offline copy verified', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
+  const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Phone Setup ✓', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
   const values = {
     'home-offline-status': setupLabels[derived.setup],
     'home-shared-status': shared.label,

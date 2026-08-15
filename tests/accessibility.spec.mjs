@@ -28,13 +28,13 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
   await page.getByRole('button', { name: /Help/ }).last().click();
   await audit(page, 'Help and feedback daylight');
 
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await audit(page, 'Emergency Red Display');
 
   await page.getByRole('button', { name: /Timeline/ }).last().click();
   await audit(page, 'Timeline Red Display');
 
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
   await page.getByRole('button', { name: 'Offline Check' }).first().click();

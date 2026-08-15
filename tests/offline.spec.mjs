@@ -33,7 +33,7 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await page.getByRole('button', { name: /Change objective/ }).click();
   await page.getByRole('radio', { name: /Choose Mount Lindsey/ }).check();
   await page.getByRole('button', { name: 'Use objective' }).click();
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.getByRole('button', { name: /Mark Vehicle departure locally/ }).click();
   await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
@@ -41,13 +41,13 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await context.setOffline(true);
   await resetServerRequests(request);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
   await page.close();
   const offlinePage = await context.newPage();
   offlinePage.on('pageerror', error => errors.push(error.message));
   offlinePage.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await offlinePage.goto('/');
-  await expect(offlinePage.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
+  await expect(offlinePage.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
   await expect(offlinePage.locator('html')).toHaveAttribute('data-display', 'red');
   await openCompanion(offlinePage);
   await expect(offlinePage.locator('#current-objective-context')).toContainText('Mount Lindsey');
@@ -63,7 +63,7 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await offlinePage.getByRole('button', { name: /Emergency/ }).last().click();
   await expect(offlinePage.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
   await expect(offlinePage.locator('a.phone-link')).toHaveCount(6);
-  await offlinePage.getByRole('button', { name: 'Set up this phone' }).click();
+  await offlinePage.getByRole('button', { name: 'Prepare this phone' }).click();
   await offlinePage.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
   await expect(offlinePage.getByText('Offline resources verified', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
@@ -161,9 +161,9 @@ test('keeps the previous complete release active when a new required JavaScript 
     });
   });
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
-  await page.getByRole('button', { name: 'Set up this phone' }).click();
+  await page.getByRole('button', { name: 'Prepare this phone' }).click();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
   await openCompanion(page);
@@ -197,8 +197,8 @@ test('reloads two previous-release tabs coherently when the verified update acti
   await page.getByRole('button', { name: 'Restart to use update' }).click();
 
   for (const candidatePage of [page, second]) {
-    await expect(candidatePage.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.9/)).toBeVisible();
+    await expect(candidatePage.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.10/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -213,8 +213,8 @@ test('reloads two previous-release tabs coherently when the verified update acti
     return records.sort();
   });
   expect(complete).toEqual([
-    'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1',
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-9-data-3cda95d4e6b1-b1$/)
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-10-data-3cda95d4e6b1-b1$/),
+    'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1'
   ]);
 });
 

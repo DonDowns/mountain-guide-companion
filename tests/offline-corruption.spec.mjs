@@ -29,11 +29,11 @@ test('repair creates a new complete cache and preserves device-local state', asy
   await page.getByRole('button', { name: /Change objective/ }).click();
   await page.getByRole('radio', { name: /Choose Mount Lindsey/ }).check();
   await page.getByRole('button', { name: 'Use objective' }).click();
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.getByRole('button', { name: /Mark Vehicle departure locally/ }).click();
   await page.getByText('Optional private fields on this phone').click();
   await page.locator('[data-private-field="name"]').fill('x');
-  await page.getByRole('button', { name: 'Set up this phone' }).click();
+  await page.getByRole('button', { name: 'Prepare this phone' }).click();
   await corruptActiveCache(page, 'js/companion-ui.js');
   await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
   await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();

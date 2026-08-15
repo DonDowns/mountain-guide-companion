@@ -45,13 +45,13 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   await page.screenshot({ path: 'tmp/visual-audit/06a-mobile-help-search.png' });
   await page.getByRole('button', { name: /Timeline/ }).last().click();
   await expectBelowHeader(page, 'Timeline');
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.screenshot({ path: 'tmp/visual-audit/07-mobile-timeline-red.png' });
   await page.getByRole('button', { name: /Emergency/ }).last().click();
   await expectBelowHeader(page, 'CALL 911 FIRST');
   await page.screenshot({ path: 'tmp/visual-audit/08-mobile-emergency-red.png' });
 
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
 
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();

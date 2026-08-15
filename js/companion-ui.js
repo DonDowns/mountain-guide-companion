@@ -145,7 +145,7 @@ export function isMountainGuideReferrer(referrer = document.referrer) {
 
 export function renderCompanionHome(state, standalone) {
   document.querySelector('#welcome-eyebrow').textContent = standalone ? 'CURRENT TRIP' : 'MOUNTAIN GUIDE COMPANION';
-  document.querySelector('#welcome-title').textContent = standalone ? 'Companion Home' : 'Set Up This Phone';
+  document.querySelector('#welcome-title').textContent = standalone ? 'Companion Home' : 'Prepare This Phone';
   document.querySelector('#welcome-summary').textContent = standalone
     ? 'Open the trip companion, verify the offline copy, or use the Field Guide and Pocket Card.'
     : 'Recommended for trip partners. This keeps the trip plan, emergency information, communication milestones, Field Guide, and Pocket Card available when there is no service.';
@@ -154,18 +154,18 @@ export function renderCompanionHome(state, standalone) {
   const secondary = document.querySelector('#home-secondary-action');
   if (standalone) {
     primary.dataset.action = 'open-companion';
-    primary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+    primary.textContent = 'Open Trip Timeline';
     secondary.dataset.action = 'offline-check';
     secondary.textContent = 'Offline Check';
   } else {
     primary.dataset.action = 'show-setup';
     primary.textContent = 'Install for Offline Use';
     secondary.dataset.action = 'open-companion';
-    secondary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Continue in Browser';
+    secondary.textContent = state.setup.companionOpened ? 'Open Trip Timeline' : 'Continue in Browser';
   }
 
   for (const button of document.querySelectorAll('.artifact-open')) {
-    button.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+    button.textContent = 'Open Trip Timeline';
   }
 }
 
@@ -178,7 +178,7 @@ export function renderSetupPanel(target, options) {
   const controlled = workerState.controlled === true;
   const setupComplete = standalone && controlled && offlineVerified;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
-  const heading = element('h2', { text: setupComplete ? 'THIS PHONE IS SET UP' : standalone ? 'FINISH SETTING UP THIS PHONE' : 'SET UP THIS PHONE' });
+  const heading = element('h2', { text: setupComplete ? 'THIS PHONE IS SET UP' : standalone ? 'Finish Preparing This Phone' : 'Prepare This Phone' });
   const intro = element('p', {
     text: standalone
       ? 'Run Offline Check, then complete the Airplane Mode test on this phone.'
@@ -215,6 +215,7 @@ export function renderSetupPanel(target, options) {
     )
   ]);
   children.push(checklist);
+  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'This prepares the Companion app to run without a signal. It is not trip authorization or permission to proceed.' }));
   children.push(element('p', { className: 'boundary-note setup-boundary', text: 'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.' }));
 
   if (offlineResult?.checking) {
@@ -283,7 +284,7 @@ export function renderArtifacts() {
     {
       title: 'Interactive Companion',
       description: 'Interactive operational reference.',
-      action: element('button', { className: 'quiet-button artifact-open', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Trip Companion' })
+      action: element('button', { className: 'quiet-button artifact-open', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Trip Timeline' })
     },
     {
       title: '3-Page Field Guide',
@@ -298,7 +299,10 @@ export function renderArtifacts() {
   ].map(item => element('article', { className: 'artifact-card' }, [
     element('h3', { text: item.title }),
     element('p', { text: item.description }),
-    item.action
+    element('div', { className: 'welcome-link-actions' }, [
+      item.action,
+      element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'home' }, text: 'Back to Top' })
+    ])
   ]));
   clearAndAppend(document.querySelector('#artifact-cards'), ...cards);
 }
@@ -529,7 +533,10 @@ export function setRedDisplay(enabled) {
   document.documentElement.style.background = enabled ? '#100000' : '';
   document.documentElement.style.colorScheme = enabled ? 'dark' : 'light';
   const button = document.querySelector('[data-action="toggle-red"]');
-  button.setAttribute('aria-pressed', String(enabled));
+  if (button) {
+    button.setAttribute('aria-pressed', String(enabled));
+    button.textContent = enabled ? 'Red Mode · On' : 'Red Mode · Off';
+  }
   document.querySelector('meta[name="theme-color"]').content = enabled ? '#100000' : '#163d46';
 }
 

@@ -1201,7 +1201,7 @@ textarea {
   left: 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   min-height: calc(var(--nav-height) + env(safe-area-inset-bottom));
   padding: 6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
   border-top: 1px solid var(--border);
@@ -1238,24 +1238,19 @@ textarea {
   overflow-wrap: anywhere;
 }
 
-.primary-nav button[aria-current="page"],
-.primary-nav button[aria-pressed="true"] {
-  background: var(--surface-alt);
-  color: var(--color-brand-primary);
-}
-
 .primary-nav button[aria-current="page"] {
+  background: var(--color-brand-primary);
+  color: var(--color-brand-primary-ink);
   box-shadow: inset 0 4px var(--color-accent-gold);
-}
-
-.primary-nav button[data-action="toggle-red"][aria-pressed="true"] {
-  background: var(--color-display-mode-active);
-  color: var(--color-display-mode-active-text);
-  box-shadow: inset 0 0 0 2px var(--color-display-mode-active-text);
 }
 
 .primary-nav .emergency-nav {
   color: var(--critical);
+}
+
+.primary-nav .emergency-nav[aria-current="page"] {
+  background: var(--color-emergency);
+  color: var(--color-emergency-text);
 }
 
 :root[data-display="red"] .primary-nav .emergency-nav {

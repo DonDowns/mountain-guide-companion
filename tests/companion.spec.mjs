@@ -45,8 +45,8 @@ async function chooseObjective(page, objective) {
 test('loads canonical identity and friend first-open setup', async ({ page }, testInfo) => {
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.9', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByText('Test version · 0.6.0-candidate.10', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -106,12 +106,12 @@ test('uses field-facing copy without implementation disclaimers or false confirm
 
 test('persists Red Display and objective selection without safety meaning', async ({ page }) => {
   await page.goto('/');
-  const red = page.getByRole('button', { name: /Red/ });
+  const red = page.getByRole('button', { name: /Red Mode/ });
   await red.click();
   await expect(red).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.reload();
-  await expect(page.getByRole('button', { name: /Red/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /Red Mode/ })).toHaveAttribute('aria-pressed', 'true');
 
   await openCompanion(page);
   const target = companionData.objectives[2];
@@ -154,10 +154,10 @@ test('makes Companion Home returnable and Start Objective cancellable without st
   await page.getByRole('button', { name: 'Start Objective' }).click();
   await page.getByRole('button', { name: 'Record current time' }).click();
   const recorded = (await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objective.id];
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Resume Trip Companion' }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open Trip Timeline' }).first()).toBeVisible();
   await expect(page.locator('#app-main')).toBeHidden();
 
   await openCompanion(page);
@@ -412,7 +412,7 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
-  await expect(page.locator('#home-primary-action')).toHaveText('Open Trip Companion');
+  await expect(page.locator('#home-primary-action')).toHaveText('Open Trip Timeline');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await expect(page.getByRole('button', { name: 'Offline Check', exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
@@ -521,7 +521,7 @@ test('provides semantic landmarks, visible focus, and named global controls', as
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page.getByRole('main')).toBeHidden();
   await expect(page.getByRole('navigation', { name: 'Companion sections' })).toBeVisible();
-  const red = page.getByRole('button', { name: /Red/ });
+  const red = page.getByRole('button', { name: /Red Mode/ });
   await expect(red).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await openCompanion(page);

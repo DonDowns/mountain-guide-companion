@@ -85,7 +85,7 @@ test('completed installed setup becomes quiet while update status remains separa
   await page.goto('/');
   await expect(page.locator('.header-setup')).toBeHidden();
   await expect(page.locator('#install-panel')).toBeHidden();
-  await expect(page.locator('#home-offline-status')).toHaveText('Offline copy verified');
+  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');
   await expect(page.locator('#home-shared-status')).toContainText(/\d+ days? old by this phone’s clock/);
   await expect(page.locator('#home-shared-status')).toContainText('Recheck changing facts when connectivity is available.');
@@ -251,7 +251,7 @@ test('verification disclosure and Help remain available after successful offline
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
   await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.locator('#home-offline-status')).toHaveText('Offline copy verified');
+  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');
