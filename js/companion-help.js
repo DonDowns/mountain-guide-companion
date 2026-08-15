@@ -53,7 +53,6 @@ function tokenMatches(indexToken, queryToken) {
 export function searchCompanionHelp(query = '') {
   const queryTokens = tokens(query);
   if (queryTokens.length === 0) return [...companionHelpTopics];
-  if (query.trim().length > 0 && query.trim().length < 3) return [];
   return companionHelpTopics.filter(topic => {
     const indexTokens = tokens(`${topic.title} ${topic.aliases} ${topic.body}`);
     return queryTokens.every(queryToken => indexTokens.some(indexToken => tokenMatches(indexToken, queryToken)));
@@ -74,15 +73,35 @@ function element(tag, options = {}, children = []) {
 export function renderCompanionHelpTopics(query = '') {
   const target = document.querySelector('#companion-help-results');
   if (!target) return [];
+  const trimmed = query.trim();
   const matches = searchCompanionHelp(query);
-  target.replaceChildren(...matches.map(topic => element('details', { className: 'help-topic' }, [
-    element('summary', { text: topic.title, 'aria-expanded': 'false' }),
-    element('p', { text: topic.body })
-  ])));
   const status = document.querySelector('#companion-help-status');
-  if (status) status.textContent = matches.length
-    ? `${matches.length} help topic${matches.length === 1 ? '' : 's'}`
-    : 'No topics found. Try offline, no signal, update, refresh, install, weather, turnaround, or emergency.';
+
+  if (trimmed) {
+    if (matches.length === 0) {
+      target.replaceChildren(element('div', { className: 'zero-results' }, [
+        element('p', { text: `No matches for "${trimmed}".` }),
+        element('p', { className: 'suggestion', text: 'Try broader words like offline, install, weather, route, or emergency.' })
+      ]));
+      if (status) status.textContent = `No matches for "${trimmed}".`;
+    } else {
+      target.replaceChildren(...matches.map(topic => {
+        const item = element('details', { className: 'help-topic', open: matches.length === 1 || undefined }, [
+          element('summary', { text: topic.title, 'aria-expanded': matches.length === 1 ? 'true' : 'false' }),
+          element('p', { text: topic.body })
+        ]);
+        return item;
+      }));
+      const countText = matches.length === 1 ? `1 match for "${trimmed}"` : `${matches.length} matches for "${trimmed}"`;
+      if (status) status.textContent = countText;
+    }
+  } else {
+    target.replaceChildren(...matches.map(topic => element('details', { className: 'help-topic' }, [
+      element('summary', { text: topic.title, 'aria-expanded': 'false' }),
+      element('p', { text: topic.body })
+    ])));
+    if (status) status.textContent = `${matches.length} help topics`;
+  }
   return matches;
 }
 

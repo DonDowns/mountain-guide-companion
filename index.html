@@ -148,9 +148,10 @@
         <p>Searchable instructions and recovery steps are packaged for offline use.</p>
       </div>
       <div class="search-container">
-        <label class="help-search" for="companion-help-search"><span>Search Help</span><input id="companion-help-search" type="search" autocomplete="off" placeholder="Search help..."></label>
+        <label class="help-search" for="companion-help-search"><span>Search Help</span><input id="companion-help-search" type="search" autocomplete="off" placeholder="Search help"></label>
         <button id="clear-help-search" type="button" class="quiet-button clear-search" aria-label="Clear search" hidden>Clear</button>
       </div>
+      <p class="search-help-hint boundary-note">Searches help topic titles and text.</p>
       <p id="companion-help-status" class="boundary-note" role="status" aria-live="polite"></p>
       <div id="companion-help-results" class="help-results"></div>
 
@@ -205,7 +206,7 @@
       <header class="artifact-header" id="artifact-header-title">
         <button class="quiet-button back-to-companion" type="button" data-action="back-to-companion">‹ Back to Companion</button>
       </header>
-      <iframe id="artifact-frame" src="about:blank" class="artifact-frame" title="Artifact Document"></iframe>
+      <iframe id="artifact-frame" class="artifact-frame" title="Artifact Document"></iframe>
     </section>
   </main>
 

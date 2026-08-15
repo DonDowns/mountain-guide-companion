@@ -106,6 +106,7 @@ test('uses field-facing copy without implementation disclaimers or false confirm
 
 test('persists Red Display and objective selection without safety meaning', async ({ page }) => {
   await page.goto('/');
+  await page.waitForFunction(() => !('serviceWorker' in navigator) || Boolean(navigator.serviceWorker.controller));
   const red = page.getByRole('button', { name: /Red Mode/ });
   await red.click();
   await expect(red).toHaveAttribute('aria-pressed', 'true');

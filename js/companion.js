@@ -446,6 +446,13 @@ function bindEvents() {
         clearSearchBtn.hidden = event.target.value.length === 0;
       }
     });
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        renderCompanionHelpTopics(searchInput.value);
+        searchInput.blur();
+      }
+    });
   }
   if (clearSearchBtn) {
     clearSearchBtn.addEventListener('click', () => {

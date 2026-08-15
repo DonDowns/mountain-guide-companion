@@ -192,6 +192,7 @@ body:not(.companion-open) .app-skip-link,
   max-width: 100%;
   margin-top: 3px;
   padding: 3px 6px;
+  border: 1px solid var(--color-status-candidate-border);
   border-radius: 999px;
   background: var(--color-status-candidate-bg);
   color: var(--color-status-candidate-text);
@@ -1479,4 +1480,19 @@ textarea {
   height: 100%;
   border: none;
   background: #fff;
+}
+
+.search-help-hint {
+  margin: 4px 0 8px 0;
+  font-size: 0.85rem;
+}
+
+.help-results .zero-results {
+  padding: 8px 0;
+}
+
+.help-results .zero-results .suggestion {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted, #555);
 }

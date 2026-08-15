@@ -161,7 +161,7 @@ export function renderCompanionHome(state, standalone, workerState, offlineResul
     primary.dataset.action = 'open-companion';
     primary.textContent = 'Open Trip Timeline';
     secondary.dataset.action = 'offline-check';
-    secondary.textContent = 'Offline Check';
+    secondary.textContent = 'Run Offline Check';
   } else {
     primary.dataset.action = 'show-setup';
     primary.textContent = 'Install for Offline Use';
@@ -227,13 +227,13 @@ export function renderSetupPanel(target, options) {
   }
 
   setupList.append(setupItem(
-    airplaneRecorded ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Airplane Mode test still required',
+    airplaneRecorded ? 'Airplane Mode Test Recorded ✓' : 'Airplane Mode test still required',
     airplaneRecorded,
-    airplaneRecorded ? undefined : 'attention'
+    airplaneRecorded ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'attention'
   ));
 
   children.push(setupList);
-  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'This confirms phone/offline preparation only and does not evaluate weather, access, terrain, or route conditions.' }));
+  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions. This confirms phone/offline preparation only and does not evaluate weather, access, terrain, route conditions, mountain safety, or permission to proceed.' }));
 
   if (offlineResult && !offlineResult.checking && !offlineVerified && offlineResult.attempted) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
@@ -268,21 +268,21 @@ export function renderSetupPanel(target, options) {
   const secondaryActions = [];
 
   if (!standalone && promptAvailable) {
-    actions.push(element('button', { className: 'primary-button install-button', type: 'button', dataset: { action: 'install' }, text: 'Install Companion' }));
+    actions.push(element('button', { className: 'primary-button install-button', type: 'button', dataset: { action: 'install' }, text: 'Install for Offline Use' }));
   }
   
   if (standalone && !offlineVerified) {
-    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Offline Check' }));
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
   } else if (standalone && offlineVerified) {
-    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Offline Check' }));
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
   } else if (!standalone) {
-    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Offline Check' }));
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
   }
 
   if (standalone && controlled && offlineVerified && !airplaneRecorded) {
-    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'record-airplane-test' }, text: 'Record Airplane Mode Test' }));
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'record-airplane-test' }, text: 'Start Airplane Mode Test' }));
   } else {
-    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: airplaneRecorded ? 'clear-airplane-test' : 'record-airplane-test' }, text: airplaneRecorded ? 'Clear Airplane Mode Record' : 'Record Airplane Mode Test' }));
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: airplaneRecorded ? 'clear-airplane-test' : 'record-airplane-test' }, text: airplaneRecorded ? 'Clear Airplane Mode Record' : 'Start Airplane Mode Test' }));
   }
 
   secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'repair-offline' }, text: 'Repair Offline Copy' }));
