@@ -83,7 +83,8 @@ test('completed installed setup becomes quiet while update status remains separa
   await seedCompletedOnboarding(page);
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
-  await expect(page.locator('.header-setup')).toBeHidden();
+  await expect(page.locator('.header-setup')).toBeVisible();
+  await expect(page.locator('.header-setup')).toHaveText('Phone Setup ✓');
   await expect(page.locator('#install-panel')).toBeHidden();
   await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');

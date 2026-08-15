@@ -144,13 +144,8 @@ export function isMountainGuideReferrer(referrer = document.referrer) {
 }
 
 export function renderCompanionHome(state, standalone, workerState, offlineResult) {
-  const offlineVerified = offlineResult?.complete === true;
-  const controlled = workerState?.controlled === true;
-  const airplaneRecorded = Boolean(state.setup?.airplaneModeTestCompletedAt);
-  const allGatesComplete = standalone && controlled && offlineVerified && airplaneRecorded;
-
   document.querySelector('#welcome-eyebrow').textContent = standalone ? 'CURRENT TRIP' : 'MOUNTAIN GUIDE COMPANION';
-  document.querySelector('#welcome-title').textContent = allGatesComplete ? 'Phone Setup ✓' : standalone ? 'Companion Home' : 'Prepare This Phone';
+  document.querySelector('#welcome-title').textContent = standalone ? 'Companion Home' : 'Prepare This Phone';
   document.querySelector('#welcome-summary').textContent = standalone
     ? 'Open the trip companion, verify the offline copy, or use the Field Guide and Pocket Card.'
     : 'Recommended for trip partners. This keeps the trip plan, emergency information, communication milestones, Field Guide, and Pocket Card available when there is no service.';
@@ -571,13 +566,33 @@ export function setRedDisplay(enabled) {
 }
 
 export function navigateTo(view) {
-  document.body.classList.add('companion-open');
-  for (const section of document.querySelectorAll('[data-view]')) section.hidden = section.dataset.view !== view;
-  for (const button of document.querySelectorAll('[data-nav]')) {
-    if (button.dataset.nav === view) button.setAttribute('aria-current', 'page');
-    else button.removeAttribute('aria-current');
+  if (view === 'home') {
+    navigateHome();
+    return;
   }
-  document.querySelector('[data-action="home"]')?.removeAttribute('aria-current');
+  document.body.classList.add('companion-open');
+  for (const section of document.querySelectorAll('[data-view]')) {
+    section.hidden = section.dataset.view !== view;
+  }
+  if (view !== 'artifact') {
+    const artifactFrame = document.querySelector('#artifact-frame');
+    if (artifactFrame && artifactFrame.src && !artifactFrame.src.endsWith('about:blank')) {
+      artifactFrame.src = 'about:blank';
+    }
+    if (globalThis.location.hash.startsWith('#artifact=')) {
+      history.replaceState(null, '', globalThis.location.pathname + globalThis.location.search);
+    }
+  }
+  for (const button of document.querySelectorAll('.primary-nav button')) {
+    if (button.dataset.nav === view) {
+      button.setAttribute('aria-current', 'page');
+    } else {
+      button.removeAttribute('aria-current');
+    }
+  }
+  for (const brand of document.querySelectorAll('.brand')) {
+    brand.removeAttribute('aria-current');
+  }
   const target = document.querySelector(`[data-view="${view}"]`);
   globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   target?.focus?.({ preventScroll: true });
@@ -585,10 +600,31 @@ export function navigateTo(view) {
 
 export function navigateHome({ focus = true } = {}) {
   document.body.classList.remove('companion-open');
-  for (const button of document.querySelectorAll('[data-nav]')) button.removeAttribute('aria-current');
-  document.querySelector('[data-action="home"]')?.setAttribute('aria-current', 'page');
-  globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  if (focus) document.querySelector('#companion-home')?.focus?.({ preventScroll: true });
+  for (const section of document.querySelectorAll('[data-view]')) {
+    section.hidden = true;
+  }
+  const artifactFrame = document.querySelector('#artifact-frame');
+  if (artifactFrame && artifactFrame.src && !artifactFrame.src.endsWith('about:blank')) {
+    artifactFrame.src = 'about:blank';
+  }
+  if (globalThis.location.hash.startsWith('#artifact=')) {
+    history.replaceState(null, '', globalThis.location.pathname + globalThis.location.search);
+  }
+  for (const button of document.querySelectorAll('.primary-nav button')) {
+    if (button.dataset.action === 'home') {
+      button.setAttribute('aria-current', 'page');
+    } else {
+      button.removeAttribute('aria-current');
+    }
+  }
+  const home = document.querySelector('#companion-home');
+  if (home) {
+    home.hidden = false;
+  }
+  if (focus) {
+    globalThis.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    home?.focus?.({ preventScroll: true });
+  }
 }
 
 export function scrollCurrentViewToTop() {

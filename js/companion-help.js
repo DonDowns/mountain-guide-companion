@@ -220,7 +220,10 @@ export function renderCompanionSupportStatus(options) {
     if (target) target.textContent = value;
   }
   const headerSetup = document.querySelector('.header-setup');
-  if (headerSetup) headerSetup.hidden = derived.setup === 'complete';
+  if (headerSetup) {
+    headerSetup.hidden = false;
+    headerSetup.textContent = derived.setup === 'complete' ? 'Phone Setup ✓' : 'Prepare this phone';
+  }
   const banner = document.querySelector('#companion-update-banner');
   if (banner) {
     banner.hidden = !derived.updateAvailable && derived.update !== 'failed';
