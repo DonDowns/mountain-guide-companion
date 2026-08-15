@@ -170,18 +170,15 @@ async function handleAction(action, button) {
     history.pushState({ artifact: url }, '', '#artifact=' + encodeURIComponent(url));
   }
   if (action === 'back-to-companion') {
-    if (history.length > 1) {
-      history.back();
-    } else {
-      navigateHome();
-      document.querySelector('#artifact-cards')?.scrollIntoView();
-    }
+    navigateHome({ focus: false });
+    const overview = document.querySelector('.artifact-overview') || document.querySelector('#artifact-cards');
+    overview?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   if (action === 'show-setup') {
     setupPanelRequested = true;
     navigateHome({ focus: false });
     renderState();
-    document.querySelector('#install-panel').scrollIntoView({ block: 'start' });
+    document.querySelector('#install-panel').scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   if (action === 'top') scrollCurrentViewToTop();
   if (action === 'toggle-red') {
@@ -521,8 +518,9 @@ globalThis.addEventListener('popstate', (event) => {
     document.querySelector('#artifact-frame').src = url;
     navigateTo('artifact');
   } else if (document.querySelector('#artifact-view:not([hidden])')) {
-    navigateHome();
-    document.querySelector('#artifact-cards')?.scrollIntoView();
+    navigateHome({ focus: false });
+    const overview = document.querySelector('.artifact-overview') || document.querySelector('#artifact-cards');
+    overview?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
 });
 

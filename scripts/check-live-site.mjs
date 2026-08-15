@@ -2338,9 +2338,10 @@ export async function checkOnce(options = {}) {
   const loadResource = fetchResourceImpl || (fetchBytesImpl
     ? async (path, loadOptions) => ({ bytes: await fetchBytesImpl(path, loadOptions), finalUrl: new URL(path, canonicalBase(liveBaseUrl)).href })
     : (path, loadOptions) => fetchDeploymentResource(path, { liveBaseUrl, allowedPaths: topLevelPaths, fetchImpl, signal: loadOptions.signal }));
-  const [localBundleBytes, localManifestBytes, releaseResource, bundleResource, htmlResource, webManifestResource, workerResource] = await Promise.all([
+  const [localBundleBytes, localManifestBytes, localReleaseBytes, releaseResource, bundleResource, htmlResource, webManifestResource, workerResource] = await Promise.all([
     readFile(resolve(repoRoot, 'offline-bundle.json')),
     readFile(resolve(repoRoot, 'data/trip-manifest.json')),
+    readFile(resolve(repoRoot, 'release.json')),
     loadValidatedResource(loadResource, 'release.json', liveBaseUrl, topLevelPaths, resourceTimeoutMs),
     loadValidatedResource(loadResource, 'offline-bundle.json', liveBaseUrl, topLevelPaths, resourceTimeoutMs),
     loadValidatedResource(loadResource, 'index.html', liveBaseUrl, topLevelPaths, resourceTimeoutMs),
@@ -2353,13 +2354,14 @@ export async function checkOnce(options = {}) {
   const webManifestBytes = webManifestResource.bytes;
   const workerBytes = workerResource.bytes;
   const release = JSON.parse(releaseBytes.toString('utf8'));
+  const localRelease = JSON.parse(localReleaseBytes.toString('utf8'));
   const bundle = JSON.parse(bundleBytes.toString('utf8'));
   const approvedPaths = new Set(['index.html', ...bundle.resources.map(resource => resource.path)]);
   const renderLoader = fetchResourceImpl || (fetchBytesImpl
     ? async (path, loadOptions) => ({ bytes: await fetchBytesImpl(path, loadOptions), finalUrl: new URL(path, canonicalBase(liveBaseUrl)).href })
     : (path, loadOptions) => fetchDeploymentResource(path, { liveBaseUrl, allowedPaths: approvedPaths, fetchImpl, signal: loadOptions.signal }));
   const errors = [];
-  if (release.companion_version !== '0.6.0-candidate.10') errors.push('candidate version mismatch');
+  if (release.companion_version !== localRelease.companion_version) errors.push('candidate version mismatch');
   if (release.release_status !== 'candidate') errors.push('release status mismatch');
   if (release.pwa_url !== expectedPublicBase) errors.push('public URL contract mismatch');
   if (release.manifest_sha256 !== sha256(localManifestBytes)) errors.push('canonical manifest fingerprint mismatch');

@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.6.0-candidate.10",
+  "version": "0.6.0-candidate.11",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "candidate-10-pretrip-ux-hardening",
+    "name": "candidate-11-physical-iphone-ux-repair",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },

@@ -46,7 +46,7 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.10', { exact: true })).toBeVisible();
+  await expect(page.getByText('Test version · 0.6.0-candidate.11', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -562,4 +562,257 @@ test('keeps mobile navigation readable and non-overlapping with increased text',
     expect(button.scrollWidth - button.width).toBeLessThanOrEqual(1);
     if (index) expect(layout.navButtons[index - 1].right).toBeLessThanOrEqual(button.left + 0.5);
   }
+});
+
+test('candidate.11 defect A: visual current-state uniqueness and computed style deselection across all routes', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
+
+  const getNavStyles = () => page.evaluate(() => {
+    const buttons = [...document.querySelectorAll('.primary-nav button')];
+    return buttons.map(b => {
+      const computed = getComputedStyle(b);
+      return {
+        label: b.textContent.trim(),
+        action: b.dataset.action || null,
+        nav: b.dataset.nav || null,
+        ariaCurrent: b.getAttribute('aria-current'),
+        bg: computed.backgroundColor,
+        color: computed.color
+      };
+    });
+  });
+
+  // Check on Timeline
+  let styles = await getNavStyles();
+  let activeButtons = styles.filter(s => s.ariaCurrent === 'page');
+  expect(activeButtons).toHaveLength(1);
+  expect(activeButtons[0].nav).toBe('timeline');
+  expect(activeButtons[0].bg).not.toBe('rgba(0, 0, 0, 0)');
+  let homeStyle = styles.find(s => s.action === 'home');
+  expect(homeStyle.ariaCurrent).toBeNull();
+  expect(homeStyle.bg).toBe('rgba(0, 0, 0, 0)');
+
+  // Tap Route
+  await page.getByRole('button', { name: /Route/ }).last().click();
+  await expect(page.locator('#route-view')).toBeVisible();
+  styles = await getNavStyles();
+  activeButtons = styles.filter(s => s.ariaCurrent === 'page');
+  expect(activeButtons).toHaveLength(1);
+  expect(activeButtons[0].nav).toBe('route');
+  expect(activeButtons[0].bg).not.toBe('rgba(0, 0, 0, 0)');
+  homeStyle = styles.find(s => s.action === 'home');
+  expect(homeStyle.ariaCurrent).toBeNull();
+  expect(homeStyle.bg).toBe('rgba(0, 0, 0, 0)');
+
+  // Tap Emergency
+  await page.getByRole('button', { name: /Emergency/ }).last().click();
+  await expect(page.locator('#emergency-view')).toBeVisible();
+  styles = await getNavStyles();
+  activeButtons = styles.filter(s => s.ariaCurrent === 'page');
+  expect(activeButtons).toHaveLength(1);
+  expect(activeButtons[0].nav).toBe('emergency');
+  expect(activeButtons[0].bg).toBe('rgb(139, 40, 31)'); // semantic red active
+  homeStyle = styles.find(s => s.action === 'home');
+  expect(homeStyle.ariaCurrent).toBeNull();
+  expect(homeStyle.bg).toBe('rgba(0, 0, 0, 0)');
+
+  // Tap Help
+  await page.getByRole('button', { name: /Help/ }).last().click();
+  await expect(page.locator('#help-view')).toBeVisible();
+  styles = await getNavStyles();
+  activeButtons = styles.filter(s => s.ariaCurrent === 'page');
+  expect(activeButtons).toHaveLength(1);
+  expect(activeButtons[0].nav).toBe('help');
+  expect(activeButtons[0].bg).not.toBe('rgba(0, 0, 0, 0)');
+  homeStyle = styles.find(s => s.action === 'home');
+  expect(homeStyle.ariaCurrent).toBeNull();
+  expect(homeStyle.bg).toBe('rgba(0, 0, 0, 0)');
+
+  // Tap Home
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  styles = await getNavStyles();
+  activeButtons = styles.filter(s => s.ariaCurrent === 'page');
+  expect(activeButtons).toHaveLength(1);
+  expect(activeButtons[0].action).toBe('home');
+  expect(activeButtons[0].bg).not.toBe('rgba(0, 0, 0, 0)');
+  const timelineStyle = styles.find(s => s.nav === 'timeline');
+  expect(timelineStyle.ariaCurrent).toBeNull();
+  expect(timelineStyle.bg).toBe('rgba(0, 0, 0, 0)');
+  const emergencyStyle = styles.find(s => s.nav === 'emergency');
+  expect(emergencyStyle.ariaCurrent).toBeNull();
+  expect(emergencyStyle.bg).toBe('rgba(0, 0, 0, 0)');
+  expect(emergencyStyle.color).toBe('rgb(139, 40, 31)'); // semantic red idle
+});
+
+test('candidate.11 defect B & F: Phone Setup completion hierarchy and Airplane Mode discoverability', async ({ page }) => {
+  await page.goto('/');
+  // Browser context incomplete state
+  const headerSetup = page.locator('.header-setup');
+  await expect(headerSetup).toBeVisible();
+  await expect(headerSetup).toHaveText('Prepare this phone');
+
+  // Complete offline state in standalone mode
+  await page.addInitScript(() => {
+    globalThis.__COMPANION_TEST_STANDALONE__ = true;
+    localStorage.setItem('mgc-companion-local-state', JSON.stringify({
+      schemaVersion: 4,
+      setup: {
+        onboarding: { version: 'companion-onboarding-candidate-8-v1', status: 'completed', recordedAt: '2026-08-11T00:00:00.000Z' },
+        offlineVerifiedAt: '2026-08-11T01:00:00.000Z',
+        offlineVerifiedBundleId: 'ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1',
+        airplaneModeTestCompletedAt: '2026-08-11T02:00:00.000Z'
+      }
+    }));
+  });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
+
+  // Compact header state displays Phone Setup ✓
+  await expect(headerSetup).toBeVisible();
+  await expect(headerSetup).toHaveText('Phone Setup ✓');
+
+  // Home status dl shows Offline readiness: Phone Setup ✓ (no duplicate Phone setup lines)
+  await expect(page.locator('.home-status dt').first()).toHaveText('Offline readiness');
+  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
+  const homeStatusText = await page.locator('.home-status').innerText();
+  expect(homeStatusText).not.toMatch(/Phone setup\s*\n\s*Phone Setup ✓/);
+
+  // Click header button to open Phone Setup details
+  await headerSetup.click();
+  const installPanel = page.locator('#install-panel');
+  await expect(installPanel).toBeVisible();
+
+  // Detailed completed card title
+  await expect(installPanel.getByRole('heading', { name: 'This Phone Is Ready for Offline Use ✓', level: 2 })).toBeVisible();
+
+  // Airplane Mode test status is visible and discoverable
+  await expect(installPanel.getByText('Airplane Mode Test Recorded ✓')).toBeVisible();
+  await expect(installPanel.getByText(/Recorded on this phone:/)).toBeVisible();
+
+  // View Airplane Mode Test Steps disclosure
+  const airplaneDetails = installPanel.locator('details.airplane-test');
+  await expect(airplaneDetails).toBeVisible();
+  await expect(airplaneDetails.locator('summary')).toHaveText('View Airplane Mode Test Steps');
+  await airplaneDetails.locator('summary').click();
+  await expect(airplaneDetails.locator('ol li')).toHaveCount(12);
+
+  // Clear button is secondary
+  const clearBtn = installPanel.getByRole('button', { name: 'Clear Airplane Mode Record' });
+  await expect(clearBtn).toBeVisible();
+  expect(await clearBtn.getAttribute('class')).toContain('secondary-button');
+
+  // Explicit safety qualifier preserved
+  await expect(installPanel.locator('.setup-boundary')).toContainText(
+    'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.'
+  );
+});
+
+test('candidate.11 defect C: artifact viewer full viewport geometry, centering, and safe area integration', async ({ page }) => {
+  await page.goto('/');
+
+  // Open Field Guide artifact
+  await page.locator('#artifact-cards').scrollIntoViewIfNeeded();
+  await page.getByRole('link', { name: 'Open Field Guide' }).click();
+
+  const artifactView = page.locator('#artifact-view');
+  await expect(artifactView).toBeVisible();
+
+  const viewGeometry = await artifactView.evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    const style = getComputedStyle(node);
+    return {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+      paddingTop: style.paddingTop,
+      paddingLeft: style.paddingLeft,
+      paddingRight: style.paddingRight,
+      paddingBottom: style.paddingBottom,
+      borderTopWidth: style.borderTopWidth,
+      position: style.position
+    };
+  });
+
+  expect(viewGeometry.top).toBe(0);
+  expect(viewGeometry.left).toBe(0);
+  expect(viewGeometry.paddingTop).toBe('0px');
+  expect(viewGeometry.paddingLeft).toBe('0px');
+  expect(viewGeometry.borderTopWidth).toBe('0px');
+  expect(viewGeometry.position).toBe('fixed');
+
+  const backButton = page.locator('.back-to-companion');
+  await expect(backButton).toBeVisible();
+  const backBox = await backButton.evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  });
+  expect(backBox.width).toBeGreaterThanOrEqual(44);
+  expect(backBox.height).toBeGreaterThanOrEqual(44);
+
+  const frameBox = await page.locator('#artifact-frame').evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return { width: rect.width, height: rect.height, top: rect.top, left: rect.left };
+  });
+  expect(frameBox.width).toBeGreaterThan(300);
+  expect(frameBox.height).toBeGreaterThan(400);
+  expect(frameBox.left).toBe(0);
+});
+
+test('candidate.11 defect D & E: deterministic one-tap Back to Companion and first-transition Home render', async ({ page }) => {
+  await page.goto('/');
+
+  // 1. Open Field Guide -> Back
+  await page.locator('#artifact-cards').scrollIntoViewIfNeeded();
+  await page.getByRole('link', { name: 'Open Field Guide' }).click();
+  await expect(page.locator('#artifact-view')).toBeVisible();
+
+  await page.locator('.back-to-companion').click();
+  await expect(page.locator('#artifact-view')).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  await expect(page.locator('.welcome-copy')).toBeVisible();
+  await expect(page.locator('.artifact-overview')).toBeVisible();
+  expect(await page.evaluate(() => document.querySelector('#artifact-frame').src.endsWith('about:blank') || !document.querySelector('#artifact-frame').src)).toBe(true);
+
+  // 2. Open Pocket Card -> Back
+  await page.getByRole('link', { name: 'Open Pocket Card' }).click();
+  await expect(page.locator('#artifact-view')).toBeVisible();
+  await page.locator('.back-to-companion').click();
+  await expect(page.locator('#artifact-view')).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  await expect(page.locator('.welcome-copy')).toBeVisible();
+
+  // 3. Populate history with Field Guide then Pocket Card, then tap Back to Companion once
+  await page.getByRole('link', { name: 'Open Field Guide' }).click();
+  await expect(page.locator('#artifact-view')).toBeVisible();
+  await page.evaluate(() => {
+    const pocketUrl = './generated/pocket-card.pdf';
+    document.querySelector('#artifact-frame').src = pocketUrl;
+    history.pushState({ artifact: pocketUrl }, '', '#artifact=' + encodeURIComponent(pocketUrl));
+  });
+  await expect(page.locator('#artifact-view')).toBeVisible();
+  // One tap on Back to Companion returns directly to Home (not back to Field Guide)
+  await page.locator('.back-to-companion').click();
+  await expect(page.locator('#artifact-view')).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  await expect(page.locator('.welcome-copy')).toBeVisible();
+  await expect(page.locator('#artifact-cards')).toBeVisible();
+
+  // 4. Cold direct URL to artifact -> Back
+  await page.goto('/#artifact=' + encodeURIComponent('./generated/field-guide.pdf'));
+  await expect(page.locator('#artifact-view')).toBeVisible();
+  await page.locator('.back-to-companion').click();
+  await expect(page.locator('#artifact-view')).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  await expect(page.locator('.welcome-copy')).toBeVisible();
+
+  // 5. Subsequent navigation to Timeline and back to Home works cleanly on first transition
+  await page.getByRole('button', { name: /Timeline/ }).last().click();
+  await expect(page.locator('#timeline-view')).toBeVisible();
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await expect(page.locator('#companion-home')).toBeVisible();
+  await expect(page.locator('.welcome-copy')).toBeVisible();
+  await expect(page.locator('.home-status')).toBeVisible();
 });
