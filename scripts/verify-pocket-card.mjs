@@ -50,6 +50,15 @@ async function main() {
   }
   if (artifact.pocket_card_pdf_sha256 !== pdfHash) errors.push('artifact record PDF SHA-256 mismatch');
   if (JSON.stringify(artifact.page_size_points) !== JSON.stringify([252, 360])) errors.push('artifact page-size points mismatch');
+  if (!Array.isArray(artifact.page_images) || artifact.page_images.length !== 2) {
+    errors.push('artifact record missing 2 page_images');
+  } else {
+    for (const item of artifact.page_images) {
+      const imgPath = resolve(repoRoot, item.path);
+      const imgHash = await sha256(imgPath);
+      if (imgHash !== item.sha256) errors.push(`${item.path} hash mismatch`);
+    }
+  }
 
   const publicLiterals = new Set([
     model.provenance.dataVersion,

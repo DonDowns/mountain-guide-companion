@@ -21,7 +21,12 @@ const resourceDefinitions = [
   ['icons/companion-maskable.svg', 'maskable-application-icon'],
   ['data/trip-manifest.json', 'canonical-manifest'],
   ['generated/field-guide.pdf', 'field-guide-pdf'],
+  ['generated/field-guide-p1.png', 'field-guide-page-image'],
+  ['generated/field-guide-p2.png', 'field-guide-page-image'],
+  ['generated/field-guide-p3.png', 'field-guide-page-image'],
   ['generated/pocket-card.pdf', 'pocket-card-pdf'],
+  ['generated/pocket-card-p1.png', 'pocket-card-page-image'],
+  ['generated/pocket-card-p2.png', 'pocket-card-page-image'],
   ['release.json', 'release-metadata']
 ];
 

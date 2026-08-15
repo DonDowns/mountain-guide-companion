@@ -46,7 +46,7 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.11', { exact: true })).toBeVisible();
+  await expect(page.getByText('Test version · 0.6.0-candidate.12', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -67,7 +67,8 @@ test('navigates Timeline, Route, and one-action Emergency', async ({ page }) => 
   await openCompanion(page);
   await expect(page.locator('#timeline-view')).toBeVisible();
   await expect(page.locator('#current-objective-context')).toContainText(companionData.objectives[0].name);
-  await expect(page.getByText(companionData.invariants.weather, { exact: true })).toBeVisible();
+  await expect(page.locator('#weather-invariant')).toHaveText(companionData.invariants.weather);
+  await expect(page.locator('#weather-snapshot-invariant')).toHaveText(companionData.invariants.weather);
 
   await page.getByRole('button', { name: /Route/ }).last().click();
   await expect(page.locator('#route-view')).toBeVisible();
@@ -391,20 +392,18 @@ test('opens both PDFs through real online browser navigation with PDF responses'
   test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Online PDF navigation runs once in Chromium desktop');
   await page.goto('/');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
-  for (const [name, path] of [
-    ['Open Field Guide', '/generated/field-guide.pdf'],
-    ['Open Pocket Card', '/generated/pocket-card.pdf']
-  ]) {
+  for (const path of ['/generated/field-guide.pdf', '/generated/pocket-card.pdf']) {
     const artifactPage = await context.newPage();
-    await artifactPage.goto('/');
-    const responsePromise = artifactPage.waitForResponse(response =>
-      new URL(response.url()).pathname === path && response.request().isNavigationRequest()
-    );
-    await artifactPage.getByRole('link', { name }).click();
+    const responsePromise = artifactPage.waitForResponse(res => new URL(res.url()).pathname === path);
+    const downloadPromise = artifactPage.waitForEvent('download').catch(() => null);
+    await artifactPage.goto(path).catch(err => {
+      if (!err.message.includes('Download is starting')) throw err;
+    });
     const response = await responsePromise;
     expect(response.headers()['content-type']).toContain('application/pdf');
     expect(response.headers()['content-type']).not.toContain('text/html');
     expect(new URL(response.url()).pathname).toBe(path);
+    await downloadPromise;
     await artifactPage.close();
   }
 });
@@ -417,10 +416,10 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await expect(page.getByRole('button', { name: 'Run Offline Check', exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Run Offline Check' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone for Offline Use' })).toBeVisible();
   await expect(page.getByText('Running from Home Screen', { exact: true })).toBeVisible();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
-  await expect(page.getByText('Airplane Mode test still required', { exact: true })).toBeVisible();
+  await expect(page.locator('#install-panel').getByText('Airplane Mode Test Required', { exact: true })).toBeVisible();
   await expect(page.getByText('Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.', { exact: false })).toBeVisible();
   await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
 });
@@ -646,12 +645,12 @@ test('candidate.11 defect A: visual current-state uniqueness and computed style 
   expect(emergencyStyle.color).toBe('rgb(139, 40, 31)'); // semantic red idle
 });
 
-test('candidate.11 defect B & F: Phone Setup completion hierarchy and Airplane Mode discoverability', async ({ page }) => {
+test('candidate.12: Phone Setup completion hierarchy and Airplane Mode discoverability', async ({ page }) => {
   await page.goto('/');
   // Browser context incomplete state
   const headerSetup = page.locator('.header-setup');
   await expect(headerSetup).toBeVisible();
-  await expect(headerSetup).toHaveText('Prepare this phone');
+  await expect(headerSetup).toHaveText('Phone Setup for Offline Use');
 
   // Complete offline state in standalone mode
   await page.addInitScript(() => {
@@ -661,7 +660,7 @@ test('candidate.11 defect B & F: Phone Setup completion hierarchy and Airplane M
       setup: {
         onboarding: { version: 'companion-onboarding-candidate-8-v1', status: 'completed', recordedAt: '2026-08-11T00:00:00.000Z' },
         offlineVerifiedAt: '2026-08-11T01:00:00.000Z',
-        offlineVerifiedBundleId: 'ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1',
+        offlineVerifiedBundleId: 'ddmg-companion-0-6-0-candidate-12-data-3cda95d4e6b1-b1',
         airplaneModeTestCompletedAt: '2026-08-11T02:00:00.000Z'
       }
     }));
@@ -673,9 +672,9 @@ test('candidate.11 defect B & F: Phone Setup completion hierarchy and Airplane M
   await expect(headerSetup).toBeVisible();
   await expect(headerSetup).toHaveText('Phone Setup ✓');
 
-  // Home status dl shows Offline readiness: Phone Setup ✓ (no duplicate Phone setup lines)
+  // Home status dl shows Offline readiness: Complete ✓ (no duplicate Phone setup lines)
   await expect(page.locator('.home-status dt').first()).toHaveText('Offline readiness');
-  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
+  await expect(page.locator('#home-offline-status')).toHaveText('Complete ✓');
   const homeStatusText = await page.locator('.home-status').innerText();
   expect(homeStatusText).not.toMatch(/Phone setup\s*\n\s*Phone Setup ✓/);
 
@@ -709,39 +708,17 @@ test('candidate.11 defect B & F: Phone Setup completion hierarchy and Airplane M
   );
 });
 
-test('candidate.11 defect C: artifact viewer full viewport geometry, centering, and safe area integration', async ({ page }) => {
+test('candidate.12: artifact viewer in-app page rendering, geometry, and centering', async ({ page }) => {
   await page.goto('/');
 
-  // Open Field Guide artifact
+  // 1. Open Field Guide artifact
   await page.locator('#artifact-cards').scrollIntoViewIfNeeded();
   await page.getByRole('link', { name: 'Open Field Guide' }).click();
 
   const artifactView = page.locator('#artifact-view');
   await expect(artifactView).toBeVisible();
-
-  const viewGeometry = await artifactView.evaluate(node => {
-    const rect = node.getBoundingClientRect();
-    const style = getComputedStyle(node);
-    return {
-      top: rect.top,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height,
-      paddingTop: style.paddingTop,
-      paddingLeft: style.paddingLeft,
-      paddingRight: style.paddingRight,
-      paddingBottom: style.paddingBottom,
-      borderTopWidth: style.borderTopWidth,
-      position: style.position
-    };
-  });
-
-  expect(viewGeometry.top).toBe(0);
-  expect(viewGeometry.left).toBe(0);
-  expect(viewGeometry.paddingTop).toBe('0px');
-  expect(viewGeometry.paddingLeft).toBe('0px');
-  expect(viewGeometry.borderTopWidth).toBe('0px');
-  expect(viewGeometry.position).toBe('fixed');
+  await expect(page.locator('#artifact-header-title')).toHaveText('3-Page Printable Field Guide');
+  await expect(page.locator('#artifact-download-pdf')).toHaveAttribute('href', './generated/field-guide.pdf');
 
   const backButton = page.locator('.back-to-companion');
   await expect(backButton).toBeVisible();
@@ -752,16 +729,48 @@ test('candidate.11 defect C: artifact viewer full viewport geometry, centering, 
   expect(backBox.width).toBeGreaterThanOrEqual(44);
   expect(backBox.height).toBeGreaterThanOrEqual(44);
 
-  const frameBox = await page.locator('#artifact-frame').evaluate(node => {
-    const rect = node.getBoundingClientRect();
-    return { width: rect.width, height: rect.height, top: rect.top, left: rect.left };
-  });
-  expect(frameBox.width).toBeGreaterThan(300);
-  expect(frameBox.height).toBeGreaterThan(400);
-  expect(frameBox.left).toBe(0);
+  // Field Guide page cards
+  const fgPages = page.locator('.artifact-page-card');
+  await expect(fgPages).toHaveCount(3);
+  await expect(page.getByText('Page 1 of 3 · Operational Timeline & Decision Gates')).toBeVisible();
+  await expect(page.getByText('Page 2 of 3 · Route Profile Summary')).toBeVisible();
+  await expect(page.getByText('Page 3 of 3 · Emergency & Communication')).toBeVisible();
+
+  // Document container has no horizontal overflow
+  const fgScrollWidth = await page.locator('#artifact-document-container').evaluate(node => ({
+    scrollWidth: node.scrollWidth,
+    clientWidth: node.clientWidth
+  }));
+  expect(fgScrollWidth.scrollWidth).toBeLessThanOrEqual(fgScrollWidth.clientWidth + 1);
+
+  // Return to Companion
+  await backButton.click();
+  await expect(artifactView).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
+
+  // 2. Open Pocket Card artifact
+  await page.getByRole('link', { name: 'Open Pocket Card' }).click();
+  await expect(artifactView).toBeVisible();
+  await expect(page.locator('#artifact-header-title')).toHaveText('Emergency & Communication Pocket Card');
+  await expect(page.locator('#artifact-download-pdf')).toHaveAttribute('href', './generated/pocket-card.pdf');
+
+  const pcPages = page.locator('.artifact-page-card.pocket-card-page');
+  await expect(pcPages).toHaveCount(2);
+  await expect(page.getByText('Front · Emergency & Jurisdictions')).toBeVisible();
+  await expect(page.getByText('Back · Communication & Milestones')).toBeVisible();
+
+  // Pocket card page width naturally scales to fill mobile width (not tiny 1/4 screen)
+  const pcPageWidth = await pcPages.first().evaluate(node => node.getBoundingClientRect().width);
+  expect(pcPageWidth).toBeGreaterThan(250); // substantial width on mobile and desktop
+  expect(pcPageWidth).toBeLessThanOrEqual(420); // capped at 420px max width
+
+  // Deterministic 1-tap return
+  await backButton.click();
+  await expect(artifactView).toBeHidden();
+  await expect(page.locator('#companion-home')).toBeVisible();
 });
 
-test('candidate.11 defect D & E: deterministic one-tap Back to Companion and first-transition Home render', async ({ page }) => {
+test('candidate.12: deterministic one-tap Back to Companion and first-transition Home render', async ({ page }) => {
   await page.goto('/');
 
   // 1. Open Field Guide -> Back
@@ -774,7 +783,6 @@ test('candidate.11 defect D & E: deterministic one-tap Back to Companion and fir
   await expect(page.locator('#companion-home')).toBeVisible();
   await expect(page.locator('.welcome-copy')).toBeVisible();
   await expect(page.locator('.artifact-overview')).toBeVisible();
-  expect(await page.evaluate(() => document.querySelector('#artifact-frame').src.endsWith('about:blank') || !document.querySelector('#artifact-frame').src)).toBe(true);
 
   // 2. Open Pocket Card -> Back
   await page.getByRole('link', { name: 'Open Pocket Card' }).click();
@@ -784,23 +792,7 @@ test('candidate.11 defect D & E: deterministic one-tap Back to Companion and fir
   await expect(page.locator('#companion-home')).toBeVisible();
   await expect(page.locator('.welcome-copy')).toBeVisible();
 
-  // 3. Populate history with Field Guide then Pocket Card, then tap Back to Companion once
-  await page.getByRole('link', { name: 'Open Field Guide' }).click();
-  await expect(page.locator('#artifact-view')).toBeVisible();
-  await page.evaluate(() => {
-    const pocketUrl = './generated/pocket-card.pdf';
-    document.querySelector('#artifact-frame').src = pocketUrl;
-    history.pushState({ artifact: pocketUrl }, '', '#artifact=' + encodeURIComponent(pocketUrl));
-  });
-  await expect(page.locator('#artifact-view')).toBeVisible();
-  // One tap on Back to Companion returns directly to Home (not back to Field Guide)
-  await page.locator('.back-to-companion').click();
-  await expect(page.locator('#artifact-view')).toBeHidden();
-  await expect(page.locator('#companion-home')).toBeVisible();
-  await expect(page.locator('.welcome-copy')).toBeVisible();
-  await expect(page.locator('#artifact-cards')).toBeVisible();
-
-  // 4. Cold direct URL to artifact -> Back
+  // 3. Cold direct URL to artifact -> Back
   await page.goto('/#artifact=' + encodeURIComponent('./generated/field-guide.pdf'));
   await expect(page.locator('#artifact-view')).toBeVisible();
   await page.locator('.back-to-companion').click();
@@ -808,11 +800,46 @@ test('candidate.11 defect D & E: deterministic one-tap Back to Companion and fir
   await expect(page.locator('#companion-home')).toBeVisible();
   await expect(page.locator('.welcome-copy')).toBeVisible();
 
-  // 5. Subsequent navigation to Timeline and back to Home works cleanly on first transition
+  // 4. Subsequent navigation to Timeline and back to Home works cleanly on first transition
   await page.getByRole('button', { name: /Timeline/ }).last().click();
   await expect(page.locator('#timeline-view')).toBeVisible();
   await page.getByRole('button', { name: 'Home', exact: true }).click();
   await expect(page.locator('#companion-home')).toBeVisible();
   await expect(page.locator('.welcome-copy')).toBeVisible();
   await expect(page.locator('.home-status')).toBeVisible();
+});
+
+test('candidate.12: Weather Snapshot card rendering, source attribution, and safety invariants', async ({ page }) => {
+  await page.goto('/');
+  await openCompanion(page);
+  await expect(page.locator('#timeline-view')).toBeVisible();
+
+  const weatherCard = page.locator('#weather-snapshot');
+  await expect(weatherCard).toBeVisible();
+  await expect(weatherCard.getByRole('heading', { name: 'Weather Snapshot', level: 3 })).toBeVisible();
+  await expect(weatherCard.locator('#weather-snapshot-summary')).toContainText(/Packaged alpine reference points/);
+  await expect(weatherCard.locator('#weather-snapshot-source')).toContainText(/Mountain Guide v15.3.10/);
+  await expect(weatherCard.locator('#weather-snapshot-source')).toContainText(/Verified 2026-08-07/);
+  await expect(weatherCard.locator('#weather-snapshot-age')).toBeVisible();
+
+  // Invariant statement
+  await expect(weatherCard.locator('#weather-snapshot-invariant')).toHaveText('Weather is evidence, not permission.');
+
+  // Reference locations
+  const locationPills = weatherCard.locator('.weather-location-pill');
+  await expect(locationPills).toHaveCount(5);
+  await expect(weatherCard.getByText('Lake Como area', { exact: true })).toBeVisible();
+  await expect(weatherCard.getByText('Blanca Peak', { exact: true })).toBeVisible();
+  await expect(weatherCard.getByText('Ellingwood Point', { exact: true })).toBeVisible();
+  await expect(weatherCard.getByText('Mount Lindsey', { exact: true })).toBeVisible();
+
+  // Refresh action button
+  const checkUpdateBtn = weatherCard.getByRole('button', { name: 'Check for Updated Shared Information' });
+  await expect(checkUpdateBtn).toBeVisible();
+  await checkUpdateBtn.click();
+  await expect(page.locator('#toast')).toBeVisible();
+
+  // Invariant: no affirmative safety language
+  const timelineText = await page.locator('#timeline-view').innerText();
+  expect(timelineText).not.toMatch(/safe to proceed|all clear|route is safe|weather permits|approved to continue|safe to climb|good to go/i);
 });

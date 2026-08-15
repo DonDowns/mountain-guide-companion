@@ -31,7 +31,11 @@ async function main() {
     'index.html', 'css/companion.css', 'js/red-bootstrap.js', 'js/companion-data.js',
     'js/companion-state.js', 'js/companion-help.js', 'js/companion-install.js', 'js/companion-ui.js', 'js/companion.js',
     'manifest.webmanifest', 'icons/companion-icon.svg', 'icons/companion-maskable.svg',
-    'data/trip-manifest.json', 'generated/field-guide.pdf', 'generated/pocket-card.pdf', 'release.json'
+    'data/trip-manifest.json', 'generated/field-guide.pdf',
+    'generated/field-guide-p1.png', 'generated/field-guide-p2.png', 'generated/field-guide-p3.png',
+    'generated/pocket-card.pdf',
+    'generated/pocket-card-p1.png', 'generated/pocket-card-p2.png',
+    'release.json'
   ]);
   const paths = bundle.resources.map(resource => resource.path);
   if (new Set(paths).size !== paths.length) errors.push('offline bundle contains duplicate paths');

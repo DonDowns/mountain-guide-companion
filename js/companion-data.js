@@ -8,7 +8,7 @@ function deepFreeze(value) {
 }
 export const companionData = deepFreeze({
   "identity": {
-    "companionVersion": "0.6.0-candidate.11",
+    "companionVersion": "0.6.0-candidate.12",
     "releaseStatus": "candidate",
     "dataVersion": "1.0.0",
     "sourceRelease": "v15.3.10",
@@ -17,7 +17,7 @@ export const companionData = deepFreeze({
     "verifiedAt": "2026-08-07T07:45:17Z",
     "manifestSha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
     "manifestShort": "3cda95d4e6b1",
-    "bundleId": "ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1",
+    "bundleId": "ddmg-companion-0-6-0-candidate-12-data-3cda95d4e6b1-b1",
     "offlineBundleVersion": 1,
     "publicBaseUrl": "https://companion.vondadowns.com/"
   },
@@ -333,19 +333,89 @@ export const companionData = deepFreeze({
     "planning": "A user-defined planning target is not automatic route authorization.",
     "conditions": "Actual conditions govern the decision."
   },
+  "weatherSnapshot": {
+    "available": true,
+    "summary": "Packaged alpine reference points for Lake Como area, Blanca Peak, Ellingwood Point, and Mount Lindsey. Reassess actual sky, wind, and cloud buildup against packaged planning context.",
+    "source": "Mountain Guide v15.3.10 (fb711292b264) · Verified 2026-08-07",
+    "timestamp": "2026-08-07T07:45:17Z",
+    "statement": "Weather is evidence, not permission.",
+    "locations": [
+      {
+        "id": "weather-lake-como-area",
+        "name": "Lake Como area",
+        "elevationFt": 11750,
+        "context": "Saturday approach reference point; no forecast values are canonical."
+      },
+      {
+        "id": "weather-blanca-peak",
+        "name": "Blanca Peak",
+        "elevationFt": 14350,
+        "context": "Sunday summit reference point; no forecast values are canonical."
+      },
+      {
+        "id": "weather-ellingwood-point",
+        "name": "Ellingwood Point",
+        "elevationFt": 14057,
+        "context": "Sunday summit reference point; no forecast values are canonical."
+      },
+      {
+        "id": "weather-mount-lindsey",
+        "name": "Mount Lindsey",
+        "elevationFt": 14055,
+        "context": "Monday summit reference point; no forecast values are canonical."
+      },
+      {
+        "id": "weather-great-sand-dunes",
+        "name": "Great Sand Dunes",
+        "elevationFt": 8200,
+        "context": "Friday visit reference point; it is not a climbing objective and no forecast values are canonical."
+      }
+    ]
+  },
   "artifacts": {
     "fieldGuide": {
       "url": "./generated/field-guide.pdf",
-      "sha256": "3ac4b8b512637d99d44263ae5ab97d75650a06bf75b0b65797cd585329517523"
+      "sha256": "3ac4b8b512637d99d44263ae5ab97d75650a06bf75b0b65797cd585329517523",
+      "pages": [
+        {
+          "page": 1,
+          "path": "generated/field-guide-p1.png",
+          "sha256": "0f918ff956e2b35813912c7dddb68496052065f44e2c7076259c016ac650a27b"
+        },
+        {
+          "page": 2,
+          "path": "generated/field-guide-p2.png",
+          "sha256": "00f3593ed712f23f14578cc5e6e4e2f5be0b909d0d2f5f2d9de345f6a096a726"
+        },
+        {
+          "page": 3,
+          "path": "generated/field-guide-p3.png",
+          "sha256": "ec786cbcdef2bc6ef5038744589363fadae6ecef7b0b7168fd4d610893c05140"
+        }
+      ]
     },
     "pocketCard": {
       "url": "./generated/pocket-card.pdf",
-      "sha256": "99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958"
+      "sha256": "99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958",
+      "pages": [
+        {
+          "page": 1,
+          "side": "front",
+          "path": "generated/pocket-card-p1.png",
+          "sha256": "a36a1f6810af511b480aba370ffeb9211d1c990a5c1aaa8d5edfedb2cd552b08"
+        },
+        {
+          "page": 2,
+          "side": "back",
+          "path": "generated/pocket-card-p2.png",
+          "sha256": "86d148c45db91a2b50e31304766edc2e81da87cc4b8c440f59a264de5ad97645"
+        }
+      ]
     }
   }
 });
 export const releaseMetadata = deepFreeze({
-  "companion_version": "0.6.0-candidate.11",
+  "companion_version": "0.6.0-candidate.12",
   "data_version": "1.0.0",
   "manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
   "source_release": "v15.3.10",
@@ -353,7 +423,7 @@ export const releaseMetadata = deepFreeze({
   "generated_at": "2026-08-11T13:37:49Z",
   "verified_at": "2026-08-07T07:45:17Z",
   "release_status": "candidate",
-  "bundle_id": "ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-12-data-3cda95d4e6b1-b1",
   "offline_bundle_version": 1,
   "offline_bundle_url": "https://companion.vondadowns.com/offline-bundle.json",
   "pwa_url": "https://companion.vondadowns.com/",

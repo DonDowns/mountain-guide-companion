@@ -37,7 +37,7 @@ export async function installCurrent(page, request) {
   await setServerState(request);
   await page.goto('/');
   await waitForServiceWorker(page);
-  await page.getByRole('button', { name: 'Prepare this phone' }).click();
+  await page.getByRole('button', { name: 'Phone Setup for Offline Use' }).click();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
 }
 

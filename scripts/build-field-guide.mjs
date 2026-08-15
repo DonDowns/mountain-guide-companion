@@ -76,6 +76,14 @@ async function main() {
   ], { cwd: repoRoot, stdio: 'inherit' });
 
   const pdfSha256 = await sha256(pdfPath);
+  const pageImages = await Promise.all([1, 2, 3].map(async page => {
+    const pagePath = `generated/field-guide-p${page}.png`;
+    return {
+      page,
+      path: pagePath,
+      sha256: await sha256(resolve(generatedDirectory, `field-guide-p${page}.png`))
+    };
+  }));
   const artifactRecord = {
     artifact_id: model.artifact.artifact_id,
     artifact_status: model.artifact.artifact_status,
@@ -89,7 +97,8 @@ async function main() {
     generated_at: model.provenance.generatedAt,
     page_count: model.artifact.page_count,
     page_size: model.artifact.page_size,
-    orientation: model.artifact.orientation
+    orientation: model.artifact.orientation,
+    page_images: pageImages
   };
   const html = template
     .replace('{{DOCUMENT_TITLE}}', escapeHtml(`${model.trip.name} - Printable Field Guide`))

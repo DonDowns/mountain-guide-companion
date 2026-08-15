@@ -11,7 +11,7 @@ import {
 } from './companion-help.js';
 import {
   companionData, createMilestoneMessage, navigateHome, navigateTo, parseOperationalDateTimeInput, releaseMetadata,
-  renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
+  renderArtifactDocument, renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
   renderStaticIdentity, renderTimeline, scrollCurrentViewToTop, setRedDisplay, showToast
 } from './companion-ui.js';
 
@@ -164,8 +164,8 @@ async function handleAction(action, button) {
     navigateHome();
   }
   if (action === 'open-artifact') {
-    const url = button.dataset.url;
-    document.querySelector('#artifact-frame').src = url;
+    const url = button.dataset.url || '';
+    renderArtifactDocument(url);
     navigateTo('artifact');
     history.pushState({ artifact: url }, '', '#artifact=' + encodeURIComponent(url));
   }
@@ -504,7 +504,7 @@ if (store.getState().setup.onboarding.version !== COMPANION_ONBOARDING_VERSION) 
 const initialHash = globalThis.location.hash;
 if (initialHash.startsWith('#artifact=')) {
   const url = decodeURIComponent(initialHash.slice(10));
-  document.querySelector('#artifact-frame').src = url;
+  renderArtifactDocument(url);
   navigateTo('artifact');
 }
 
@@ -515,7 +515,7 @@ globalThis.addEventListener('popstate', (event) => {
   const hash = globalThis.location.hash;
   if (hash.startsWith('#artifact=')) {
     const url = decodeURIComponent(hash.slice(10));
-    document.querySelector('#artifact-frame').src = url;
+    renderArtifactDocument(url);
     navigateTo('artifact');
   } else if (document.querySelector('#artifact-view:not([hidden])')) {
     navigateHome({ focus: false });

@@ -58,6 +58,15 @@ async function main() {
   ], { cwd: repoRoot, stdio: 'inherit' });
 
   const pdfSha256 = await sha256(pdfPath);
+  const pageImages = await Promise.all([
+    { page: 1, side: 'front', filename: 'pocket-card-p1.png' },
+    { page: 2, side: 'back', filename: 'pocket-card-p2.png' }
+  ].map(async item => ({
+    page: item.page,
+    side: item.side,
+    path: `generated/${item.filename}`,
+    sha256: await sha256(resolve(generatedDirectory, item.filename))
+  })));
   const artifactRecord = {
     artifact_id: model.artifact.artifact_id,
     artifact_status: model.artifact.artifact_status,
@@ -73,7 +82,8 @@ async function main() {
     page_size: model.artifact.page_size,
     page_size_points: [252, 360],
     orientation: model.artifact.orientation,
-    sides: ['front', 'back']
+    sides: ['front', 'back'],
+    page_images: pageImages
   };
   const html = template
     .replace('{{DOCUMENT_TITLE}}', 'Emergency &amp; Communication Pocket Card')

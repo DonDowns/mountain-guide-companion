@@ -170,7 +170,6 @@ export function renderCompanionHome(state, standalone, workerState, offlineResul
 }
 
 export function renderSetupPanel(target, options) {
-  const airplaneInstructionsOpen = Boolean(target.querySelector('.airplane-test')?.open);
   const {
     standalone, ios, promptAvailable, offlineResult, workerState, state
   } = options;
@@ -179,7 +178,7 @@ export function renderSetupPanel(target, options) {
   const airplaneRecorded = Boolean(state.setup.airplaneModeTestCompletedAt);
   const allGatesComplete = standalone && controlled && offlineVerified && airplaneRecorded;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
-  const heading = element('h2', { text: allGatesComplete ? 'This Phone Is Ready for Offline Use ✓' : standalone ? 'Finish Preparing This Phone' : 'Prepare This Phone' });
+  const heading = element('h2', { text: allGatesComplete ? 'This Phone Is Ready for Offline Use ✓' : standalone ? 'Finish Preparing This Phone for Offline Use' : 'Phone Setup for Offline Use' });
   const intro = element('p', {
     text: standalone
       ? 'Run Offline Check, then complete the Airplane Mode test on this phone.'
@@ -222,9 +221,9 @@ export function renderSetupPanel(target, options) {
   }
 
   setupList.append(setupItem(
-    airplaneRecorded ? 'Airplane Mode Test Recorded ✓' : 'Airplane Mode test still required',
+    airplaneRecorded ? 'Airplane Mode Test Recorded ✓' : 'Airplane Mode Test Required',
     airplaneRecorded,
-    airplaneRecorded ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'attention'
+    airplaneRecorded ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'Complete the physical Airplane Mode test on this phone.'
   ));
 
   children.push(setupList);
@@ -347,6 +346,7 @@ export function renderObjectiveContext(state) {
 }
 
 export function renderTimeline(state, uiState = {}) {
+  renderWeatherSnapshot(companionData.weatherSnapshot);
   const selectedId = companionData.objectives.some(item => item.id === state.selectedObjectiveId)
     ? state.selectedObjectiveId
     : companionData.objectives[0].id;
@@ -565,6 +565,139 @@ export function setRedDisplay(enabled) {
   document.querySelector('meta[name="theme-color"]').content = enabled ? '#100000' : '#163d46';
 }
 
+export function formatWeatherAge(timestamp, now = new Date()) {
+  const verified = new Date(timestamp);
+  const nowDate = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(verified.getTime()) || Number.isNaN(nowDate.getTime())) {
+    return 'Age unavailable';
+  }
+  const diffMs = nowDate.getTime() - verified.getTime();
+  if (diffMs < 0) return 'Age unavailable';
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 1) return 'Updated < 1 hr ago';
+  if (diffHours < 24) return `Updated ${diffHours} hr ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `Updated ${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+}
+
+export function renderWeatherSnapshot(weatherSnapshot = companionData.weatherSnapshot, now = new Date()) {
+  if (!weatherSnapshot) return;
+  const summaryEl = document.querySelector('#weather-snapshot-summary');
+  const sourceEl = document.querySelector('#weather-snapshot-source');
+  const timeEl = document.querySelector('#weather-snapshot-time');
+  const ageEl = document.querySelector('#weather-snapshot-age');
+  const locationsEl = document.querySelector('#weather-snapshot-locations');
+  const invariantEl = document.querySelector('#weather-snapshot-invariant');
+
+  if (summaryEl) summaryEl.textContent = weatherSnapshot.summary;
+  if (sourceEl) sourceEl.textContent = weatherSnapshot.source;
+  if (timeEl) timeEl.textContent = formatDate(weatherSnapshot.timestamp);
+  if (ageEl) ageEl.textContent = formatWeatherAge(weatherSnapshot.timestamp, now);
+  if (invariantEl) invariantEl.textContent = weatherSnapshot.statement || 'Weather is evidence, not permission.';
+
+  if (locationsEl && Array.isArray(weatherSnapshot.locations)) {
+    const pills = weatherSnapshot.locations.map(loc => {
+      return element('div', { className: 'weather-location-pill' }, [
+        element('strong', { text: loc.name }),
+        element('small', { text: `${loc.elevationFt.toLocaleString()} ft · ${loc.context}` })
+      ]);
+    });
+    clearAndAppend(locationsEl, ...pills);
+  }
+}
+
+export function renderArtifactDocument(artifactId) {
+  const container = document.querySelector('#artifact-document-container');
+  const title = document.querySelector('#artifact-header-title');
+  const downloadLink = document.querySelector('#artifact-download-pdf');
+  if (!container) return;
+
+  const isPocketCard = String(artifactId).includes('pocket-card');
+  if (isPocketCard) {
+    if (title) title.textContent = 'Emergency & Communication Pocket Card';
+    if (downloadLink) {
+      downloadLink.href = companionData.artifacts.pocketCard.url;
+      downloadLink.setAttribute('download', 'pocket-card.pdf');
+    }
+    const pages = [
+      {
+        page: 1,
+        label: 'Front · Emergency & Jurisdictions',
+        src: './generated/pocket-card-p1.png',
+        alt: 'Pocket Card Front - Emergency and Jurisdictions'
+      },
+      {
+        page: 2,
+        label: 'Back · Communication & Milestones',
+        src: './generated/pocket-card-p2.png',
+        alt: 'Pocket Card Back - Communication and Milestones'
+      }
+    ];
+    const pageNodes = pages.map(p => {
+      return element('div', { className: 'artifact-page-card pocket-card-page' }, [
+        element('div', { className: 'artifact-page-label', text: p.label }),
+        element('img', {
+          className: 'artifact-page-img',
+          src: p.src,
+          alt: p.alt,
+          width: '252',
+          height: '360',
+          loading: p.page === 1 ? 'eager' : 'lazy'
+        })
+      ]);
+    });
+    clearAndAppend(container, ...pageNodes);
+  } else {
+    if (title) title.textContent = '3-Page Printable Field Guide';
+    if (downloadLink) {
+      downloadLink.href = companionData.artifacts.fieldGuide.url;
+      downloadLink.setAttribute('download', 'field-guide.pdf');
+    }
+    const pages = [
+      {
+        page: 1,
+        label: 'Page 1 of 3 · Operational Timeline & Decision Gates',
+        src: './generated/field-guide-p1.png',
+        alt: 'Field Guide Page 1 - Operational Timeline and Decision Gates'
+      },
+      {
+        page: 2,
+        label: 'Page 2 of 3 · Route Profile Summary',
+        src: './generated/field-guide-p2.png',
+        alt: 'Field Guide Page 2 - Route Profile Summary'
+      },
+      {
+        page: 3,
+        label: 'Page 3 of 3 · Emergency & Communication',
+        src: './generated/field-guide-p3.png',
+        alt: 'Field Guide Page 3 - Emergency and Communication'
+      }
+    ];
+    const pageNodes = pages.map(p => {
+      return element('div', { className: 'artifact-page-card' }, [
+        element('div', { className: 'artifact-page-label', text: p.label }),
+        element('img', {
+          className: 'artifact-page-img',
+          src: p.src,
+          alt: p.alt,
+          width: '612',
+          height: '792',
+          loading: p.page === 1 ? 'eager' : 'lazy'
+        })
+      ]);
+    });
+    clearAndAppend(container, ...pageNodes);
+  }
+  container.scrollTop = 0;
+}
+
+export function teardownArtifactDocument() {
+  const container = document.querySelector('#artifact-document-container');
+  if (container) {
+    clearAndAppend(container);
+  }
+}
+
 export function navigateTo(view) {
   if (view === 'home') {
     navigateHome();
@@ -575,10 +708,7 @@ export function navigateTo(view) {
     section.hidden = section.dataset.view !== view;
   }
   if (view !== 'artifact') {
-    const artifactFrame = document.querySelector('#artifact-frame');
-    if (artifactFrame && artifactFrame.src && !artifactFrame.src.endsWith('about:blank')) {
-      artifactFrame.src = 'about:blank';
-    }
+    teardownArtifactDocument();
     if (globalThis.location.hash.startsWith('#artifact=')) {
       history.replaceState(null, '', globalThis.location.pathname + globalThis.location.search);
     }
@@ -603,10 +733,7 @@ export function navigateHome({ focus = true } = {}) {
   for (const section of document.querySelectorAll('[data-view]')) {
     section.hidden = true;
   }
-  const artifactFrame = document.querySelector('#artifact-frame');
-  if (artifactFrame && artifactFrame.src && !artifactFrame.src.endsWith('about:blank')) {
-    artifactFrame.src = 'about:blank';
-  }
+  teardownArtifactDocument();
   if (globalThis.location.hash.startsWith('#artifact=')) {
     history.replaceState(null, '', globalThis.location.pathname + globalThis.location.search);
   }

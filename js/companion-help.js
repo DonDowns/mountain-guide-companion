@@ -147,16 +147,18 @@ export function sharedInformationState({
   };
 }
 
-export function deriveCompanionStatus({ standalone, offlineResult = {}, workerState = {}, verifiedAt, now }) {
+export function deriveCompanionStatus({ standalone, offlineResult = {}, workerState = {}, state = {}, verifiedAt, now }) {
   const controlled = workerState.controlled === true;
   const offlineReady = controlled && offlineResult.complete === true;
+  const airplaneRecorded = Boolean(state?.setup?.airplaneModeTestCompletedAt);
   let setup = 'not-started';
   if (offlineResult.checking) setup = 'in-progress';
-  else if (standalone && offlineReady) setup = 'complete';
+  else if (standalone && offlineReady && airplaneRecorded) setup = 'complete';
+  else if (standalone && offlineReady && !airplaneRecorded) setup = 'airplane-required';
   else if (offlineResult.attempted || offlineResult.error || workerState.supported === false || offlineReady || standalone) setup = 'incomplete';
   const update = workerState.updateStatus || (workerState.updateAvailable ? 'available' : 'current');
   const sharedData = sharedInformationState({ verifiedAt, now, updateAvailable: workerState.updateAvailable === true }).status;
-  return { setup, offlineReady, installed: Boolean(standalone), controlled, update, sharedData, updateAvailable: workerState.updateAvailable === true };
+  return { setup, offlineReady, airplaneRecorded, installed: Boolean(standalone), controlled, update, sharedData, updateAvailable: workerState.updateAvailable === true };
 }
 
 function deviceCategory() {
@@ -184,6 +186,7 @@ export function buildCompanionDiagnostics(options) {
     `Connection: ${navigator.onLine ? 'Online' : 'Offline'}`,
     `Service worker controlling: ${derived.controlled ? 'Yes' : 'No'}`,
     `Offline package: ${derived.offlineReady ? 'Verified' : 'Not verified in this session'}`,
+    `Airplane Mode test: ${derived.airplaneRecorded ? 'Recorded' : 'Not recorded'}`,
     `Setup state: ${derived.setup}`,
     `Update state: ${derived.update}`
   ].join('\n');
@@ -200,9 +203,15 @@ export function buildFeatureRequest(fields) {
 export function renderCompanionSupportStatus(options) {
   const derived = deriveCompanionStatus(options);
   const shared = sharedInformationState({ verifiedAt: options.verifiedAt, now: options.now, updateAvailable: derived.updateAvailable });
-  const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Phone Setup ✓', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
+  const setupLabels = {
+    'not-started': 'Installation Required',
+    'in-progress': 'Checking this phone…',
+    'airplane-required': 'Airplane Mode Test Required',
+    complete: 'Complete ✓',
+    incomplete: derived.installed ? 'Offline Check Required' : 'Installation Required'
+  };
   const values = {
-    'home-offline-status': setupLabels[derived.setup],
+    'home-offline-status': setupLabels[derived.setup] || 'Installation Required',
     'home-shared-status': shared.label,
     'home-update-status': updateLabel(derived.update),
     'diagnostic-app-type': 'Companion App',
@@ -222,7 +231,7 @@ export function renderCompanionSupportStatus(options) {
   const headerSetup = document.querySelector('.header-setup');
   if (headerSetup) {
     headerSetup.hidden = false;
-    headerSetup.textContent = derived.setup === 'complete' ? 'Phone Setup ✓' : 'Prepare this phone';
+    headerSetup.textContent = derived.setup === 'complete' ? 'Phone Setup ✓' : 'Phone Setup for Offline Use';
   }
   const banner = document.querySelector('#companion-update-banner');
   if (banner) {

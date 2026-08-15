@@ -158,9 +158,30 @@ async function main() {
       planning: manifest.safety_invariants.planning,
       conditions: manifest.safety_invariants.conditions
     },
+    weatherSnapshot: {
+      available: true,
+      summary: 'Packaged alpine reference points for Lake Como area, Blanca Peak, Ellingwood Point, and Mount Lindsey. Reassess actual sky, wind, and cloud buildup against packaged planning context.',
+      source: `Mountain Guide ${manifest.metadata.source_release} (${manifest.metadata.source_commit.slice(0, 12)}) · Verified ${manifest.metadata.verified_at.slice(0, 10)}`,
+      timestamp: manifest.metadata.verified_at,
+      statement: manifest.safety_invariants.weather,
+      locations: manifest.weather_reference_locations.map(loc => ({
+        id: loc.id,
+        name: loc.name,
+        elevationFt: loc.elevation_ft,
+        context: loc.forecast_context
+      }))
+    },
     artifacts: {
-      fieldGuide: { url: `./${config.field_guide_path}`, sha256: fieldGuide.field_guide_pdf_sha256 },
-      pocketCard: { url: `./${config.pocket_card_path}`, sha256: pocketCard.pocket_card_pdf_sha256 }
+      fieldGuide: {
+        url: `./${config.field_guide_path}`,
+        sha256: fieldGuide.field_guide_pdf_sha256,
+        pages: fieldGuide.page_images || []
+      },
+      pocketCard: {
+        url: `./${config.pocket_card_path}`,
+        sha256: pocketCard.pocket_card_pdf_sha256,
+        pages: pocketCard.page_images || []
+      }
     }
   };
 

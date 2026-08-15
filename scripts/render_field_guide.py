@@ -370,6 +370,13 @@ def main():
     page_three(pdf, model)
     pdf.save()
 
+    import pypdfium2 as pdfium
+    doc = pdfium.PdfDocument(str(output_path))
+    for i, page in enumerate(doc):
+        image = page.render(scale=2).to_pil()
+        page_path = output_path.parent / f"field-guide-p{i+1}.png"
+        image.save(str(page_path), format="PNG", optimize=True)
+
 
 if __name__ == '__main__':
     main()
