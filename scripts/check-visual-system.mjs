@@ -100,13 +100,13 @@ if (!candidateRule.includes('var(--color-status-candidate-bg)') ||
 if (/critical|emergency|brand-red/.test(candidateRule)) errors.push('candidate badge must not use emergency or red tokens');
 
 const currentNavRule = css.match(/\.primary-nav button\[aria-current="page"\]\s*\{([\s\S]*?)\n\}/)?.[1] || '';
-if (!currentNavRule.includes('color-accent-gold') || /critical|emergency|brand-red/.test(currentNavRule)) {
-  errors.push('current navigation must use gold hierarchy without emergency/red semantics');
+if (currentNavRule.includes('color-accent-gold') || /critical|emergency|brand-red/.test(currentNavRule)) {
+  errors.push('current navigation must not use gold or emergency/red semantics');
 }
-if (!css.includes('.primary-nav button[data-action="toggle-red"][aria-pressed="true"]')) {
+if (!css.includes('.header-actions button[data-action="toggle-red"][aria-pressed="true"]')) {
   errors.push('literal Red Display control must retain a distinct pressed-state rule');
 }
-const redToggleRule = css.match(/\.primary-nav button\[data-action="toggle-red"\]\[aria-pressed="true"\]\s*\{([\s\S]*?)\n\}/)?.[1] || '';
+const redToggleRule = css.match(/\.header-actions button\[data-action="toggle-red"\]\[aria-pressed="true"\]\s*\{([\s\S]*?)\n\}/)?.[1] || '';
 if (!redToggleRule.includes('color-display-mode-active') || /color-emergency/.test(redToggleRule)) {
   errors.push('Red Display pressed state must use dedicated display-mode tokens, not emergency tokens');
 }

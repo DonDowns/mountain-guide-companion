@@ -223,6 +223,11 @@ body:not(.companion-open) .app-skip-link,
   border-color: var(--color-accent-gold);
 }
 
+.header-actions button[data-action="toggle-red"][aria-pressed="true"] {
+  background: var(--color-display-mode-active);
+  color: var(--color-display-mode-active-text);
+}
+
 .welcome,
 main,
 .provenance {
@@ -1241,7 +1246,6 @@ textarea {
 .primary-nav button[aria-current="page"] {
   background: var(--color-brand-primary);
   color: var(--color-brand-primary-ink);
-  box-shadow: inset 0 4px var(--color-accent-gold);
 }
 
 .primary-nav .emergency-nav {
