@@ -45,8 +45,8 @@ async function chooseObjective(page, objective) {
 test('loads canonical identity and friend first-open setup', async ({ page }, testInfo) => {
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.9', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByText('Test version · 0.6.0-candidate.10', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -106,12 +106,13 @@ test('uses field-facing copy without implementation disclaimers or false confirm
 
 test('persists Red Display and objective selection without safety meaning', async ({ page }) => {
   await page.goto('/');
-  const red = page.getByRole('button', { name: /Red/ });
+  await page.waitForFunction(() => !('serviceWorker' in navigator) || Boolean(navigator.serviceWorker.controller));
+  const red = page.getByRole('button', { name: /Red Mode/ });
   await red.click();
   await expect(red).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
   await page.reload();
-  await expect(page.getByRole('button', { name: /Red/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /Red Mode/ })).toHaveAttribute('aria-pressed', 'true');
 
   await openCompanion(page);
   const target = companionData.objectives[2];
@@ -154,10 +155,10 @@ test('makes Companion Home returnable and Start Objective cancellable without st
   await page.getByRole('button', { name: 'Start Objective' }).click();
   await page.getByRole('button', { name: 'Record current time' }).click();
   const recorded = (await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')))).actualStarts[objective.id];
-  await page.getByRole('button', { name: /Red/ }).click();
+  await page.getByRole('button', { name: /Red Mode/ }).click();
   await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Resume Trip Companion' }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open Trip Timeline' }).first()).toBeVisible();
   await expect(page.locator('#app-main')).toBeHidden();
 
   await openCompanion(page);
@@ -412,15 +413,15 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeVisible();
-  await expect(page.locator('#home-primary-action')).toHaveText('Open Trip Companion');
+  await expect(page.locator('#home-primary-action')).toHaveText('Open Trip Timeline');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
-  await expect(page.getByRole('button', { name: 'Offline Check', exact: true }).first()).toBeVisible();
-  await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
-  await expect(page.getByText('Companion installed', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Run Offline Check', exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Run Offline Check' }).first().click();
+  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone' })).toBeVisible();
+  await expect(page.getByText('Running from Home Screen', { exact: true })).toBeVisible();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await expect(page.getByText('Airplane Mode test still required', { exact: true })).toBeVisible();
-  await expect(page.getByText('Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.', { exact: false })).toBeVisible();
   await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
 });
 
@@ -476,12 +477,13 @@ test('records the physical Airplane Mode test only after explicit confirmation',
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.goto('/');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
-  await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await page.getByText('Airplane Mode test instructions').click();
+  await page.getByRole('button', { name: 'Run Offline Check' }).first().click();
+  // The details element auto-expands in Candidate 10 after a successful Offline Check.
   await expect(page.getByRole('heading', { name: 'AIRPLANE MODE TEST' })).toBeVisible();
   await expect(page.locator('.airplane-test li')).toHaveCount(12);
   page.once('dialog', dialog => dialog.accept());
-  await page.getByRole('button', { name: 'Record Airplane Mode Test' }).click();
+  await page.getByRole('button', { name: 'Start Airplane Mode Test' }).click();
+  await expect(page.getByText('Airplane Mode Test Recorded ✓')).toBeVisible();
   await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));
   expect(stored.setup.airplaneModeTestCompletedAt).toBeTruthy();
@@ -489,15 +491,16 @@ test('records the physical Airplane Mode test only after explicit confirmation',
 
 test('exposes an install action only after a supported browser prompt', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Install Companion' })).toHaveCount(0);
+  const installButton = page.locator('.install-button');
+  await expect(installButton).toBeHidden();
   await page.evaluate(() => {
     const prompt = new Event('beforeinstallprompt', { cancelable: true });
     prompt.prompt = async () => { globalThis.__installPrompted = true; };
     prompt.userChoice = Promise.resolve({ outcome: 'accepted' });
     dispatchEvent(prompt);
   });
-  await expect(page.getByRole('button', { name: 'Install Companion' })).toBeVisible();
-  await page.getByRole('button', { name: 'Install Companion' }).click();
+  await expect(installButton).toBeVisible();
+  await installButton.click();
   expect(await page.evaluate(() => globalThis.__installPrompted)).toBe(true);
 });
 
@@ -521,7 +524,7 @@ test('provides semantic landmarks, visible focus, and named global controls', as
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page.getByRole('main')).toBeHidden();
   await expect(page.getByRole('navigation', { name: 'Companion sections' })).toBeVisible();
-  const red = page.getByRole('button', { name: /Red/ });
+  const red = page.getByRole('button', { name: /Red Mode/ });
   await expect(red).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await openCompanion(page);

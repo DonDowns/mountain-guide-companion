@@ -143,9 +143,14 @@ export function isMountainGuideReferrer(referrer = document.referrer) {
   }
 }
 
-export function renderCompanionHome(state, standalone) {
+export function renderCompanionHome(state, standalone, workerState, offlineResult) {
+  const offlineVerified = offlineResult?.complete === true;
+  const controlled = workerState?.controlled === true;
+  const airplaneRecorded = Boolean(state.setup?.airplaneModeTestCompletedAt);
+  const allGatesComplete = standalone && controlled && offlineVerified && airplaneRecorded;
+
   document.querySelector('#welcome-eyebrow').textContent = standalone ? 'CURRENT TRIP' : 'MOUNTAIN GUIDE COMPANION';
-  document.querySelector('#welcome-title').textContent = standalone ? 'Companion Home' : 'Set Up This Phone';
+  document.querySelector('#welcome-title').textContent = allGatesComplete ? 'Phone Setup ✓' : standalone ? 'Companion Home' : 'Prepare This Phone';
   document.querySelector('#welcome-summary').textContent = standalone
     ? 'Open the trip companion, verify the offline copy, or use the Field Guide and Pocket Card.'
     : 'Recommended for trip partners. This keeps the trip plan, emergency information, communication milestones, Field Guide, and Pocket Card available when there is no service.';
@@ -154,18 +159,18 @@ export function renderCompanionHome(state, standalone) {
   const secondary = document.querySelector('#home-secondary-action');
   if (standalone) {
     primary.dataset.action = 'open-companion';
-    primary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+    primary.textContent = 'Open Trip Timeline';
     secondary.dataset.action = 'offline-check';
-    secondary.textContent = 'Offline Check';
+    secondary.textContent = 'Run Offline Check';
   } else {
     primary.dataset.action = 'show-setup';
     primary.textContent = 'Install for Offline Use';
     secondary.dataset.action = 'open-companion';
-    secondary.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Continue in Browser';
+    secondary.textContent = state.setup.companionOpened ? 'Open Trip Timeline' : 'Continue in Browser';
   }
 
   for (const button of document.querySelectorAll('.artifact-open')) {
-    button.textContent = state.setup.companionOpened ? 'Resume Trip Companion' : 'Open Trip Companion';
+    button.textContent = 'Open Trip Timeline';
   }
 }
 
@@ -176,9 +181,10 @@ export function renderSetupPanel(target, options) {
   } = options;
   const offlineVerified = offlineResult?.complete === true;
   const controlled = workerState.controlled === true;
-  const setupComplete = standalone && controlled && offlineVerified;
+  const airplaneRecorded = Boolean(state.setup.airplaneModeTestCompletedAt);
+  const allGatesComplete = standalone && controlled && offlineVerified && airplaneRecorded;
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
-  const heading = element('h2', { text: setupComplete ? 'THIS PHONE IS SET UP' : standalone ? 'FINISH SETTING UP THIS PHONE' : 'SET UP THIS PHONE' });
+  const heading = element('h2', { text: allGatesComplete ? 'This Phone Is Ready for Offline Use ✓' : standalone ? 'Finish Preparing This Phone' : 'Prepare This Phone' });
   const intro = element('p', {
     text: standalone
       ? 'Run Offline Check, then complete the Airplane Mode test on this phone.'
@@ -204,25 +210,32 @@ export function renderSetupPanel(target, options) {
     }));
   }
 
-  const checklist = element('ul', { className: 'setup-checklist', 'aria-label': 'Setup status' }, [
-    setupItem('Companion installed', standalone),
-    setupItem('Offline control active', controlled),
-    setupItem('Offline resources verified', offlineVerified),
-    setupItem(
-      state.setup.airplaneModeTestCompletedAt ? 'Airplane Mode test recorded' : 'Airplane Mode test still required',
-      Boolean(state.setup.airplaneModeTestCompletedAt),
-      state.setup.airplaneModeTestCompletedAt ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : ''
-    )
+  const setupList = element('ul', { className: 'setup-checklist', 'aria-label': 'Setup status' }, [
+    setupItem('Running from Home Screen', standalone),
+    setupItem('Offline control active', controlled)
   ]);
-  children.push(checklist);
-  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.' }));
 
-  if (offlineResult?.checking) {
-    children.push(element('div', { className: 'offline-result', role: 'status' }, [
-      element('strong', { text: 'CHECKING OFFLINE RESOURCES' }),
-      element('p', { text: 'Checking the Companion resources on this phone.' })
+  if (offlineResult?.checking && !offlineVerified) {
+    setupList.append(element('li', { className: 'pending' }, [
+      element('span', { ariaHidden: 'true', text: '○' }),
+      element('span', { text: 'Checking this phone…' })
     ]));
-  } else if (offlineResult && !offlineVerified) {
+  } else if (!offlineVerified) {
+    setupList.append(setupItem('Offline resources verified', false));
+  } else {
+    setupList.append(setupItem('Offline resources verified', true));
+  }
+
+  setupList.append(setupItem(
+    airplaneRecorded ? 'Airplane Mode Test Recorded ✓' : 'Airplane Mode test still required',
+    airplaneRecorded,
+    airplaneRecorded ? `Recorded on this phone: ${formatActualStart(state.setup.airplaneModeTestCompletedAt)}.` : 'attention'
+  ));
+
+  children.push(setupList);
+  children.push(element('p', { className: 'boundary-note setup-boundary', text: 'Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions. This confirms phone/offline preparation only and does not evaluate weather, access, terrain, route conditions, mountain safety, or permission to proceed.' }));
+
+  if (offlineResult && !offlineResult.checking && !offlineVerified && offlineResult.attempted) {
     children.push(element('div', { className: 'offline-result', role: 'status' }, [
       element('strong', { text: 'OFFLINE RESOURCES INCOMPLETE' }),
       element('p', { text: offlineResult.error || 'The offline resources did not verify.' }),
@@ -244,20 +257,38 @@ export function renderSetupPanel(target, options) {
     'Confirm the Pocket Card opens.',
     'Return to the setup screen and record the test.'
   ].map(text => element('li', { text }));
-  children.push(element('details', { className: 'airplane-test', open: airplaneInstructionsOpen || undefined }, [
-    element('summary', { text: 'Airplane Mode test instructions' }),
+  children.push(element('details', { className: 'airplane-test', open: (!airplaneRecorded && offlineVerified) || undefined }, [
+    element('summary', { text: 'View Airplane Mode Test Steps' }),
     element('h3', { text: 'AIRPLANE MODE TEST' }),
     element('ol', {}, airplaneSteps),
     element('p', { className: 'boundary-note', text: 'Each phone must complete its own Offline Check and Airplane Mode test.' })
   ]));
 
   const actions = [];
-  if (!standalone && promptAvailable) actions.push(element('button', { className: 'install-button', type: 'button', dataset: { action: 'install' }, text: 'Install Companion' }));
-  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Offline Check' }));
-  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'repair-offline' }, text: 'Repair Offline Copy' }));
-  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: state.setup.airplaneModeTestCompletedAt ? 'clear-airplane-test' : 'record-airplane-test' }, text: state.setup.airplaneModeTestCompletedAt ? 'Clear Airplane Mode Record' : 'Record Airplane Mode Test' }));
-  actions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
-  children.push(element('div', { className: 'setup-actions' }, actions));
+  const secondaryActions = [];
+
+  if (!standalone && promptAvailable) {
+    actions.push(element('button', { className: 'primary-button install-button', type: 'button', dataset: { action: 'install' }, text: 'Install for Offline Use' }));
+  }
+  
+  if (standalone && !offlineVerified) {
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
+  } else if (standalone && offlineVerified) {
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
+  } else if (!standalone) {
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'offline-check' }, text: 'Run Offline Check' }));
+  }
+
+  if (standalone && controlled && offlineVerified && !airplaneRecorded) {
+    actions.push(element('button', { className: 'primary-button', type: 'button', dataset: { action: 'record-airplane-test' }, text: 'Start Airplane Mode Test' }));
+  } else {
+    secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: airplaneRecorded ? 'clear-airplane-test' : 'record-airplane-test' }, text: airplaneRecorded ? 'Clear Airplane Mode Record' : 'Start Airplane Mode Test' }));
+  }
+
+  secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'repair-offline' }, text: 'Repair Offline Copy' }));
+  secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
+
+  children.push(element('div', { className: 'setup-actions' }, [...actions, ...secondaryActions]));
 
   clearAndAppend(target, element('section', { className: 'setup-panel', dataset: { mode: standalone ? 'installed' : 'browser' }, 'aria-labelledby': 'setup-heading' }, children));
   target.querySelector('h2').id = 'setup-heading';
@@ -283,22 +314,25 @@ export function renderArtifacts() {
     {
       title: 'Interactive Companion',
       description: 'Interactive operational reference.',
-      action: element('button', { className: 'quiet-button artifact-open', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Trip Companion' })
+      action: element('button', { className: 'quiet-button artifact-open', type: 'button', dataset: { action: 'open-companion' }, text: 'Open Trip Timeline' })
     },
     {
       title: '3-Page Field Guide',
       description: 'Printable physical backup.',
-      action: element('a', { href: companionData.artifacts.fieldGuide.url, text: 'Open Field Guide' })
+      action: element('a', { className: 'quiet-button', href: companionData.artifacts.fieldGuide.url, text: 'Open Field Guide', dataset: { action: 'open-artifact', url: companionData.artifacts.fieldGuide.url } })
     },
     {
       title: 'Emergency Pocket Card',
       description: 'Compact emergency and communication backup.',
-      action: element('a', { href: companionData.artifacts.pocketCard.url, text: 'Open Pocket Card' })
+      action: element('a', { className: 'quiet-button', href: companionData.artifacts.pocketCard.url, text: 'Open Pocket Card', dataset: { action: 'open-artifact', url: companionData.artifacts.pocketCard.url } })
     }
   ].map(item => element('article', { className: 'artifact-card' }, [
     element('h3', { text: item.title }),
     element('p', { text: item.description }),
-    item.action
+    element('div', { className: 'welcome-link-actions' }, [
+      item.action,
+      element('button', { className: 'quiet-button', type: 'button', dataset: { action: 'home' }, text: 'Back to Top' })
+    ])
   ]));
   clearAndAppend(document.querySelector('#artifact-cards'), ...cards);
 }
@@ -529,7 +563,10 @@ export function setRedDisplay(enabled) {
   document.documentElement.style.background = enabled ? '#100000' : '';
   document.documentElement.style.colorScheme = enabled ? 'dark' : 'light';
   const button = document.querySelector('[data-action="toggle-red"]');
-  button.setAttribute('aria-pressed', String(enabled));
+  if (button) {
+    button.setAttribute('aria-pressed', String(enabled));
+    button.textContent = enabled ? 'Red Mode · On' : 'Red Mode · Off';
+  }
   document.querySelector('meta[name="theme-color"]').content = enabled ? '#100000' : '#163d46';
 }
 

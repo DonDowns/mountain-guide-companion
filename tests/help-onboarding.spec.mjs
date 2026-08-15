@@ -85,7 +85,7 @@ test('completed installed setup becomes quiet while update status remains separa
   await page.goto('/');
   await expect(page.locator('.header-setup')).toBeHidden();
   await expect(page.locator('#install-panel')).toBeHidden();
-  await expect(page.locator('#home-offline-status')).toHaveText('Offline copy verified');
+  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');
   await expect(page.locator('#home-shared-status')).toContainText(/\d+ days? old by this phone’s clock/);
   await expect(page.locator('#home-shared-status')).toContainText('Recheck changing facts when connectivity is available.');
@@ -141,14 +141,36 @@ test('search UI shows the correct topic, empty list, and no-result guidance', as
   await page.goto('/');
   await page.getByRole('button', { name: /Help/ }).click();
   const search = page.locator('#companion-help-search');
-  await search.fill('emergencies');
+  await expect(search).toHaveAttribute('placeholder', 'Search help');
+  await expect(page.locator('.search-help-hint')).toHaveText('Searches help topic titles and text.');
+
+  await search.fill('dispatch');
   await expect(page.locator('.help-topic').filter({ has: page.getByText('Use emergency information', { exact: true }) })).toHaveCount(1);
-  await expect(page.locator('#companion-help-status')).toContainText(/help topic/);
+  await expect(page.locator('#companion-help-status')).toHaveText('1 match for "dispatch"');
+  await expect(page.locator('.help-topic summary')).toHaveAttribute('aria-expanded', 'true');
+
+  await search.fill('offline');
+  await expect(page.locator('#companion-help-status')).toContainText('matches for "offline"');
+
+  const clearBtn = page.locator('#clear-help-search');
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(search).toHaveValue('');
+  await expect(page.locator('.help-topic')).toHaveCount(15);
+  await expect(page.locator('#companion-help-status')).toHaveText('15 help topics');
+  await expect(clearBtn).toBeHidden();
+
   await search.fill('UNFINDABLE ZEBRA');
   await expect(page.locator('.help-topic')).toHaveCount(0);
-  await expect(page.locator('#companion-help-status')).toContainText('No topics found');
+  await expect(page.locator('.zero-results')).toContainText('No matches for "UNFINDABLE ZEBRA".');
+  await expect(page.locator('#companion-help-status')).toHaveText('No matches for "UNFINDABLE ZEBRA".');
+
+  await search.press('Enter');
+  await expect(page.locator('.zero-results')).toContainText('No matches for "UNFINDABLE ZEBRA".');
+
   await search.fill('');
   await expect(page.locator('.help-topic')).toHaveCount(15);
+  await expect(page.locator('#companion-help-status')).toHaveText('15 help topics');
 });
 
 test('feedback preview renders hostile text safely and diagnostics omit private trip fields', async ({ page }) => {
@@ -251,7 +273,7 @@ test('verification disclosure and Help remain available after successful offline
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
   await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.locator('#home-offline-status')).toHaveText('Offline copy verified');
+  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');

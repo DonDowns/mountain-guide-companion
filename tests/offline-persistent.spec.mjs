@@ -14,7 +14,7 @@ test('persisted Chromium profile cold-launches after a simulated browser close',
     await seedCompletedOnboarding(first);
     await first.goto(baseURL);
     await waitForServiceWorker(first);
-    await first.getByRole('button', { name: /Red/ }).click();
+    await first.getByRole('button', { name: /Red Mode/ }).click();
     await first.evaluate(() => {
       const state = JSON.parse(localStorage.getItem('mgc-companion-local-state'));
       state.statusNote = 'z';
@@ -26,7 +26,7 @@ test('persisted Chromium profile cold-launches after a simulated browser close',
     const offline = await chromium.launchPersistentContext(profile, { headless: true, offline: true, viewport: { width: 390, height: 844 } });
     const second = offline.pages()[0] || await offline.newPage();
     await second.goto(baseURL);
-    await expect(second.getByRole('heading', { name: 'Set Up This Phone', level: 1 })).toBeVisible();
+    await expect(second.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
     await expect(second.locator('html')).toHaveAttribute('data-display', 'red');
     await second.locator('[data-action="open-companion"]').first().click();
     const stored = await second.evaluate(() => JSON.parse(localStorage.getItem('mgc-companion-local-state')));

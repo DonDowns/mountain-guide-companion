@@ -47,7 +47,7 @@ function renderState(state = store.getState()) {
   renderSetupPanel(document.querySelector('#install-panel'), setupOptions(state));
   const derived = renderCompanionSupportStatus(setupOptions(state));
   document.querySelector('#install-panel').hidden = derived.setup === 'complete' && !setupPanelRequested;
-  renderCompanionHome(state, isStandalone());
+  renderCompanionHome(store.getState(), isStandalone(), workerState, offlineResult);
 }
 
 function setOnboardingBackgroundInert(inert) {
@@ -162,6 +162,20 @@ async function handleAction(action, button) {
     pendingObjectiveId = '';
     editMilestoneKey = '';
     navigateHome();
+  }
+  if (action === 'open-artifact') {
+    const url = button.dataset.url;
+    document.querySelector('#artifact-frame').src = url;
+    navigateTo('artifact');
+    history.pushState({ artifact: url }, '', '#artifact=' + encodeURIComponent(url));
+  }
+  if (action === 'back-to-companion') {
+    if (history.length > 1) {
+      history.back();
+    } else {
+      navigateHome();
+      document.querySelector('#artifact-cards')?.scrollIntoView();
+    }
   }
   if (action === 'show-setup') {
     setupPanelRequested = true;
@@ -423,6 +437,34 @@ function bindEvents() {
     }
   }, true);
 
+  const searchInput = document.querySelector('#companion-help-search');
+  const clearSearchBtn = document.querySelector('#clear-help-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+      renderCompanionHelpTopics(event.target.value);
+      if (clearSearchBtn) {
+        clearSearchBtn.hidden = event.target.value.length === 0;
+      }
+    });
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        renderCompanionHelpTopics(searchInput.value);
+        searchInput.blur();
+      }
+    });
+  }
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        renderCompanionHelpTopics('');
+        clearSearchBtn.hidden = true;
+        searchInput.focus();
+      }
+    });
+  }
+
   document.addEventListener('keydown', event => {
     const overlay = document.querySelector('#companion-onboarding');
     if (!overlay || overlay.hidden) return;
@@ -462,8 +504,27 @@ if (store.getState().setup.onboarding.version !== COMPANION_ONBOARDING_VERSION) 
   globalThis.setTimeout(() => openOnboarding(), 0);
 }
 
+const initialHash = globalThis.location.hash;
+if (initialHash.startsWith('#artifact=')) {
+  const url = decodeURIComponent(initialHash.slice(10));
+  document.querySelector('#artifact-frame').src = url;
+  navigateTo('artifact');
+}
+
 globalThis.addEventListener('online', () => renderState());
 globalThis.addEventListener('offline', () => renderState());
+
+globalThis.addEventListener('popstate', (event) => {
+  const hash = globalThis.location.hash;
+  if (hash.startsWith('#artifact=')) {
+    const url = decodeURIComponent(hash.slice(10));
+    document.querySelector('#artifact-frame').src = url;
+    navigateTo('artifact');
+  } else if (document.querySelector('#artifact-view:not([hidden])')) {
+    navigateHome();
+    document.querySelector('#artifact-cards')?.scrollIntoView();
+  }
+});
 
 registerProductionServiceWorker(state => {
   workerState = state;

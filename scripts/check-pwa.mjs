@@ -61,7 +61,7 @@ async function main() {
   }
 
   for (const required of [
-    'Mountain Guide Companion', 'Set Up This Phone', 'Companion Home', 'Continue in Browser', 'Home', 'Timeline', 'Route', 'Emergency', 'Red',
+    'Mountain Guide Companion', 'Prepare This Phone', 'Companion Home', 'Continue in Browser', 'Home', 'Timeline', 'Route', 'Emergency', 'Red',
     '↑ Top', 'CALL 911 FIRST', 'Three Companion Artifacts', 'Test version', 'Help &amp; Diagnostics',
     'Copy Problem Report', 'Copy Feature Request', 'Check for New Shared Information', 'not yet a field release'
   ]) requireText(html.toLowerCase(), required.toLowerCase(), 'index.html', errors);

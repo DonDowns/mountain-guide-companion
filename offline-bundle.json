@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "bundle_id": "ddmg-companion-0-6-0-candidate-9-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-10-data-3cda95d4e6b1-b1",
   "cache_namespace": "ddmg-companion",
-  "companion_version": "0.6.0-candidate.9",
+  "companion_version": "0.6.0-candidate.10",
   "data_version": "1.0.0",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "27d33b3a7cadfd1c18e10be626ae9dfc4d38501099f92bd968b1e70119b3f67d",
+  "bundle_content_sha256": "c4ecc74e7f576433f13674b59afab37716f14c04516326eeaff8c30bc657be62",
   "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
   "entry_count": 16,
-  "total_bytes": 219937,
+  "total_bytes": 226784,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -20,15 +20,15 @@
   "resources": [
     {
       "path": "index.html",
-      "sha256": "85123ae9226a498636baf8bc2407defb4f019925a1d00c117e8e48a9a9a4b7d2",
-      "bytes": 15253,
+      "sha256": "6e508edf398f4598c2cc95f498853725e1a3497108482c059ef3c2afa398e490",
+      "bytes": 15896,
       "role": "application-shell",
       "required": true
     },
     {
       "path": "css/companion.css",
-      "sha256": "9df6e00a490b33ff204afe7c2fb2b89c539d10a9710060aac964ff1691020091",
-      "bytes": 25973,
+      "sha256": "1ec211b7731f399f775b00ca78465f347c8f32190da849ed6ae476be39c540d1",
+      "bytes": 27380,
       "role": "application-style",
       "required": true
     },
@@ -41,8 +41,8 @@
     },
     {
       "path": "js/companion-data.js",
-      "sha256": "8551aa18c9aa4a34d00d0b35f0b75f345e103539a374294e51acd47668b65e25",
-      "bytes": 14652,
+      "sha256": "8b43d093177ca32aead1b01e76c6b758b3211edf94a886201b3a59f8ba646071",
+      "bytes": 14656,
       "role": "canonical-runtime-data",
       "required": true
     },
@@ -55,8 +55,8 @@
     },
     {
       "path": "js/companion-help.js",
-      "sha256": "fc92d2efcdd697f47fa579f420cc683cc0c25581d35502fcbd1dd89dfab4c54f",
-      "bytes": 17804,
+      "sha256": "0490d94e0ba090a3c7f7fa370009b4d971eca161f0e6d8e66d9fd4640cd5cde1",
+      "bytes": 18665,
       "role": "offline-help-and-support",
       "required": true
     },
@@ -69,15 +69,15 @@
     },
     {
       "path": "js/companion-ui.js",
-      "sha256": "1ed7c2d74e4ff42a3681d731f9f1edd630be7e9b649a1b0157f3efc563602fb2",
-      "bytes": 31359,
+      "sha256": "a1f610ed5f62afe5cc72426cbc44b4d6f572e69835b4f1791c5405db1ee863f3",
+      "bytes": 33265,
       "role": "application-ui",
       "required": true
     },
     {
       "path": "js/companion.js",
-      "sha256": "7c0461c4103ba5dc30553dd8f2c3b93eb90f0efe1d7d0ad65d6e57e3425da130",
-      "bytes": 19515,
+      "sha256": "8cf3f25084f3a34caf334672c254f83c4a5a9631df93545af10226044c2217b4",
+      "bytes": 21539,
       "role": "application-controller",
       "required": true
     },
@@ -125,8 +125,8 @@
     },
     {
       "path": "release.json",
-      "sha256": "1882be679bacf06cbed618ac259ea5d30f3645ee399ff69b7a40c0f93cb8e41a",
-      "bytes": 912,
+      "sha256": "15d9ca623c5713bc349bca94c59f2e6ddb27509e123dd82647e60a67d34ceefe",
+      "bytes": 914,
       "role": "release-metadata",
       "required": true
     }

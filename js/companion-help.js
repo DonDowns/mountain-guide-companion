@@ -23,7 +23,7 @@ export const companionHelpTopics = Object.freeze([
 const onboardingSteps = Object.freeze([
   { title: 'What was shared', body: () => `${companionData.trip.name} was packaged as a public Companion. The trip owner controls the published shared facts; your operational entries stay on this phone.` },
   { title: 'Prepare this phone', body: () => 'On iPhone, use Safari → Share → Add to Home Screen. Open once online, then run Offline Check so the complete packaged app, trip data, Help, and physical-reference PDFs verify.' },
-  { title: 'Prove the offline reopen', body: () => 'Force-quit, enable Airplane Mode, reopen from the Home Screen, and check Timeline, Route, Emergency, Help, the Field Guide, and the Pocket Card. Record the test only after doing it.' },
+  { title: 'Confirm it works without service', body: () => 'Force-quit, enable Airplane Mode, reopen from the Home Screen, and check Timeline, Route, Emergency, Help, the Field Guide, and the Pocket Card. Record the test only after doing it.' },
   { title: 'Refresh, Help, and limits', body: () => 'Check for newer shared information only with a reliable connection. Help contains recovery steps. Companion is planning evidence—not rescue guidance, medical clearance, route authorization, or permission to continue.' }
 ]);
 
@@ -52,7 +52,7 @@ function tokenMatches(indexToken, queryToken) {
 
 export function searchCompanionHelp(query = '') {
   const queryTokens = tokens(query);
-  if (!queryTokens.length) return [...companionHelpTopics];
+  if (queryTokens.length === 0) return [...companionHelpTopics];
   return companionHelpTopics.filter(topic => {
     const indexTokens = tokens(`${topic.title} ${topic.aliases} ${topic.body}`);
     return queryTokens.every(queryToken => indexTokens.some(indexToken => tokenMatches(indexToken, queryToken)));
@@ -73,15 +73,35 @@ function element(tag, options = {}, children = []) {
 export function renderCompanionHelpTopics(query = '') {
   const target = document.querySelector('#companion-help-results');
   if (!target) return [];
+  const trimmed = query.trim();
   const matches = searchCompanionHelp(query);
-  target.replaceChildren(...matches.map(topic => element('details', { className: 'help-topic' }, [
-    element('summary', { text: topic.title, 'aria-expanded': 'false' }),
-    element('p', { text: topic.body })
-  ])));
   const status = document.querySelector('#companion-help-status');
-  if (status) status.textContent = matches.length
-    ? `${matches.length} help topic${matches.length === 1 ? '' : 's'}`
-    : 'No topics found. Try offline, no signal, update, refresh, install, weather, turnaround, or emergency.';
+
+  if (trimmed) {
+    if (matches.length === 0) {
+      target.replaceChildren(element('div', { className: 'zero-results' }, [
+        element('p', { text: `No matches for "${trimmed}".` }),
+        element('p', { className: 'suggestion', text: 'Try broader words like offline, install, weather, route, or emergency.' })
+      ]));
+      if (status) status.textContent = `No matches for "${trimmed}".`;
+    } else {
+      target.replaceChildren(...matches.map(topic => {
+        const item = element('details', { className: 'help-topic', open: matches.length === 1 || undefined }, [
+          element('summary', { text: topic.title, 'aria-expanded': matches.length === 1 ? 'true' : 'false' }),
+          element('p', { text: topic.body })
+        ]);
+        return item;
+      }));
+      const countText = matches.length === 1 ? `1 match for "${trimmed}"` : `${matches.length} matches for "${trimmed}"`;
+      if (status) status.textContent = countText;
+    }
+  } else {
+    target.replaceChildren(...matches.map(topic => element('details', { className: 'help-topic' }, [
+      element('summary', { text: topic.title, 'aria-expanded': 'false' }),
+      element('p', { text: topic.body })
+    ])));
+    if (status) status.textContent = `${matches.length} help topics`;
+  }
   return matches;
 }
 
@@ -180,7 +200,7 @@ export function buildFeatureRequest(fields) {
 export function renderCompanionSupportStatus(options) {
   const derived = deriveCompanionStatus(options);
   const shared = sharedInformationState({ verifiedAt: options.verifiedAt, now: options.now, updateAvailable: derived.updateAvailable });
-  const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Offline copy verified', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
+  const setupLabels = { 'not-started': 'Not started', 'in-progress': 'Checking this phone…', complete: 'Phone Setup ✓', incomplete: derived.installed ? 'Setup needs attention' : 'Install to finish setup' };
   const values = {
     'home-offline-status': setupLabels[derived.setup],
     'home-shared-status': shared.label,
