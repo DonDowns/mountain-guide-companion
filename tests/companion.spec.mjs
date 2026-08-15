@@ -416,11 +416,11 @@ test('shows factual installed state and verifies the complete offline bundle', a
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await expect(page.getByRole('button', { name: 'Offline Check', exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
-  await expect(page.getByText('Companion installed', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone' })).toBeVisible();
+  await expect(page.getByText('Running from Home Screen', { exact: true })).toBeVisible();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await expect(page.getByText('Airplane Mode test still required', { exact: true })).toBeVisible();
-  await expect(page.getByText('Offline Check confirms the required Companion resources are stored on this phone. It does not evaluate weather, access, terrain, or route conditions.', { exact: true })).toBeVisible();
+  await expect(page.getByText('This confirms phone/offline preparation only and does not evaluate weather, access, terrain, or route conditions.', { exact: true })).toBeVisible();
   await expect(page.locator('#install-panel')).not.toContainText(/all clear|good to go|ready to climb/i);
 });
 
@@ -477,7 +477,7 @@ test('records the physical Airplane Mode test only after explicit confirmation',
   await page.goto('/');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await page.getByText('Airplane Mode test instructions').click();
+  // The details element auto-expands in Candidate 10 after a successful Offline Check.
   await expect(page.getByRole('heading', { name: 'AIRPLANE MODE TEST' })).toBeVisible();
   await expect(page.locator('.airplane-test li')).toHaveCount(12);
   page.once('dialog', dialog => dialog.accept());

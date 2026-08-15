@@ -38,6 +38,6 @@ test('meets automated WCAG 2.1 AA checks across core states', async ({ page }) =
   await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
   await page.reload();
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone' })).toBeVisible();
   await audit(page, 'installed setup and Offline Check');
 });

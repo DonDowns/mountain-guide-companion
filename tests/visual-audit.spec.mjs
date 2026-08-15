@@ -58,9 +58,9 @@ test('captures the Phase 6A mountain-earth visual-audit matrix', async ({ page }
   await expect(page.getByRole('heading', { name: 'Companion Home', level: 1 })).toBeAttached();
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
   await page.getByRole('button', { name: 'Offline Check' }).first().click();
-  await expect(page.getByRole('heading', { name: 'THIS PHONE IS SET UP' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Finish Preparing This Phone' })).toBeVisible();
   await page.locator('#install-panel').evaluate(node => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
-  await expect(page.getByText('Companion installed', { exact: true })).toBeVisible();
+  await expect(page.locator('.setup-checklist')).toContainText('Running from Home Screen');
   await page.screenshot({ path: 'tmp/visual-audit/09-mobile-installed-offline-check.png' });
 
   await page.setViewportSize({ width: 844, height: 390 });

@@ -147,7 +147,10 @@
         <h2 id="help-title">Help &amp; Diagnostics</h2>
         <p>Searchable instructions and recovery steps are packaged for offline use.</p>
       </div>
-      <label class="help-search" for="companion-help-search"><span>Search Help</span><input id="companion-help-search" type="search" autocomplete="off" placeholder="Try offline, no signal, update, install, weather, or emergency"></label>
+      <div class="search-container">
+        <label class="help-search" for="companion-help-search"><span>Search Help</span><input id="companion-help-search" type="search" autocomplete="off" placeholder="Search help..."></label>
+        <button id="clear-help-search" type="button" class="quiet-button clear-search" aria-label="Clear search" hidden>Clear</button>
+      </div>
       <p id="companion-help-status" class="boundary-note" role="status" aria-live="polite"></p>
       <div id="companion-help-results" class="help-results"></div>
 
@@ -196,6 +199,13 @@
       </section>
       <aside class="hold-note"><strong>Safety boundary</strong><p>Companion is decision support, not permission. It does not provide live weather, rescue guidance, medical clearance, route authorization, or confirmation that a message was delivered.</p></aside>
       <div class="view-utility"><button class="quiet-button" type="button" data-action="top">↑ Top</button></div>
+    </section>
+
+    <section class="app-view artifact-view" id="artifact-view" data-view="artifact" tabindex="-1" aria-labelledby="artifact-header-title" hidden>
+      <header class="artifact-header" id="artifact-header-title">
+        <button class="quiet-button back-to-companion" type="button" data-action="back-to-companion">‹ Back to Companion</button>
+      </header>
+      <iframe id="artifact-frame" src="about:blank" class="artifact-frame" title="Artifact Document"></iframe>
     </section>
   </main>
 

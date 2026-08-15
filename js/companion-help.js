@@ -23,7 +23,7 @@ export const companionHelpTopics = Object.freeze([
 const onboardingSteps = Object.freeze([
   { title: 'What was shared', body: () => `${companionData.trip.name} was packaged as a public Companion. The trip owner controls the published shared facts; your operational entries stay on this phone.` },
   { title: 'Prepare this phone', body: () => 'On iPhone, use Safari → Share → Add to Home Screen. Open once online, then run Offline Check so the complete packaged app, trip data, Help, and physical-reference PDFs verify.' },
-  { title: 'Prove the offline reopen', body: () => 'Force-quit, enable Airplane Mode, reopen from the Home Screen, and check Timeline, Route, Emergency, Help, the Field Guide, and the Pocket Card. Record the test only after doing it.' },
+  { title: 'Confirm it works without service', body: () => 'Force-quit, enable Airplane Mode, reopen from the Home Screen, and check Timeline, Route, Emergency, Help, the Field Guide, and the Pocket Card. Record the test only after doing it.' },
   { title: 'Refresh, Help, and limits', body: () => 'Check for newer shared information only with a reliable connection. Help contains recovery steps. Companion is planning evidence—not rescue guidance, medical clearance, route authorization, or permission to continue.' }
 ]);
 
@@ -52,7 +52,8 @@ function tokenMatches(indexToken, queryToken) {
 
 export function searchCompanionHelp(query = '') {
   const queryTokens = tokens(query);
-  if (!queryTokens.length) return [...companionHelpTopics];
+  if (queryTokens.length === 0) return [...companionHelpTopics];
+  if (query.trim().length > 0 && query.trim().length < 3) return [];
   return companionHelpTopics.filter(topic => {
     const indexTokens = tokens(`${topic.title} ${topic.aliases} ${topic.body}`);
     return queryTokens.every(queryToken => indexTokens.some(indexToken => tokenMatches(indexToken, queryToken)));
