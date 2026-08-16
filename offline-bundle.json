@@ -7,11 +7,11 @@
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "2b3b5cff50fa133b5e78ed8d6536e35c7cba47c613dbf7077d19cb81323b61fb",
+  "bundle_content_sha256": "cec3558c08b84c0b6e5bce5e2226b4f39f16e7ba61dfe6f05c0ad2f5d7e22924",
   "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
   "entry_count": 21,
-  "total_bytes": 1678783,
+  "total_bytes": 1679034,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -76,8 +76,8 @@
     },
     {
       "path": "js/companion.js",
-      "sha256": "490698b1ee4d9fb5af8d5c8484bcae6c7660c288fe6dd1243357d92bb7bbde84",
-      "bytes": 21711,
+      "sha256": "1165162cd2d8976656b44e7989a4e0d1454de3067c6de0a184b3ea97eebad853",
+      "bytes": 21962,
       "role": "application-controller",
       "required": true
     },
@@ -160,7 +160,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "e411843887a1fde51edf48e057b2482e5356624c23f0c6f53063d95d3c6ff6f6",
+      "sha256": "0a462ea0ed689c051d2ad7d0077cc67c2e0c4f75ca646639fb6ca6f14e44ffff",
       "bytes": 914,
       "role": "release-metadata",
       "required": true

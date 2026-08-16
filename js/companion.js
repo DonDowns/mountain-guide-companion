@@ -321,7 +321,9 @@ async function handleAction(action, button) {
     document.querySelector('[name="pending-objective"]:checked')?.focus();
   }
   if (action === 'confirm-objective') {
-    const objective = companionData.objectives.find(item => item.id === pendingObjectiveId);
+    const checkedRadio = document.querySelector('input[name="pending-objective"]:checked');
+    const targetId = checkedRadio ? checkedRadio.value : pendingObjectiveId;
+    const objective = companionData.objectives.find(item => item.id === targetId);
     if (!objective) return;
     objectiveSelectorOpen = false;
     pendingObjectiveId = '';
@@ -416,6 +418,7 @@ function bindEvents() {
   });
 
   document.addEventListener('input', event => {
+    if (event.target.name === 'pending-objective') pendingObjectiveId = event.target.value;
     if (event.target.id === 'companion-help-search') renderCompanionHelpTopics(event.target.value);
     if (event.target.matches('[data-local-field="statusNote"]')) {
       const value = event.target.value;
