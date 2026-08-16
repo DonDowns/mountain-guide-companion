@@ -7,11 +7,11 @@
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "fda46b7289b7e7da0f3e1f519699d0e43e18e1aa0e9b65ff34f48499400a6830",
+  "bundle_content_sha256": "2b3b5cff50fa133b5e78ed8d6536e35c7cba47c613dbf7077d19cb81323b61fb",
   "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
   "entry_count": 21,
-  "total_bytes": 1678769,
+  "total_bytes": 1678783,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -20,8 +20,8 @@
   "resources": [
     {
       "path": "index.html",
-      "sha256": "0e4c887eba3fb0dbe49b0876b5c25ba48d8a412689405955cc15dc9c9ce467d1",
-      "bytes": 17452,
+      "sha256": "189da40ec5c95200e8acdaad53286fd80fca38c07c2ae73109ab946871e4c542",
+      "bytes": 17466,
       "role": "application-shell",
       "required": true
     },
@@ -160,7 +160,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "dfaf5fe3adf671e0888d3f7170fc9b55964247630a69b4f21ef9091ed1cb8f8c",
+      "sha256": "e411843887a1fde51edf48e057b2482e5356624c23f0c6f53063d95d3c6ff6f6",
       "bytes": 914,
       "role": "release-metadata",
       "required": true
