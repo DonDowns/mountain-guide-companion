@@ -169,7 +169,7 @@ function deviceCategory() {
 }
 
 function updateLabel(status) {
-  return ({ checking: 'Checking', downloading: 'Downloading', available: 'Update downloaded', applying: 'Applying', failed: 'Check or update failed', offline: 'Offline — check unavailable', current: 'No downloaded update' })[status] || 'Status unavailable';
+  return ({ checking: 'Checking', downloading: 'Downloading', available: 'Update downloaded', applying: 'Applying', failed: 'Check or update failed', offline: 'Offline — check unavailable', current: 'Up to date' })[status] || 'Status unavailable';
 }
 
 export function buildCompanionDiagnostics(options) {

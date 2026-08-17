@@ -22,7 +22,8 @@
     </a>
     <div class="header-actions">
       <button class="quiet-button" type="button" data-action="toggle-red" aria-pressed="false">Red Mode · Off</button>
-      <button class="quiet-button" type="button" data-action="share">Share</button>
+      <button class="quiet-button" type="button" data-action="share-companion">Share Companion</button>
+      <button class="quiet-button" type="button" data-action="show-qr">Show QR Code</button>
       <button class="quiet-button header-setup" type="button" data-action="show-setup">Prepare this phone</button>
     </div>
   </header>
@@ -42,7 +43,8 @@
         <button class="secondary-button" id="home-secondary-action" type="button" data-action="open-companion">Continue in Browser</button>
       </div>
       <div class="welcome-link-actions">
-        <button class="quiet-button" type="button" data-action="share">Share Companion</button>
+        <button class="quiet-button" type="button" data-action="share-companion">Share Companion</button>
+        <button class="quiet-button" type="button" data-action="show-qr">Show QR Code</button>
         <a class="quiet-button" id="return-to-mountain-guide" href="https://mountainguide.vondadowns.com/" hidden>Return to Mountain Guide</a>
       </div>
       <p class="release-note">Physical phone testing is still required. This is not yet a field release.</p>
@@ -253,6 +255,21 @@
         <button class="secondary-button" id="companion-onboarding-back" type="button" data-action="tutorial-back">Back</button>
         <button class="quiet-button" type="button" data-action="dismiss-tutorial">Skip for now</button>
         <button class="primary-button" id="companion-onboarding-next" type="button" data-action="tutorial-next">Next</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="qr-overlay" id="companion-qr-overlay" hidden>
+    <section class="qr-sheet" role="dialog" aria-modal="true" aria-labelledby="companion-qr-title" aria-describedby="companion-qr-body">
+      <button class="qr-close" type="button" data-action="dismiss-qr" aria-label="Dismiss QR code">×</button>
+      <p class="eyebrow">SHARE COMPANION</p>
+      <h2 id="companion-qr-title">Scan QR Code</h2>
+      <p id="companion-qr-body">Scan with another phone’s camera to open the public Mountain Guide Companion.</p>
+      <div id="companion-qr-container" class="qr-container" aria-label="QR Code for Companion public URL"></div>
+      <p class="qr-url" id="companion-qr-url"></p>
+      <div class="qr-actions">
+        <button class="secondary-button" type="button" data-action="share-companion">Share Companion Link</button>
+        <button class="primary-button" type="button" data-action="dismiss-qr">Done</button>
       </div>
     </section>
   </div>

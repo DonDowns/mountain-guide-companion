@@ -280,7 +280,8 @@ export function renderSetupPanel(target, options) {
   }
 
   secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'repair-offline' }, text: 'Repair Offline Copy' }));
-  secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share' }, text: 'Share Companion' }));
+  secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'share-companion' }, text: 'Share Companion' }));
+  secondaryActions.push(element('button', { className: 'secondary-button', type: 'button', dataset: { action: 'show-qr' }, text: 'Show QR Code' }));
 
   children.push(element('div', { className: 'setup-actions' }, [...actions, ...secondaryActions]));
 
@@ -773,6 +774,278 @@ export function refreshElapsed(state) {
   if (!node) return;
   const actual = state.actualStarts[node.dataset.elapsedFor] || '';
   node.textContent = actual ? `Elapsed ${formatElapsed(actual)}` : 'Planned start remains unchanged.';
+}
+
+export function createQRCode(text) {
+  const EXP = new Uint8Array(512);
+  const LOG = new Uint8Array(256);
+  let x = 1;
+  for (let i = 0; i < 255; i++) {
+    EXP[i] = x;
+    EXP[i + 255] = x;
+    LOG[x] = i;
+    x = (x << 1) ^ (x >= 128 ? 0x11d : 0);
+  }
+
+  function gfMul(a, b) {
+    if (a === 0 || b === 0) return 0;
+    return EXP[LOG[a] + LOG[b]];
+  }
+
+  function polyMul(p1, p2) {
+    const r = new Uint8Array(p1.length + p2.length - 1);
+    for (let i = 0; i < p1.length; i++) {
+      for (let j = 0; j < p2.length; j++) {
+        r[i + j] ^= gfMul(p1[i], p2[j]);
+      }
+    }
+    return r;
+  }
+
+  function polyRest(dividend, divisor) {
+    const out = new Uint8Array(dividend);
+    for (let i = 0; i < dividend.length - divisor.length + 1; i++) {
+      const coef = out[i];
+      if (coef !== 0) {
+        for (let j = 1; j < divisor.length; j++) {
+          out[i + j] ^= gfMul(divisor[j], coef);
+        }
+      }
+    }
+    return out.slice(dividend.length - divisor.length + 1);
+  }
+
+  function getGeneratorPoly(numEC) {
+    let g = new Uint8Array([1]);
+    for (let i = 0; i < numEC; i++) {
+      g = polyMul(g, new Uint8Array([1, EXP[i]]));
+    }
+    return g;
+  }
+
+  const TABLE_M = [
+    [1, 26, 16, 10, 1, 16, 0, 0],
+    [2, 44, 28, 16, 1, 28, 0, 0],
+    [3, 70, 44, 26, 1, 44, 0, 0],
+    [4, 100, 64, 18, 2, 32, 0, 0],
+    [5, 134, 86, 24, 2, 43, 0, 0],
+    [6, 172, 108, 16, 4, 27, 0, 0]
+  ];
+
+  const utf8 = new TextEncoder().encode(text);
+  const dataLen = utf8.length;
+
+  let versionInfo = null;
+  for (const row of TABLE_M) {
+    const maxDataBytes = row[2];
+    if (dataLen + 2 <= maxDataBytes) {
+      versionInfo = row;
+      break;
+    }
+  }
+
+  if (!versionInfo) throw new Error('Text too long for Companion QR code generator');
+
+  const [version, totalCodewords, dataCodewords, ecPerBlock, g1Blocks, g1Data, g2Blocks, g2Data] = versionInfo;
+
+  const bitBuffer = [];
+  function putBits(num, length) {
+    for (let i = length - 1; i >= 0; i--) {
+      bitBuffer.push((num >>> i) & 1);
+    }
+  }
+
+  putBits(4, 4);
+  putBits(dataLen, 8);
+  for (const byte of utf8) putBits(byte, 8);
+  const totalDataBits = dataCodewords * 8;
+  const termLen = Math.min(4, totalDataBits - bitBuffer.length);
+  putBits(0, termLen);
+  while (bitBuffer.length % 8 !== 0) bitBuffer.push(0);
+
+  const dataBytes = [];
+  for (let i = 0; i < bitBuffer.length; i += 8) {
+    let b = 0;
+    for (let j = 0; j < 8; j++) b = (b << 1) | bitBuffer[i + j];
+    dataBytes.push(b);
+  }
+  let padToggle = 0;
+  while (dataBytes.length < dataCodewords) {
+    dataBytes.push(padToggle === 0 ? 0xec : 0x11);
+    padToggle ^= 1;
+  }
+
+  const genPoly = getGeneratorPoly(ecPerBlock);
+  const dataBlocks = [];
+  const ecBlocks = [];
+  let byteOffset = 0;
+  const totalBlocks = g1Blocks + g2Blocks;
+
+  for (let i = 0; i < totalBlocks; i++) {
+    const isG1 = i < g1Blocks;
+    const blockSize = isG1 ? g1Data : g2Data;
+    const rawBlock = new Uint8Array(dataBytes.slice(byteOffset, byteOffset + blockSize));
+    byteOffset += blockSize;
+    dataBlocks.push(rawBlock);
+
+    const dividend = new Uint8Array(blockSize + ecPerBlock);
+    dividend.set(rawBlock, 0);
+    const ec = polyRest(dividend, genPoly);
+    ecBlocks.push(ec);
+  }
+
+  const finalCodewords = [];
+  const maxDataBlockLen = Math.max(g1Data, g2Data || 0);
+  for (let i = 0; i < maxDataBlockLen; i++) {
+    for (let b = 0; b < totalBlocks; b++) {
+      if (i < dataBlocks[b].length) finalCodewords.push(dataBlocks[b][i]);
+    }
+  }
+  for (let i = 0; i < ecPerBlock; i++) {
+    for (let b = 0; b < totalBlocks; b++) {
+      finalCodewords.push(ecBlocks[b][i]);
+    }
+  }
+
+  const size = 17 + 4 * version;
+  const matrix = Array.from({ length: size }, () => new Array(size).fill(null));
+  const isFunction = Array.from({ length: size }, () => new Array(size).fill(false));
+
+  function setModule(r, c, val) {
+    matrix[r][c] = val ? 1 : 0;
+    isFunction[r][c] = true;
+  }
+
+  function addFinder(topRow, leftCol) {
+    for (let r = -1; r <= 7; r++) {
+      for (let c = -1; c <= 7; c++) {
+        const row = topRow + r;
+        const col = leftCol + c;
+        if (row < 0 || row >= size || col < 0 || col >= size) continue;
+        const isBlack = (r >= 0 && r <= 6 && (c === 0 || c === 6)) ||
+                        (c >= 0 && c <= 6 && (r === 0 || r === 6)) ||
+                        (r >= 2 && r <= 4 && c >= 2 && c <= 4);
+        setModule(row, col, isBlack);
+      }
+    }
+  }
+  addFinder(0, 0);
+  addFinder(0, size - 7);
+  addFinder(size - 7, 0);
+
+  for (let i = 8; i < size - 8; i++) {
+    if (!isFunction[6][i]) setModule(6, i, i % 2 === 0);
+    if (!isFunction[i][6]) setModule(i, 6, i % 2 === 0);
+  }
+
+  const ALIGN_POS = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34] };
+  const alignCoords = ALIGN_POS[version] || [];
+  for (const r of alignCoords) {
+    for (const c of alignCoords) {
+      if (isFunction[r][c]) continue;
+      for (let dr = -2; dr <= 2; dr++) {
+        for (let dc = -2; dc <= 2; dc++) {
+          setModule(r + dr, c + dc, Math.max(Math.abs(dr), Math.abs(dc)) !== 1);
+        }
+      }
+    }
+  }
+
+  setModule(4 * version + 9, 8, true);
+
+  for (let i = 0; i < 9; i++) {
+    if (!isFunction[8][i]) { matrix[8][i] = 0; isFunction[8][i] = true; }
+    if (!isFunction[i][8]) { matrix[i][8] = 0; isFunction[i][8] = true; }
+  }
+  for (let i = 0; i < 8; i++) {
+    if (!isFunction[8][size - 1 - i]) { matrix[8][size - 1 - i] = 0; isFunction[8][size - 1 - i] = true; }
+    if (!isFunction[size - 1 - i][8]) { matrix[size - 1 - i][8] = 0; isFunction[size - 1 - i][8] = true; }
+  }
+
+  const allBits = [];
+  for (const byte of finalCodewords) {
+    for (let i = 7; i >= 0; i--) allBits.push((byte >>> i) & 1);
+  }
+
+  let bitIdx = 0;
+  let up = true;
+  for (let right = size - 1; right > 0; right -= 2) {
+    if (right === 6) right--;
+    for (let vert = 0; vert < size; vert++) {
+      const r = up ? (size - 1 - vert) : vert;
+      for (let c = right; c >= right - 1; c--) {
+        if (!isFunction[r][c]) {
+          matrix[r][c] = bitIdx < allBits.length ? allBits[bitIdx++] : 0;
+        }
+      }
+    }
+    up = !up;
+  }
+
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (!isFunction[r][c] && (r + c) % 2 === 0) {
+        matrix[r][c] ^= 1;
+      }
+    }
+  }
+
+  const FORMAT_BITS = [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0];
+  const formatCoordsTopLeft = [
+    [8, 0], [8, 1], [8, 2], [8, 3], [8, 4], [8, 5], [8, 7], [8, 8],
+    [7, 8], [5, 8], [4, 8], [3, 8], [2, 8], [1, 8], [0, 8]
+  ];
+  for (let i = 0; i < 15; i++) {
+    const [r, c] = formatCoordsTopLeft[i];
+    matrix[r][c] = FORMAT_BITS[i];
+  }
+  for (let i = 0; i < 8; i++) {
+    matrix[8][size - 1 - i] = FORMAT_BITS[14 - i];
+  }
+  for (let i = 0; i < 7; i++) {
+    matrix[size - 1 - i][8] = FORMAT_BITS[i];
+  }
+
+  return { size, matrix };
+}
+
+export function renderQrCodeSvg(target, url) {
+  if (!target) return;
+  const qr = createQRCode(url);
+  const size = qr.size;
+  const quietZone = 4;
+  const viewBoxSize = size + quietZone * 2;
+
+  let pathData = '';
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (qr.matrix[r][c] === 1) {
+        const x = c + quietZone;
+        const y = r + quietZone;
+        pathData += `M${x},${y}h1v1h-1z `;
+      }
+    }
+  }
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${viewBoxSize} ${viewBoxSize}`);
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', '100%');
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', `QR Code for ${url}`);
+
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bg.setAttribute('width', String(viewBoxSize));
+  bg.setAttribute('height', String(viewBoxSize));
+  bg.setAttribute('fill', '#ffffff');
+  svg.append(bg);
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', pathData);
+  path.setAttribute('fill', '#000000');
+  svg.append(path);
+
+  target.replaceChildren(svg);
 }
 
 export { companionData, releaseMetadata };

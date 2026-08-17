@@ -5,11 +5,12 @@ let workerStatePublisher = null;
 let updateStatus = 'current';
 
 function publishWorkerState(overrides = {}) {
+  const hasWaiting = Boolean(serviceWorkerRegistration?.waiting);
   workerStatePublisher?.({
     supported: 'serviceWorker' in navigator,
     controlled: Boolean(navigator.serviceWorker?.controller),
-    updateAvailable: Boolean(serviceWorkerRegistration?.waiting),
-    updateStatus: serviceWorkerRegistration?.waiting ? 'available' : updateStatus,
+    updateAvailable: hasWaiting,
+    updateStatus: hasWaiting ? 'available' : (updateStatus === 'available' ? 'current' : updateStatus),
     registration: serviceWorkerRegistration,
     ...overrides
   });
@@ -149,6 +150,7 @@ export async function registerProductionServiceWorker(onChange) {
       publish();
       installing?.addEventListener('statechange', () => {
         if (installing.state === 'installed') updateStatus = serviceWorkerRegistration.waiting ? 'available' : 'current';
+        if (installing.state === 'activated') updateStatus = 'current';
         if (installing.state === 'redundant') updateStatus = 'failed';
         publish();
       });

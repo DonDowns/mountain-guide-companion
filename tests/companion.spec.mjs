@@ -46,7 +46,7 @@ test('loads canonical identity and friend first-open setup', async ({ page }, te
   await page.goto('/');
   await expect(page.getByText('MOUNTAIN GUIDE COMPANION', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
-  await expect(page.getByText('Test version · 0.6.0-candidate.12', { exact: true })).toBeVisible();
+  await expect(page.getByText('Test version · 0.6.0-candidate.13', { exact: true })).toBeVisible();
   await expect(page.getByText(/PHYSICAL PHONE TESTING REQUIRED/)).toBeVisible();
   expect(releaseMetadata.release_status).toBe('candidate');
   await expect(page.locator('#trip-name')).toHaveText(companionData.trip.name);
@@ -346,7 +346,7 @@ test('keeps private fields device-local, shares only the public URL, and clears 
   await page.locator('[data-private-field="name"]').fill('x');
   await page.locator('[data-private-field="alternate"]').fill('y');
   await page.locator('[data-private-field="note"]').fill('z');
-  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  await page.getByRole('button', { name: 'Share Companion', exact: true }).first().click();
   const payload = await page.evaluate(() => globalThis.__sharedPayload);
   expect(payload.url).toBe(releaseMetadata.pwa_url);
   expect(Object.keys(payload).sort()).toEqual(['text', 'title', 'url']);
@@ -371,7 +371,7 @@ test('falls back from unavailable native sharing to clipboard using only the pub
     });
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  await page.getByRole('button', { name: 'Share Companion', exact: true }).first().click();
   expect(await page.evaluate(() => globalThis.__copiedPublicValue)).toBe(releaseMetadata.pwa_url);
 });
 
@@ -383,7 +383,7 @@ test('documents a manual public-link fallback when share and clipboard are unava
     globalThis.prompt = (message, value) => { globalThis.__manualCopy = { message, value }; };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  await page.getByRole('button', { name: 'Share Companion', exact: true }).first().click();
   const fallback = await page.evaluate(() => globalThis.__manualCopy);
   expect(fallback).toEqual({ message: 'Copy this public Companion link:', value: releaseMetadata.pwa_url });
 });
@@ -490,6 +490,8 @@ test('records the physical Airplane Mode test only after explicit confirmation',
 
 test('exposes an install action only after a supported browser prompt', async ({ page }) => {
   await page.goto('/');
+  const dismiss = page.getByRole('button', { name: 'Close tutorial' });
+  if (await dismiss.isVisible()) await dismiss.click();
   const installButton = page.locator('.install-button');
   await expect(installButton).toBeHidden();
   await page.evaluate(() => {
@@ -660,7 +662,7 @@ test('candidate.12: Phone Setup completion hierarchy and Airplane Mode discovera
       setup: {
         onboarding: { version: 'companion-onboarding-candidate-8-v1', status: 'completed', recordedAt: '2026-08-11T00:00:00.000Z' },
         offlineVerifiedAt: '2026-08-11T01:00:00.000Z',
-        offlineVerifiedBundleId: 'ddmg-companion-0-6-0-candidate-12-data-3cda95d4e6b1-b1',
+        offlineVerifiedBundleId: 'ddmg-companion-0-6-0-candidate-13-data-3cda95d4e6b1-b1',
         airplaneModeTestCompletedAt: '2026-08-11T02:00:00.000Z'
       }
     }));
@@ -842,4 +844,117 @@ test('candidate.12: Weather Snapshot card rendering, source attribution, and saf
   // Invariant: no affirmative safety language
   const timelineText = await page.locator('#timeline-view').innerText();
   expect(timelineText).not.toMatch(/safe to proceed|all clear|route is safe|weather permits|approved to continue|safe to climb|good to go/i);
+});
+
+test('candidate.13: Share Companion invokes native Web Share and does not open QR modal', async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.__shareInvocations = [];
+    navigator.share = async payload => {
+      globalThis.__shareInvocations.push(payload);
+    };
+  });
+  await page.goto('/');
+  await expect(page.locator('#companion-qr-overlay')).toBeHidden();
+
+  // Header Share Companion button
+  const headerShareBtn = page.getByRole('button', { name: 'Share Companion', exact: true }).first();
+  await headerShareBtn.click();
+
+  const shareCalls = await page.evaluate(() => globalThis.__shareInvocations);
+  expect(shareCalls).toHaveLength(1);
+  expect(shareCalls[0].url).toBe(releaseMetadata.pwa_url);
+  expect(shareCalls[0].title).toBe('Mountain Guide Companion');
+  await expect(page.locator('#companion-qr-overlay')).toBeHidden();
+  await expect(page.locator('#toast')).toContainText('Share sheet opened with the public Companion link.');
+});
+
+test('candidate.13: Show QR Code displays QR overlay and does not invoke native share', async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.__shareInvocations = [];
+    navigator.share = async payload => {
+      globalThis.__shareInvocations.push(payload);
+    };
+  });
+  await page.goto('/');
+  await expect(page.locator('#companion-qr-overlay')).toBeHidden();
+
+  // Click Show QR Code
+  const qrBtn = page.getByRole('button', { name: 'Show QR Code', exact: true }).first();
+  await qrBtn.click();
+
+  // QR Modal is visible with SVG and public URL
+  const qrOverlay = page.locator('#companion-qr-overlay');
+  await expect(qrOverlay).toBeVisible();
+  await expect(qrOverlay.getByRole('heading', { name: 'Scan QR Code' })).toBeVisible();
+  await expect(qrOverlay.locator('#companion-qr-container svg')).toBeVisible();
+  await expect(qrOverlay.locator('#companion-qr-url')).toHaveText(releaseMetadata.pwa_url);
+
+  // Native share was NOT invoked
+  const shareCalls = await page.evaluate(() => globalThis.__shareInvocations);
+  expect(shareCalls).toHaveLength(0);
+
+  // Dismiss QR code via Done button
+  await qrOverlay.getByRole('button', { name: 'Done' }).click();
+  await expect(qrOverlay).toBeHidden();
+});
+
+test('candidate.13: QR modal supports Escape key dismissal and inner Share Link action', async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.__shareInvocations = [];
+    navigator.share = async payload => {
+      globalThis.__shareInvocations.push(payload);
+    };
+  });
+  await page.goto('/');
+  const qrBtn = page.getByRole('button', { name: 'Show QR Code', exact: true }).first();
+  await qrBtn.click();
+
+  const qrOverlay = page.locator('#companion-qr-overlay');
+  await expect(qrOverlay).toBeVisible();
+
+  // Test inner Share Companion Link button inside the QR modal
+  await qrOverlay.getByRole('button', { name: 'Share Companion Link' }).click();
+  const shareCalls = await page.evaluate(() => globalThis.__shareInvocations);
+  expect(shareCalls).toHaveLength(1);
+  expect(shareCalls[0].url).toBe(releaseMetadata.pwa_url);
+
+  // Test Escape key dismissal
+  await page.keyboard.press('Escape');
+  await expect(qrOverlay).toBeHidden();
+});
+
+test('candidate.13: checks for updates on startup and on foreground return without reload loop', async ({ page, context }) => {
+  await page.addInitScript(() => {
+    globalThis.__updateCheckCalls = 0;
+    sessionStorage.setItem('__page_reloads__', String(Number(sessionStorage.getItem('__page_reloads__') || 0) + 1));
+  });
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
+
+  // Verify reload count is exactly 1 (no reload loops)
+  const loadCount = await page.evaluate(() => Number(sessionStorage.getItem('__page_reloads__')));
+  expect(loadCount).toBe(1);
+
+  // Home update status dl shows Up to date
+  const updateStatus = page.locator('#home-update-status');
+  await expect(updateStatus).toHaveText('Up to date');
+
+  // Trigger foreground return by changing visibilityState
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+
+  // Verify still no reload loop
+  const postLoadCount = await page.evaluate(() => Number(sessionStorage.getItem('__page_reloads__')));
+  expect(postLoadCount).toBe(1);
+});
+
+test('candidate.13: user-triggered update installation displays exact toast on reload', async ({ page }) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('mgc-update-installed-toast', 'true');
+  });
+  await page.goto('/');
+  const toast = page.locator('#toast');
+  await expect(toast).toBeVisible();
+  await expect(toast).toHaveText('Update successfully installed.');
 });

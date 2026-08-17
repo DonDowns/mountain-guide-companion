@@ -196,7 +196,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
 
   for (const candidatePage of [page, second]) {
     await expect(candidatePage.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.12/)).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.13/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -211,7 +211,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
     return records.sort();
   });
   expect(complete).toEqual([
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-12-data-3cda95d4e6b1-b1$/),
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-13-data-3cda95d4e6b1-b1$/),
     'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1'
   ]);
 });
@@ -227,6 +227,5 @@ test('Offline Check rejects an active registration when this page has no control
   });
   expect(state).toEqual({ active: true, controlled: false });
   await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
-  await expect(page.getByText(/not controlling this page/i)).toBeVisible();
+  await expect(page.getByText('Offline setup is not controlling this page. Reopen Companion and retry Offline Check.')).toBeVisible();
 });
