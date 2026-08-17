@@ -53,11 +53,37 @@ async function main() {
   await mkdir(temporaryDirectory, { recursive: true });
   for (const path of [htmlPath, pdfPath, artifactPath, temporaryModelPath]) await rm(path, { force: true });
   await writeFile(temporaryModelPath, JSON.stringify(model, null, 2) + '\n');
-  execFileSync(resolvePython(), [
-    resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath
+
+
+
+  let existingArtifact = null;
+  try {
+    existingArtifact = JSON.parse(await readFile(artifactPath, 'utf8'));
+  } catch (e) {}
+
+  const python = resolvePython();
+
+  execFileSync(python, [
+    resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath, '--skip-images'
   ], { cwd: repoRoot, stdio: 'inherit' });
 
   const pdfSha256 = await sha256(pdfPath);
+
+  let imagesMissing = false;
+  for (const page of [1, 2]) {
+    try {
+      await readFile(resolve(generatedDirectory, `pocket-card-p${page}.png`));
+    } catch (e) {
+      imagesMissing = true;
+    }
+  }
+
+  if (!existingArtifact || existingArtifact.pocket_card_pdf_sha256 !== pdfSha256 || imagesMissing) {
+    execFileSync(python, [
+      resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath, '--images-only'
+    ], { cwd: repoRoot, stdio: 'inherit' });
+  }
+
   const pageImages = await Promise.all([
     { page: 1, side: 'front', filename: 'pocket-card-p1.png' },
     { page: 2, side: 'back', filename: 'pocket-card-p2.png' }
