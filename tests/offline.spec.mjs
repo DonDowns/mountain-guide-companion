@@ -63,7 +63,7 @@ test('installs, verifies, and cold-launches every field-critical path with zero 
   await offlinePage.getByRole('button', { name: /Emergency/ }).last().click();
   await expect(offlinePage.getByRole('heading', { name: 'CALL 911 FIRST' })).toBeVisible();
   await expect(offlinePage.locator('a.phone-link')).toHaveCount(6);
-  await offlinePage.getByRole('button', { name: 'Prepare this phone' }).click();
+  await offlinePage.getByRole('button', { name: 'Phone Setup for Offline Use' }).click();
   await offlinePage.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
   await expect(offlinePage.getByText('Offline resources verified', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
@@ -79,21 +79,19 @@ test('opens both bundled PDFs through real browser navigation while offline', as
   test.skip(!testInfo.project.name.includes('chromium-desktop'), 'Offline PDF navigation runs once in Chromium desktop');
   await installCurrent(page, request);
   await context.setOffline(true);
-  for (const [name, path] of [
-    ['Open Field Guide', '/generated/field-guide.pdf'],
-    ['Open Pocket Card', '/generated/pocket-card.pdf']
-  ]) {
+  for (const path of ['/generated/field-guide.pdf', '/generated/pocket-card.pdf']) {
     const artifactPage = await context.newPage();
-    await artifactPage.goto('/');
-    const responsePromise = artifactPage.waitForResponse(response =>
-      new URL(response.url()).pathname === path && response.request().isNavigationRequest()
-    );
-    await artifactPage.getByRole('link', { name }).click();
+    const responsePromise = artifactPage.waitForResponse(res => new URL(res.url()).pathname === path);
+    const downloadPromise = artifactPage.waitForEvent('download').catch(() => null);
+    await artifactPage.goto(path).catch(err => {
+      if (!err.message.includes('Download is starting')) throw err;
+    });
     const response = await responsePromise;
     expect(response.headers()['content-type']).toContain('application/pdf');
     expect(response.headers()['content-type']).not.toContain('text/html');
     expect(response.fromServiceWorker()).toBe(true);
     expect(new URL(response.url()).pathname).toBe(path);
+    await downloadPromise;
     await artifactPage.close();
   }
   await context.setOffline(false);
@@ -163,7 +161,7 @@ test('keeps the previous complete release active when a new required JavaScript 
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-display', 'red');
-  await page.getByRole('button', { name: 'Prepare this phone' }).click();
+  await page.getByRole('button', { name: 'Phone Setup for Offline Use' }).click();
   await expect(page.getByText('Offline resources verified', { exact: true })).toBeVisible();
   await expect(page.getByText(/Recorded on this phone:/)).toBeVisible();
   await openCompanion(page);
@@ -198,7 +196,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
 
   for (const candidatePage of [page, second]) {
     await expect(candidatePage.getByRole('heading', { name: 'Prepare This Phone', level: 1 })).toBeVisible();
-    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.11/)).toBeVisible();
+    await expect(candidatePage.getByText(/Companion 0\.6\.0-candidate\.13/)).toBeVisible();
     expect(await candidatePage.evaluate(() => Number(sessionStorage.getItem('__companion_load_count__')))).toBeGreaterThanOrEqual(2);
   }
   const complete = await page.evaluate(async () => {
@@ -213,7 +211,7 @@ test('reloads two previous-release tabs coherently when the verified update acti
     return records.sort();
   });
   expect(complete).toEqual([
-    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1$/),
+    expect.stringMatching(/^ddmg-companion-0-6-0-candidate-13-data-3cda95d4e6b1-b1$/),
     'ddmg-companion-0-6-0-candidate-4-data-3cda95d4e6b1-b1'
   ]);
 });
@@ -229,6 +227,5 @@ test('Offline Check rejects an active registration when this page has no control
   });
   expect(state).toEqual({ active: true, controlled: false });
   await page.locator('.setup-panel').getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.getByText('OFFLINE RESOURCES INCOMPLETE', { exact: true })).toBeVisible();
-  await expect(page.getByText(/not controlling this page/i)).toBeVisible();
+  await expect(page.getByText('Offline setup is not controlling this page. Reopen Companion and retry Offline Check.')).toBeVisible();
 });

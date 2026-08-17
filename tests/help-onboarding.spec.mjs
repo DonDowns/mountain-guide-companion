@@ -33,8 +33,11 @@ test('status model keeps setup, packaged data, and update truth separate without
   expect(recent.label).toBe('Packaged trip data · verified Aug 10, 2026 · 1 day old by this phone’s clock. Recheck changing facts when connectivity is available.');
   expect(old).toMatchObject({ status: 'current-package', ageDays: 41 });
   expect(old.label).toBe('Packaged trip data · verified Jul 1, 2026 · 41 days old by this phone’s clock. Recheck changing facts when connectivity is available.');
-  expect(deriveCompanionStatus({ standalone: true, offlineResult: { complete: true }, workerState: { controlled: true } })).toMatchObject({
+  expect(deriveCompanionStatus({ standalone: true, offlineResult: { complete: true }, workerState: { controlled: true }, state: { setup: { airplaneModeTestCompletedAt: '2026-08-11T12:00:00Z' } } })).toMatchObject({
     setup: 'complete', sharedData: 'current-package', update: 'current'
+  });
+  expect(deriveCompanionStatus({ standalone: true, offlineResult: { complete: true }, workerState: { controlled: true } })).toMatchObject({
+    setup: 'airplane-required', sharedData: 'current-package', update: 'current'
   });
   expect(deriveCompanionStatus({ standalone: false, offlineResult: { complete: true }, workerState: { controlled: true, updateAvailable: true } })).toMatchObject({
     setup: 'incomplete', sharedData: 'stale-package', update: 'available'
@@ -81,12 +84,21 @@ test('an earlier tutorial version reappears once and migrates only the onboardin
 
 test('completed installed setup becomes quiet while update status remains separately labeled', async ({ page }) => {
   await seedCompletedOnboarding(page);
-  await page.addInitScript(() => { globalThis.__COMPANION_TEST_STANDALONE__ = true; });
+  await page.addInitScript(() => {
+    globalThis.__COMPANION_TEST_STANDALONE__ = true;
+    const key = 'mgc-companion-local-state';
+    let state = {};
+    try { state = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch { state = {}; }
+    state.schemaVersion = 4;
+    state.setup = state.setup && typeof state.setup === 'object' ? state.setup : {};
+    state.setup.airplaneModeTestCompletedAt = '2026-08-11T00:00:00.000Z';
+    localStorage.setItem(key, JSON.stringify(state));
+  });
   await page.goto('/');
   await expect(page.locator('.header-setup')).toBeVisible();
   await expect(page.locator('.header-setup')).toHaveText('Phone Setup ✓');
   await expect(page.locator('#install-panel')).toBeHidden();
-  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
+  await expect(page.locator('#home-offline-status')).toHaveText('Complete ✓');
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');
   await expect(page.locator('#home-shared-status')).toContainText(/\d+ days? old by this phone’s clock/);
   await expect(page.locator('#home-shared-status')).toContainText('Recheck changing facts when connectivity is available.');
@@ -273,8 +285,8 @@ test('verification disclosure and Help remain available after successful offline
   await page.goto('/');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
-  await page.getByRole('button', { name: 'Offline Check' }).click();
-  await expect(page.locator('#home-offline-status')).toHaveText('Phone Setup ✓');
+  await page.getByRole('button', { name: 'Offline Check' }).first().click();
+  await expect(page.locator('#home-offline-status')).toHaveText('Airplane Mode Test Required');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#home-shared-status')).toContainText('verified Aug 7, 2026');

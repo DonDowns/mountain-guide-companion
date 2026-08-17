@@ -63,19 +63,53 @@ async function main() {
     readFile(resolve(repoRoot, 'print/field-guide.css'), 'utf8')
   ]);
 
+  let existingArtifact = null;
+  try {
+    existingArtifact = JSON.parse(await readFile(artifactPath, 'utf8'));
+  } catch (e) {}
+
   await mkdir(generatedDirectory, { recursive: true });
   await mkdir(temporaryDirectory, { recursive: true });
   for (const path of [htmlPath, pdfPath, artifactPath, temporaryModelPath]) await rm(path, { force: true });
   await writeFile(temporaryModelPath, JSON.stringify(model, null, 2) + '\n');
 
   const python = resolvePython();
+
   execFileSync(python, [
     resolve(repoRoot, 'scripts/render_field_guide.py'),
     temporaryModelPath,
-    pdfPath
+    pdfPath,
+    '--skip-images'
   ], { cwd: repoRoot, stdio: 'inherit' });
 
   const pdfSha256 = await sha256(pdfPath);
+
+  let imagesMissing = false;
+  for (let page = 1; page <= 3; page++) {
+    try {
+      await readFile(resolve(generatedDirectory, `field-guide-p${page}.png`));
+    } catch (e) {
+      imagesMissing = true;
+    }
+  }
+
+  if (!existingArtifact || existingArtifact.field_guide_pdf_sha256 !== pdfSha256 || imagesMissing) {
+    execFileSync(python, [
+      resolve(repoRoot, 'scripts/render_field_guide.py'),
+      temporaryModelPath,
+      pdfPath,
+      '--images-only'
+    ], { cwd: repoRoot, stdio: 'inherit' });
+  }
+
+  const pageImages = await Promise.all([1, 2, 3].map(async page => {
+    const pagePath = `generated/field-guide-p${page}.png`;
+    return {
+      page,
+      path: pagePath,
+      sha256: await sha256(resolve(generatedDirectory, `field-guide-p${page}.png`))
+    };
+  }));
   const artifactRecord = {
     artifact_id: model.artifact.artifact_id,
     artifact_status: model.artifact.artifact_status,
@@ -89,7 +123,8 @@ async function main() {
     generated_at: model.provenance.generatedAt,
     page_count: model.artifact.page_count,
     page_size: model.artifact.page_size,
-    orientation: model.artifact.orientation
+    orientation: model.artifact.orientation,
+    page_images: pageImages
   };
   const html = template
     .replace('{{DOCUMENT_TITLE}}', escapeHtml(`${model.trip.name} - Printable Field Guide`))

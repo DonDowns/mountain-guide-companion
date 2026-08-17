@@ -22,7 +22,8 @@
     </a>
     <div class="header-actions">
       <button class="quiet-button" type="button" data-action="toggle-red" aria-pressed="false">Red Mode · Off</button>
-      <button class="quiet-button" type="button" data-action="share">Share</button>
+      <button class="quiet-button" type="button" data-action="share-companion">Share Companion</button>
+      <button class="quiet-button" type="button" data-action="show-qr">Show QR Code</button>
       <button class="quiet-button header-setup" type="button" data-action="show-setup">Prepare this phone</button>
     </div>
   </header>
@@ -42,7 +43,8 @@
         <button class="secondary-button" id="home-secondary-action" type="button" data-action="open-companion">Continue in Browser</button>
       </div>
       <div class="welcome-link-actions">
-        <button class="quiet-button" type="button" data-action="share">Share Companion</button>
+        <button class="quiet-button" type="button" data-action="share-companion">Share Companion</button>
+        <button class="quiet-button" type="button" data-action="show-qr">Show QR Code</button>
         <a class="quiet-button" id="return-to-mountain-guide" href="https://mountainguide.vondadowns.com/" hidden>Return to Mountain Guide</a>
       </div>
       <p class="release-note">Physical phone testing is still required. This is not yet a field release.</p>
@@ -86,6 +88,25 @@
         <h2 id="timeline-title">Timeline</h2>
         <p class="safety-invariant" id="weather-invariant"></p>
       </div>
+      <section class="weather-snapshot-card" id="weather-snapshot" aria-labelledby="weather-snapshot-title">
+        <div class="weather-snapshot-header">
+          <div>
+            <p class="eyebrow">PACKAGED WEATHER EVIDENCE</p>
+            <h3 id="weather-snapshot-title">Weather Snapshot</h3>
+          </div>
+          <span class="age-badge" id="weather-snapshot-age">Checking age…</span>
+        </div>
+        <p class="weather-snapshot-summary" id="weather-snapshot-summary"></p>
+        <div class="weather-snapshot-meta">
+          <div class="meta-item"><small>FORECAST SOURCE</small><strong id="weather-snapshot-source"></strong></div>
+          <div class="meta-item"><small>SNAPSHOT TIME</small><strong id="weather-snapshot-time"></strong></div>
+        </div>
+        <div class="weather-locations" id="weather-snapshot-locations"></div>
+        <p class="boundary-note weather-snapshot-invariant" id="weather-snapshot-invariant">Weather is evidence, not permission.</p>
+        <div class="weather-snapshot-actions">
+          <button class="secondary-button" type="button" data-action="check-shared-update">Check for Updated Shared Information</button>
+        </div>
+      </section>
       <div id="objective-selector" class="objective-selector" aria-label="Select current objective"></div>
       <div id="selected-objective" class="selected-objective"></div>
       <section class="decision-section" tabindex="-1" aria-labelledby="decision-title">
@@ -203,10 +224,14 @@
     </section>
 
     <section class="app-view artifact-view" id="artifact-view" data-view="artifact" tabindex="-1" aria-labelledby="artifact-header-title" hidden>
-      <header class="artifact-header" id="artifact-header-title">
+      <header class="artifact-header">
         <button class="quiet-button back-to-companion" type="button" data-action="back-to-companion">‹ Back to Companion</button>
+        <h2 id="artifact-header-title" class="artifact-title">Artifact Document</h2>
+        <div class="artifact-header-actions" id="artifact-header-actions">
+          <a class="quiet-button download-pdf-button" id="artifact-download-pdf" href="#companion-home" download target="_blank" rel="noopener">Download PDF</a>
+        </div>
       </header>
-      <iframe id="artifact-frame" class="artifact-frame" title="Artifact Document"></iframe>
+      <div id="artifact-document-container" class="artifact-document-container" tabindex="0" role="region" aria-label="Document Pages"></div>
     </section>
   </main>
 
@@ -230,6 +255,21 @@
         <button class="secondary-button" id="companion-onboarding-back" type="button" data-action="tutorial-back">Back</button>
         <button class="quiet-button" type="button" data-action="dismiss-tutorial">Skip for now</button>
         <button class="primary-button" id="companion-onboarding-next" type="button" data-action="tutorial-next">Next</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="qr-overlay" id="companion-qr-overlay" hidden>
+    <section class="qr-sheet" role="dialog" aria-modal="true" aria-labelledby="companion-qr-title" aria-describedby="companion-qr-body">
+      <button class="qr-close" type="button" data-action="dismiss-qr" aria-label="Dismiss QR code">×</button>
+      <p class="eyebrow">SHARE COMPANION</p>
+      <h2 id="companion-qr-title">Scan QR Code</h2>
+      <p id="companion-qr-body">Scan with another phone’s camera to open the public Mountain Guide Companion.</p>
+      <div id="companion-qr-container" class="qr-container" aria-label="QR Code for Companion public URL"></div>
+      <p class="qr-url" id="companion-qr-url"></p>
+      <div class="qr-actions">
+        <button class="secondary-button" type="button" data-action="share-companion">Share Companion Link</button>
+        <button class="primary-button" type="button" data-action="dismiss-qr">Done</button>
       </div>
     </section>
   </div>

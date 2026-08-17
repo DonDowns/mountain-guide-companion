@@ -1,10 +1,10 @@
 {
   "name": "mountain-guide-companion",
-  "version": "0.6.0-candidate.11",
+  "version": "0.6.0-candidate.13",
   "private": true,
   "type": "module",
   "companion_phase": {
-    "name": "candidate-11-physical-iphone-ux-repair",
+    "name": "candidate-13-share-and-update-discovery",
     "runtime_allowed": true,
     "print_artifacts_allowed": true
   },

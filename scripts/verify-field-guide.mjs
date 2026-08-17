@@ -50,6 +50,15 @@ async function main() {
     if (artifact[key] !== value) errors.push(`artifact record ${key} mismatch`);
   }
   if (artifact.field_guide_pdf_sha256 !== pdfHash) errors.push('artifact record PDF SHA-256 mismatch');
+  if (!Array.isArray(artifact.page_images) || artifact.page_images.length !== 3) {
+    errors.push('artifact record missing 3 page_images');
+  } else {
+    for (const item of artifact.page_images) {
+      const imgPath = resolve(repoRoot, item.path);
+      const imgHash = await sha256(imgPath);
+      if (imgHash !== item.sha256) errors.push(`${item.path} hash mismatch`);
+    }
+  }
 
   const publicLiterals = new Set([
     model.provenance.dataVersion,

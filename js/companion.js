@@ -11,8 +11,8 @@ import {
 } from './companion-help.js';
 import {
   companionData, createMilestoneMessage, navigateHome, navigateTo, parseOperationalDateTimeInput, releaseMetadata,
-  renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed, renderRoutes, renderSetupPanel,
-  renderStaticIdentity, renderTimeline, scrollCurrentViewToTop, setRedDisplay, showToast
+  renderArtifactDocument, renderArtifacts, renderCompanionHome, renderEmergency, renderObjectiveContext, refreshElapsed,
+  renderQrCodeSvg, renderRoutes, renderSetupPanel, renderStaticIdentity, renderTimeline, scrollCurrentViewToTop, setRedDisplay, showToast
 } from './companion-ui.js';
 
 const store = createCompanionStore(companionData.objectives[0].id);
@@ -50,9 +50,11 @@ function renderState(state = store.getState()) {
   renderCompanionHome(store.getState(), isStandalone(), workerState, offlineResult);
 }
 
+let qrReturnFocus = null;
+
 function setOnboardingBackgroundInert(inert) {
   for (const child of document.body.children) {
-    if (child.id === 'companion-onboarding' || child.tagName === 'SCRIPT') continue;
+    if (child.id === 'companion-onboarding' || child.id === 'companion-qr-overlay' || child.tagName === 'SCRIPT') continue;
     if (inert && !child.inert) {
       child.inert = true;
       child.dataset.onboardingInert = 'true';
@@ -61,6 +63,31 @@ function setOnboardingBackgroundInert(inert) {
       delete child.dataset.onboardingInert;
     }
   }
+}
+
+function openQrModal(trigger = null) {
+  const overlay = document.querySelector('#companion-qr-overlay');
+  if (!overlay) return;
+  const active = trigger || document.activeElement;
+  qrReturnFocus = active && active !== document.body ? active : document.querySelector('#home-primary-action');
+  const container = document.querySelector('#companion-qr-container');
+  const urlDisplay = document.querySelector('#companion-qr-url');
+  if (urlDisplay) urlDisplay.textContent = releaseMetadata.pwa_url;
+  if (container) renderQrCodeSvg(container, releaseMetadata.pwa_url);
+  overlay.hidden = false;
+  setOnboardingBackgroundInert(true);
+  document.body.style.overflow = 'hidden';
+  globalThis.setTimeout(() => overlay.querySelector('button[data-action="dismiss-qr"]')?.focus(), 0);
+}
+
+function closeQrModal() {
+  const overlay = document.querySelector('#companion-qr-overlay');
+  if (!overlay || overlay.hidden) return;
+  overlay.hidden = true;
+  setOnboardingBackgroundInert(false);
+  document.body.style.overflow = '';
+  const target = qrReturnFocus?.isConnected ? qrReturnFocus : document.querySelector('#home-primary-action');
+  target?.focus?.({ preventScroll: true });
 }
 
 function openOnboarding(trigger = null) {
@@ -164,8 +191,8 @@ async function handleAction(action, button) {
     navigateHome();
   }
   if (action === 'open-artifact') {
-    const url = button.dataset.url;
-    document.querySelector('#artifact-frame').src = url;
+    const url = button.dataset.url || '';
+    renderArtifactDocument(url);
     navigateTo('artifact');
     history.pushState({ artifact: url }, '', '#artifact=' + encodeURIComponent(url));
   }
@@ -184,9 +211,15 @@ async function handleAction(action, button) {
   if (action === 'toggle-red') {
     store.update(state => { state.redDisplay = !state.redDisplay; });
   }
-  if (action === 'share') {
+  if (action === 'share' || action === 'share-companion') {
     const result = await sharePublicCompanion(releaseMetadata.pwa_url, 'Mountain Guide Companion');
     if (result.completed) showToast(result.method === 'share' ? 'Share sheet opened with the public Companion link.' : 'Public Companion link copied.');
+  }
+  if (action === 'show-qr') {
+    openQrModal(button);
+  }
+  if (action === 'dismiss-qr') {
+    closeQrModal();
   }
   if (action === 'install') {
     const result = await requestInstall();
@@ -218,6 +251,7 @@ async function handleAction(action, button) {
     store.update(state => { state.setup.airplaneModeTestCompletedAt = ''; });
   }
   if (action === 'activate-update') {
+    try { sessionStorage.setItem('mgc-update-installed-toast', 'true'); } catch {}
     const activated = await activateWaitingUpdate();
     if (!activated) showToast('No downloaded update is waiting.');
   }
@@ -321,7 +355,9 @@ async function handleAction(action, button) {
     document.querySelector('[name="pending-objective"]:checked')?.focus();
   }
   if (action === 'confirm-objective') {
-    const objective = companionData.objectives.find(item => item.id === pendingObjectiveId);
+    const checkedRadio = document.querySelector('input[name="pending-objective"]:checked');
+    const targetId = checkedRadio ? checkedRadio.value : pendingObjectiveId;
+    const objective = companionData.objectives.find(item => item.id === targetId);
     if (!objective) return;
     objectiveSelectorOpen = false;
     pendingObjectiveId = '';
@@ -416,6 +452,7 @@ function bindEvents() {
   });
 
   document.addEventListener('input', event => {
+    if (event.target.name === 'pending-objective') pendingObjectiveId = event.target.value;
     if (event.target.id === 'companion-help-search') renderCompanionHelpTopics(event.target.value);
     if (event.target.matches('[data-local-field="statusNote"]')) {
       const value = event.target.value;
@@ -463,6 +500,31 @@ function bindEvents() {
   }
 
   document.addEventListener('keydown', event => {
+    const qrOverlay = document.querySelector('#companion-qr-overlay');
+    if (qrOverlay && !qrOverlay.hidden) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeQrModal();
+        return;
+      }
+      if (event.key === 'Tab') {
+        const controls = [...qrOverlay.querySelectorAll('button:not([hidden]):not([disabled])')];
+        const first = controls[0];
+        const last = controls.at(-1);
+        if (!controls.includes(document.activeElement)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first)?.focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+      return;
+    }
+
     const overlay = document.querySelector('#companion-onboarding');
     if (!overlay || overlay.hidden) return;
     if (event.key === 'Escape') {
@@ -497,6 +559,13 @@ bindEvents();
 watchInstallPrompt(() => renderState());
 store.subscribe(renderState);
 
+try {
+  if (sessionStorage.getItem('mgc-update-installed-toast') === 'true') {
+    sessionStorage.removeItem('mgc-update-installed-toast');
+    showToast('Update successfully installed.');
+  }
+} catch {}
+
 if (store.getState().setup.onboarding.version !== COMPANION_ONBOARDING_VERSION) {
   globalThis.setTimeout(() => openOnboarding(), 0);
 }
@@ -504,7 +573,7 @@ if (store.getState().setup.onboarding.version !== COMPANION_ONBOARDING_VERSION) 
 const initialHash = globalThis.location.hash;
 if (initialHash.startsWith('#artifact=')) {
   const url = decodeURIComponent(initialHash.slice(10));
-  document.querySelector('#artifact-frame').src = url;
+  renderArtifactDocument(url);
   navigateTo('artifact');
 }
 
@@ -515,12 +584,23 @@ globalThis.addEventListener('popstate', (event) => {
   const hash = globalThis.location.hash;
   if (hash.startsWith('#artifact=')) {
     const url = decodeURIComponent(hash.slice(10));
-    document.querySelector('#artifact-frame').src = url;
+    renderArtifactDocument(url);
     navigateTo('artifact');
   } else if (document.querySelector('#artifact-view:not([hidden])')) {
     navigateHome({ focus: false });
     const overview = document.querySelector('.artifact-overview') || document.querySelector('#artifact-cards');
     overview?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+});
+
+let lastForegroundCheck = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && navigator.onLine) {
+    const now = Date.now();
+    if (now - lastForegroundCheck > 3000) {
+      lastForegroundCheck = now;
+      checkForCompanionUpdate();
+    }
   }
 });
 

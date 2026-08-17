@@ -11,5 +11,22 @@
   "generated_at": "2026-08-07T08:49:53Z",
   "page_count": 3,
   "page_size": "US Letter",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "page_images": [
+    {
+      "page": 1,
+      "path": "generated/field-guide-p1.png",
+      "sha256": "0f918ff956e2b35813912c7dddb68496052065f44e2c7076259c016ac650a27b"
+    },
+    {
+      "page": 2,
+      "path": "generated/field-guide-p2.png",
+      "sha256": "00f3593ed712f23f14578cc5e6e4e2f5be0b909d0d2f5f2d9de345f6a096a726"
+    },
+    {
+      "page": 3,
+      "path": "generated/field-guide-p3.png",
+      "sha256": "ec786cbcdef2bc6ef5038744589363fadae6ecef7b0b7168fd4d610893c05140"
+    }
+  ]
 }

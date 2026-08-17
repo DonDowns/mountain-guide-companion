@@ -1189,6 +1189,18 @@ test('delivered Content-Type is mandatory, validated by family, and preserved in
       path: 'generated/field-guide.pdf',
       varied: 'Application/PDF',
       run: value => verify(files, { fetchResourceImpl: contentTypeOverrideLoader(files, 'generated/field-guide.pdf', value, 'CoNtEnT-TyPe') })
+    },
+    {
+      name: 'Field Guide PNG',
+      path: 'generated/field-guide-p1.png',
+      varied: 'Image/PNG',
+      run: value => verify(files, { fetchResourceImpl: contentTypeOverrideLoader(files, 'generated/field-guide-p1.png', value, 'CoNtEnT-TyPe') })
+    },
+    {
+      name: 'Pocket Card PNG',
+      path: 'generated/pocket-card-p1.png',
+      varied: 'Image/PNG',
+      run: value => verify(files, { fetchResourceImpl: contentTypeOverrideLoader(files, 'generated/pocket-card-p1.png', value, 'CoNtEnT-TyPe') })
     }
   ];
 
@@ -2615,6 +2627,100 @@ test('resource count, byte-count, and checksum integrity checks remain enforced'
   await t.test('resource count', () => assert.rejects(verify(missingResource), /deployed offline-bundle\.json differs from the validated commit/));
   await t.test('byte count', () => assert.rejects(verify(replaceFile(files, resource.path, Buffer.concat([original, Buffer.from('x')]))), /live integrity mismatch/));
   await t.test('checksum at same byte count', () => assert.rejects(verify(replaceFile(files, resource.path, changedSameLength)), /live integrity mismatch/));
+});
+
+test('PNG resource MIME, path, hash, and integrity policies enforce fail-closed verification', async t => {
+  const { bundle, files } = await deploymentFiles();
+  const pngResources = bundle.resources.filter(resource => resource.path.endsWith('.png'));
+  assert.equal(pngResources.length, 5);
+
+  await t.test('all approved Field Guide PNG resources with image/png are accepted', async () => {
+    const fieldGuidePngs = ['generated/field-guide-p1.png', 'generated/field-guide-p2.png', 'generated/field-guide-p3.png'];
+    for (const path of fieldGuidePngs) {
+      assert.equal(expectedDeliveredContentType(path), 'image/png');
+    }
+    const verified = await verify(files);
+    assert.ok(verified.verifiedResourceCount >= 5);
+  });
+
+  await t.test('all approved Pocket Card PNG resources with image/png are accepted', async () => {
+    const pocketCardPngs = ['generated/pocket-card-p1.png', 'generated/pocket-card-p2.png'];
+    for (const path of pocketCardPngs) {
+      assert.equal(expectedDeliveredContentType(path), 'image/png');
+    }
+    const verified = await verify(files);
+    assert.ok(verified.verifiedResourceCount >= 5);
+  });
+
+  for (const wrongMime of ['image/jpeg', 'text/plain', 'application/pdf', 'image/svg+xml', 'application/octet-stream']) {
+    await t.test(`approved Field Guide PNG with wrong MIME ${wrongMime} fails closed`, async () => {
+      await assert.rejects(
+        verify(files, { fetchResourceImpl: contentTypeOverrideLoader(files, 'generated/field-guide-p1.png', wrongMime) }),
+        /generated\/field-guide-p1\.png returned unsupported Content-Type/
+      );
+    });
+    await t.test(`approved Pocket Card PNG with wrong MIME ${wrongMime} fails closed`, async () => {
+      await assert.rejects(
+        verify(files, { fetchResourceImpl: contentTypeOverrideLoader(files, 'generated/pocket-card-p1.png', wrongMime) }),
+        /generated\/pocket-card-p1\.png returned unsupported Content-Type/
+      );
+    });
+  }
+
+  await t.test('unapproved PNG path in request fails closed', async () => {
+    const allowed = new Set(bundle.resources.map(r => r.path));
+    assert.throws(() => canonicalDeploymentPath('generated/unapproved.png', testUrl, allowed));
+    assert.throws(() => canonicalDeploymentPath('images/extra.png', testUrl, allowed));
+  });
+
+  await t.test('unapproved PNG resource in offline bundle fails closed', async () => {
+    const forgedBundle = {
+      ...bundle,
+      resources: [
+        ...bundle.resources,
+        {
+          path: 'generated/unapproved.png',
+          sha256: '0'.repeat(64),
+          bytes: 100,
+          role: 'field-guide-page-image',
+          required: true
+        }
+      ]
+    };
+    let forgedFiles = replaceFile(files, 'offline-bundle.json', JSON.stringify(forgedBundle));
+    forgedFiles = replaceFile(forgedFiles, 'generated/unapproved.png', Buffer.from('unapproved'));
+    await assert.rejects(verify(forgedFiles), /deployed offline-bundle\.json differs from the validated commit/);
+  });
+
+  await t.test('approved Field Guide PNG with wrong byte count fails closed', async () => {
+    const originalBytes = files.get('generated/field-guide-p1.png');
+    const truncatedBytes = originalBytes.subarray(0, originalBytes.length - 1);
+    const corruptedFiles = replaceFile(files, 'generated/field-guide-p1.png', truncatedBytes);
+    await assert.rejects(verify(corruptedFiles), /generated\/field-guide-p1\.png live integrity mismatch/);
+  });
+
+  await t.test('approved Pocket Card PNG with wrong byte count fails closed', async () => {
+    const originalBytes = files.get('generated/pocket-card-p1.png');
+    const truncatedBytes = originalBytes.subarray(0, originalBytes.length - 1);
+    const corruptedFiles = replaceFile(files, 'generated/pocket-card-p1.png', truncatedBytes);
+    await assert.rejects(verify(corruptedFiles), /generated\/pocket-card-p1\.png live integrity mismatch/);
+  });
+
+  await t.test('approved Field Guide PNG with hash mismatch at identical byte count fails closed', async () => {
+    const originalBytes = files.get('generated/field-guide-p1.png');
+    const corruptedBytes = Buffer.from(originalBytes);
+    corruptedBytes[corruptedBytes.length - 1] ^= 0xff;
+    const corruptedFiles = replaceFile(files, 'generated/field-guide-p1.png', corruptedBytes);
+    await assert.rejects(verify(corruptedFiles), /generated\/field-guide-p1\.png live integrity mismatch/);
+  });
+
+  await t.test('approved Pocket Card PNG with hash mismatch at identical byte count fails closed', async () => {
+    const originalBytes = files.get('generated/pocket-card-p1.png');
+    const corruptedBytes = Buffer.from(originalBytes);
+    corruptedBytes[corruptedBytes.length - 1] ^= 0xff;
+    const corruptedFiles = replaceFile(files, 'generated/pocket-card-p1.png', corruptedBytes);
+    await assert.rejects(verify(corruptedFiles), /generated\/pocket-card-p1\.png live integrity mismatch/);
+  });
 });
 
 test('CI and Pages prove pinned local-only Playwright installation and local injected execution', async () => {

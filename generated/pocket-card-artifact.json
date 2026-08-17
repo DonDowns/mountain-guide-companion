@@ -19,5 +19,19 @@
   "sides": [
     "front",
     "back"
+  ],
+  "page_images": [
+    {
+      "page": 1,
+      "side": "front",
+      "path": "generated/pocket-card-p1.png",
+      "sha256": "a36a1f6810af511b480aba370ffeb9211d1c990a5c1aaa8d5edfedb2cd552b08"
+    },
+    {
+      "page": 2,
+      "side": "back",
+      "path": "generated/pocket-card-p2.png",
+      "sha256": "86d148c45db91a2b50e31304766edc2e81da87cc4b8c440f59a264de5ad97645"
+    }
   ]
 }

@@ -345,10 +345,20 @@ def page_three(pdf, model):
 
 
 def main():
-    if len(sys.argv) != 3:
-        raise SystemExit('Usage: render_field_guide.py MODEL_JSON OUTPUT_PDF')
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
+        raise SystemExit('Usage: render_field_guide.py MODEL_JSON OUTPUT_PDF [--skip-images|--images-only]')
     model_path = Path(sys.argv[1])
     output_path = Path(sys.argv[2])
+    
+    if '--images-only' in sys.argv:
+        import pypdfium2 as pdfium
+        doc = pdfium.PdfDocument(str(output_path))
+        for i in range(len(doc)):
+            page = doc[i]
+            image = page.render(scale=2).to_pil()
+            page_path = output_path.parent / f"{output_path.stem}-p{i+1}.png"
+            image.save(str(page_path), format="PNG", optimize=True)
+        return
     model = json.loads(model_path.read_text())
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -369,6 +379,14 @@ def main():
     page_two(pdf, model)
     page_three(pdf, model)
     pdf.save()
+
+    if '--skip-images' not in sys.argv:
+        import pypdfium2 as pdfium
+        doc = pdfium.PdfDocument(str(output_path))
+        for i, page in enumerate(doc):
+            image = page.render(scale=2).to_pil()
+            page_path = output_path.parent / f"field-guide-p{i+1}.png"
+            image.save(str(page_path), format="PNG", optimize=True)
 
 
 if __name__ == '__main__':

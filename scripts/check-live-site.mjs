@@ -27,7 +27,8 @@ const deliveredMimeTypes = new Map([
   ['.json', ['application/json']],
   ['.webmanifest', ['application/manifest+json', 'application/json']],
   ['.svg', ['image/svg+xml']],
-  ['.pdf', ['application/pdf']]
+  ['.pdf', ['application/pdf']],
+  ['.png', ['image/png']]
 ]);
 
 function extensionFor(path) {

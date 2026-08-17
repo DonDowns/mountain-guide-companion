@@ -17,7 +17,12 @@ const deployablePaths = [
   'icons',
   'data/trip-manifest.json',
   'generated/field-guide.pdf',
-  'generated/pocket-card.pdf'
+  'generated/field-guide-p1.png',
+  'generated/field-guide-p2.png',
+  'generated/field-guide-p3.png',
+  'generated/pocket-card.pdf',
+  'generated/pocket-card-p1.png',
+  'generated/pocket-card-p2.png'
 ];
 
 async function copyPath(path) {

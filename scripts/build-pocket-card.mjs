@@ -49,15 +49,48 @@ async function main() {
     readFile(resolve(repoRoot, 'pocket-card/pocket-card.template.html'), 'utf8'),
     readFile(resolve(repoRoot, 'pocket-card/pocket-card.css'), 'utf8')
   ]);
+  let existingArtifact = null;
+  try {
+    existingArtifact = JSON.parse(await readFile(artifactPath, 'utf8'));
+  } catch (e) {}
+
   await mkdir(generatedDirectory, { recursive: true });
   await mkdir(temporaryDirectory, { recursive: true });
   for (const path of [htmlPath, pdfPath, artifactPath, temporaryModelPath]) await rm(path, { force: true });
   await writeFile(temporaryModelPath, JSON.stringify(model, null, 2) + '\n');
-  execFileSync(resolvePython(), [
-    resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath
+
+  const python = resolvePython();
+
+  execFileSync(python, [
+    resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath, '--skip-images'
   ], { cwd: repoRoot, stdio: 'inherit' });
 
   const pdfSha256 = await sha256(pdfPath);
+
+  let imagesMissing = false;
+  for (const page of [1, 2]) {
+    try {
+      await readFile(resolve(generatedDirectory, `pocket-card-p${page}.png`));
+    } catch (e) {
+      imagesMissing = true;
+    }
+  }
+
+  if (!existingArtifact || existingArtifact.pocket_card_pdf_sha256 !== pdfSha256 || imagesMissing) {
+    execFileSync(python, [
+      resolve(repoRoot, 'scripts/render_pocket_card.py'), temporaryModelPath, pdfPath, '--images-only'
+    ], { cwd: repoRoot, stdio: 'inherit' });
+  }
+
+  const pageImages = await Promise.all([
+    { page: 1, side: 'front', filename: 'pocket-card-p1.png' },
+    { page: 2, side: 'back', filename: 'pocket-card-p2.png' }
+  ].map(async item => ({
+    page: item.page,
+    side: item.side,
+    path: `generated/${item.filename}`,
+    sha256: await sha256(resolve(generatedDirectory, item.filename))
+  })));
   const artifactRecord = {
     artifact_id: model.artifact.artifact_id,
     artifact_status: model.artifact.artifact_status,
@@ -73,7 +106,8 @@ async function main() {
     page_size: model.artifact.page_size,
     page_size_points: [252, 360],
     orientation: model.artifact.orientation,
-    sides: ['front', 'back']
+    sides: ['front', 'back'],
+    page_images: pageImages
   };
   const html = template
     .replace('{{DOCUMENT_TITLE}}', 'Emergency &amp; Communication Pocket Card')

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "bundle_id": "ddmg-companion-0-6-0-candidate-11-data-3cda95d4e6b1-b1",
+  "bundle_id": "ddmg-companion-0-6-0-candidate-13-data-3cda95d4e6b1-b1",
   "cache_namespace": "ddmg-companion",
-  "companion_version": "0.6.0-candidate.11",
+  "companion_version": "0.6.0-candidate.13",
   "data_version": "1.0.0",
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "cabbf176ccb763012bcf4ea3c1cd9532a3313e64a900f9b8629129850e0ab4c4",
+  "bundle_content_sha256": "5d7dcc1fa2485932056d21e5343d3f72b877a19ad08f71bd148f2c3866da8a3c",
   "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
-  "entry_count": 16,
-  "total_bytes": 228843,
+  "entry_count": 21,
+  "total_bytes": 1693410,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -20,15 +20,15 @@
   "resources": [
     {
       "path": "index.html",
-      "sha256": "13a417772bc146df3126356bdd42cbcf235cafe52339fdd300860a9f0d935510",
-      "bytes": 15902,
+      "sha256": "2f1cf199002c8f8130577133c572bdebca146796fb0a8429cbdf0b931ba24cf8",
+      "bytes": 18645,
       "role": "application-shell",
       "required": true
     },
     {
       "path": "css/companion.css",
-      "sha256": "597f996b91dea995770ec3c5face8010bb7335c673731ea1b2747b80580fc48d",
-      "bytes": 28340,
+      "sha256": "ff14726d3aeb8864efcb9d986081b3630645efecfd550d4d80eaa725affeb808",
+      "bytes": 34464,
       "role": "application-style",
       "required": true
     },
@@ -41,8 +41,8 @@
     },
     {
       "path": "js/companion-data.js",
-      "sha256": "73ceb75f439fcc737527d1a7cb0f92be5f736f23a16b99aa5f036195444bc651",
-      "bytes": 14656,
+      "sha256": "d93a43a2a76e8e2b7c41f94c25afba0edc5ff4200bc5d26f7d715b1eec33115e",
+      "bytes": 17179,
       "role": "canonical-runtime-data",
       "required": true
     },
@@ -55,29 +55,29 @@
     },
     {
       "path": "js/companion-help.js",
-      "sha256": "243e16ba4fcf98b43b8326f00224bf10fdafa7f878ae5d195ac65de48f52ee8c",
-      "bytes": 18755,
+      "sha256": "b7016156b69a87c0efbfb812544f862b05163275387dd710f804b0bdff3cce5b",
+      "bytes": 19164,
       "role": "offline-help-and-support",
       "required": true
     },
     {
       "path": "js/companion-install.js",
-      "sha256": "b0fd5ba54bb1d23d5e82172f518a6021b456123b4e6ea434c69fead4b1dc96f5",
-      "bytes": 8618,
+      "sha256": "854b3fad3165dad154d5aef40b281b5b838a244365dddb9755ba7af8ef9eb6fa",
+      "bytes": 8632,
       "role": "install-and-offline-control",
       "required": true
     },
     {
       "path": "js/companion-ui.js",
-      "sha256": "6db03941dfb018816b78b1016b2097124b7c8a96afbff1ff8a7307f37b201820",
-      "bytes": 34054,
+      "sha256": "b4434e304823cea44a20f94d882e3d3d0bbccd77e6cd54d534afca0ca8a66e05",
+      "bytes": 47662,
       "role": "application-ui",
       "required": true
     },
     {
       "path": "js/companion.js",
-      "sha256": "e676d6e079f398964ea70a63bcad5d6d46d17107948c863146d9557063e9778b",
-      "bytes": 21753,
+      "sha256": "c0d97b5c9f74e86d1c9b02cc96020f6acb6fc1ae332918e9574e77faad1788fa",
+      "bytes": 24838,
       "role": "application-controller",
       "required": true
     },
@@ -117,6 +117,27 @@
       "required": true
     },
     {
+      "path": "generated/field-guide-p1.png",
+      "sha256": "0f918ff956e2b35813912c7dddb68496052065f44e2c7076259c016ac650a27b",
+      "bytes": 370707,
+      "role": "field-guide-page-image",
+      "required": true
+    },
+    {
+      "path": "generated/field-guide-p2.png",
+      "sha256": "00f3593ed712f23f14578cc5e6e4e2f5be0b909d0d2f5f2d9de345f6a096a726",
+      "bytes": 374650,
+      "role": "field-guide-page-image",
+      "required": true
+    },
+    {
+      "path": "generated/field-guide-p3.png",
+      "sha256": "ec786cbcdef2bc6ef5038744589363fadae6ecef7b0b7168fd4d610893c05140",
+      "bytes": 290258,
+      "role": "field-guide-page-image",
+      "required": true
+    },
+    {
       "path": "generated/pocket-card.pdf",
       "sha256": "99fbd6b99b3ccaa641bbfc7f5d68244728e22985c373c44db870088b74226958",
       "bytes": 5844,
@@ -124,8 +145,22 @@
       "required": true
     },
     {
+      "path": "generated/pocket-card-p1.png",
+      "sha256": "a36a1f6810af511b480aba370ffeb9211d1c990a5c1aaa8d5edfedb2cd552b08",
+      "bytes": 217423,
+      "role": "pocket-card-page-image",
+      "required": true
+    },
+    {
+      "path": "generated/pocket-card-p2.png",
+      "sha256": "86d148c45db91a2b50e31304766edc2e81da87cc4b8c440f59a264de5ad97645",
+      "bytes": 183023,
+      "role": "pocket-card-page-image",
+      "required": true
+    },
+    {
       "path": "release.json",
-      "sha256": "5fa869d54688fa7c785164fe6afaa738639d8b4e7b0160d0be702368cecf56ae",
+      "sha256": "3924b9ebc35efe11a49c2f00374ef8560597514055ca68e9c45c0f427ecc620c",
       "bytes": 914,
       "role": "release-metadata",
       "required": true
