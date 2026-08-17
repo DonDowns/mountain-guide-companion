@@ -177,6 +177,24 @@ export function renderSetupPanel(target, options) {
   const controlled = workerState.controlled === true;
   const airplaneRecorded = Boolean(state.setup.airplaneModeTestCompletedAt);
   const allGatesComplete = standalone && controlled && offlineVerified && airplaneRecorded;
+
+  const panelKey = JSON.stringify([
+    Boolean(standalone),
+    Boolean(ios),
+    Boolean(promptAvailable),
+    offlineResult?.complete ?? null,
+    offlineResult?.checking ?? null,
+    offlineResult?.attempted ?? null,
+    offlineResult?.error ?? '',
+    Boolean(controlled),
+    Boolean(airplaneRecorded),
+    state?.setup?.airplaneModeTestCompletedAt || ''
+  ]);
+  if (target.dataset.renderKey === panelKey && target.firstElementChild) {
+    return;
+  }
+  target.dataset.renderKey = panelKey;
+
   const eyebrow = element('p', { className: 'eyebrow', text: standalone ? 'OFFLINE SETUP' : 'RECOMMENDED FOR TRIP PARTNERS' });
   const heading = element('h2', { text: allGatesComplete ? 'This Phone Is Ready for Offline Use ✓' : standalone ? 'Finish Preparing This Phone for Offline Use' : 'Phone Setup for Offline Use' });
   const intro = element('p', {
@@ -251,7 +269,7 @@ export function renderSetupPanel(target, options) {
     'Confirm the Pocket Card opens.',
     'Return to the setup screen and record the test.'
   ].map(text => element('li', { text }));
-  children.push(element('details', { className: 'airplane-test', open: (!airplaneRecorded && offlineVerified) || undefined }, [
+  children.push(element('details', { className: 'airplane-test', open: (standalone && !airplaneRecorded && offlineVerified) || undefined }, [
     element('summary', { text: 'View Airplane Mode Test Steps' }),
     element('h3', { text: 'AIRPLANE MODE TEST' }),
     element('ol', {}, airplaneSteps),
@@ -705,6 +723,7 @@ export function navigateTo(view) {
     return;
   }
   document.body.classList.add('companion-open');
+  document.body.getBoundingClientRect();
   for (const section of document.querySelectorAll('[data-view]')) {
     section.hidden = section.dataset.view !== view;
   }
@@ -731,6 +750,7 @@ export function navigateTo(view) {
 
 export function navigateHome({ focus = true } = {}) {
   document.body.classList.remove('companion-open');
+  document.body.getBoundingClientRect();
   for (const section of document.querySelectorAll('[data-view]')) {
     section.hidden = true;
   }

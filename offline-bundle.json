@@ -7,11 +7,11 @@
   "source_release": "v15.3.10",
   "source_commit": "fb711292b2642c2296eb76c0cfe2531606029609",
   "trip_manifest_sha256": "3cda95d4e6b1d5d7138dd2ca3320501d9b59076a0f9c9cfb3e67117ed5384758",
-  "bundle_content_sha256": "2f8ceff3ce1e1e9e23f386411e57ca0367d02356f6ea6c0f73af98cedb28f086",
+  "bundle_content_sha256": "5d7dcc1fa2485932056d21e5343d3f72b877a19ad08f71bd148f2c3866da8a3c",
   "generated_at": "2026-08-11T13:37:49Z",
   "release_status": "candidate",
   "entry_count": 21,
-  "total_bytes": 1692927,
+  "total_bytes": 1693410,
   "pdf_bytes": 18506,
   "retention": {
     "current_complete": 1,
@@ -62,15 +62,15 @@
     },
     {
       "path": "js/companion-install.js",
-      "sha256": "b374748152ce641cf928ed3f858281d30b2d9bc081f973b55d975bdc4a689c11",
-      "bytes": 8744,
+      "sha256": "854b3fad3165dad154d5aef40b281b5b838a244365dddb9755ba7af8ef9eb6fa",
+      "bytes": 8632,
       "role": "install-and-offline-control",
       "required": true
     },
     {
       "path": "js/companion-ui.js",
-      "sha256": "a58a6e249b41a27318985a371796885496db51a68cb06e2cae1714694533bc1f",
-      "bytes": 47067,
+      "sha256": "b4434e304823cea44a20f94d882e3d3d0bbccd77e6cd54d534afca0ca8a66e05",
+      "bytes": 47662,
       "role": "application-ui",
       "required": true
     },
@@ -160,7 +160,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "4aab13af6a73b72ae0b8075dfedc48ebfd25a258a08398f94bb476cd6cbeb2c1",
+      "sha256": "3924b9ebc35efe11a49c2f00374ef8560597514055ca68e9c45c0f427ecc620c",
       "bytes": 914,
       "role": "release-metadata",
       "required": true

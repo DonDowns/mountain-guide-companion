@@ -157,10 +157,9 @@ export async function registerProductionServiceWorker(onChange) {
     });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       const nextController = navigator.serviceWorker.controller;
-      const replacedController = Boolean(observedController && nextController && nextController !== observedController);
       observedController = nextController || observedController;
       publish();
-      if (replacedController && !controllerReloadStarted) {
+      if (updateStatus === 'applying' && !controllerReloadStarted) {
         controllerReloadStarted = true;
         globalThis.location.reload();
       }
