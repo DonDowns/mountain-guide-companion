@@ -49,17 +49,15 @@ async function main() {
     readFile(resolve(repoRoot, 'pocket-card/pocket-card.template.html'), 'utf8'),
     readFile(resolve(repoRoot, 'pocket-card/pocket-card.css'), 'utf8')
   ]);
-  await mkdir(generatedDirectory, { recursive: true });
-  await mkdir(temporaryDirectory, { recursive: true });
-  for (const path of [htmlPath, pdfPath, artifactPath, temporaryModelPath]) await rm(path, { force: true });
-  await writeFile(temporaryModelPath, JSON.stringify(model, null, 2) + '\n');
-
-
-
   let existingArtifact = null;
   try {
     existingArtifact = JSON.parse(await readFile(artifactPath, 'utf8'));
   } catch (e) {}
+
+  await mkdir(generatedDirectory, { recursive: true });
+  await mkdir(temporaryDirectory, { recursive: true });
+  for (const path of [htmlPath, pdfPath, artifactPath, temporaryModelPath]) await rm(path, { force: true });
+  await writeFile(temporaryModelPath, JSON.stringify(model, null, 2) + '\n');
 
   const python = resolvePython();
 
